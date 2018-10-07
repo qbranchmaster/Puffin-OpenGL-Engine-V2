@@ -3,6 +3,8 @@
 
 #include <string>
 
+constexpr auto NULL_OBJ_MSG = "Not initialized object.";
+
 namespace puffin {
     class Exception {
     public:

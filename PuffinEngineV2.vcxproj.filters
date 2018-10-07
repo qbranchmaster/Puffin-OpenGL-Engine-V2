@@ -16,13 +16,31 @@
     <Filter Include="Pliki nagłówkowe\PuffinEngine">
       <UniqueIdentifier>{b5495137-7fe0-4c86-aee6-59d210b79246}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki źródłowe\PuffinEngine">
+      <UniqueIdentifier>{754f23d0-2a1c-487b-8f4a-d9a679669d5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="Src\PuffinEngine\Logger.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Core.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EngineDemo.cpp">
       <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Display.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Configuration.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\System.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +48,21 @@
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
     <ClInclude Include="Inc\PuffinEngine\Exception.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Configuration.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Core.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EngineDemo.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Display.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\System.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
-#ifndef PUFFIN_LOGGER_H
-#define PUFFIN_LOGGER_H
+#ifndef PUFFIN_LOGGER_HPP
+#define PUFFIN_LOGGER_HPP
 
 #include <GL/glew.h>
 
@@ -54,4 +54,4 @@ namespace puffin {
     void logError(std::string source, std::string message);
 } // namespace puffin
 
-#endif // PUFFIN_LOGGER_H
+#endif // PUFFIN_LOGGER_HPP

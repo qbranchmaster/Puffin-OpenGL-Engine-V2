@@ -1,16 +1,13 @@
 #include <iostream>
 
-#include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
+#include "EngineDemo.hpp"
 
 using namespace puffin;
 
 int main() {
-    Logger::instance().enable(true, "puffin_engine.log");
-    Logger::instance().enableTimeStamp(true);
-
     try {
-
+        EngineDemo demo;
+        demo.run();
     } 
     catch (const Exception &ex) {
         std::cerr << ex.what() << std::endl;
