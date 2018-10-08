@@ -10,11 +10,6 @@
 namespace puffin {
     class System {
     public:
-        void initializeGlfw();
-        void terminateGlfw();
-
-        void initializeGlCore();
-
         std::string getGpuVendor() const;
         std::string getGpuName() const;
         std::string getGlslVersion() const;

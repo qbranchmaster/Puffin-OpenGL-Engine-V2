@@ -7,7 +7,7 @@ class EngineDemo : public puffin::Core {
 public:
     EngineDemo();
 
-    void run();
+    void render();
 };
 
 #endif // ENGINE_DEMO_HPP

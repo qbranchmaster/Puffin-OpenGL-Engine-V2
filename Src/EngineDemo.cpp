@@ -8,13 +8,18 @@ EngineDemo::EngineDemo() : Core() {
 
     logInfo("EngineDemo::EngineDemo()", "Creating PuffinEngine instance.");
 
-    configuration()->setDisplaySize(1280, 720);
-    configuration()->setDisplayFullscreen(false);
-    configuration()->setWindowCaption("Puffin Engine Demo");
+    window()->enableFullscreen(false);
+    window()->setCaption("Puffin Engine Demo");
 
-    createDispaly();
+    configuration()->setFrameResolution(1280, 720);
+    configuration()->setMsaaSamples(4);
+    configuration()->setOpenGLVersion(4, 0);
+
+    createRenderer();
+    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,
+        this));
 }
 
-void EngineDemo::run() {
-
+void EngineDemo::render() {
+     
 }

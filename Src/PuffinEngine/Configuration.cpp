@@ -32,27 +32,11 @@ std::pair<GLushort, GLushort> Configuration::getOpenGLVersion() const {
     return gl_version_;
 }
 
-void Configuration::setWindowCaption(std::string caption) {
-    window_caption_ = caption;
+void Configuration::setFrameResolution(GLuint width, GLuint height) {
+    frame_width_ = width;
+    frame_height_ = height;
 }
 
-std::string Configuration::getWindowCaption() const {
-    return window_caption_;
-}
-
-void Configuration::setDisplayFullscreen(GLboolean state) {
-    display_fullscreen_ = state;
-}
-
-GLboolean Configuration::getDisplayFullscreen() const {
-    return display_fullscreen_;
-}
-
-void Configuration::setDisplaySize(GLuint width, GLuint height) {
-    display_width_ = width;
-    display_height_ = height;
-}
-
-std::pair<GLuint, GLuint> Configuration::getDisplaySize() const {
-    return std::make_pair(display_width_, display_height_);
+std::pair<GLuint, GLuint> Configuration::getFrameResolution() const {
+    return std::make_pair(frame_width_, frame_height_);
 }

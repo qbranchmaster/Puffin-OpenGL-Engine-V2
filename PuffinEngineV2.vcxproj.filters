@@ -33,13 +33,16 @@
     <ClCompile Include="Src\EngineDemo.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="Src\PuffinEngine\Display.cpp">
-      <Filter>Pliki źródłowe\PuffinEngine</Filter>
-    </ClCompile>
     <ClCompile Include="Src\PuffinEngine\Configuration.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
     <ClCompile Include="Src\PuffinEngine\System.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\MasterRenderer.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Window.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,10 +62,16 @@
     <ClInclude Include="Inc\EngineDemo.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\PuffinEngine\Display.hpp">
+    <ClInclude Include="Inc\PuffinEngine\System.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\PuffinEngine\System.hpp">
+    <ClInclude Include="Inc\PuffinEngine\MasterRenderer.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Time.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Window.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
   </ItemGroup>

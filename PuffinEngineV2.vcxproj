@@ -146,18 +146,21 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\PuffinEngine\Configuration.cpp" />
     <ClCompile Include="Src\PuffinEngine\Core.cpp" />
-    <ClCompile Include="Src\PuffinEngine\Display.cpp" />
+    <ClCompile Include="Src\PuffinEngine\Window.cpp" />
     <ClCompile Include="Src\PuffinEngine\Logger.cpp" />
+    <ClCompile Include="Src\PuffinEngine\MasterRenderer.cpp" />
     <ClCompile Include="Src\PuffinEngine\System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\EngineDemo.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Configuration.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Core.hpp" />
-    <ClInclude Include="Inc\PuffinEngine\Display.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\Window.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Exception.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Logger.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\MasterRenderer.hpp" />
     <ClInclude Include="Inc\PuffinEngine\System.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\Time.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

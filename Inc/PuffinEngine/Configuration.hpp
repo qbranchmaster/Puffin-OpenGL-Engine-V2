@@ -10,14 +10,8 @@
 namespace puffin {
     class Configuration {
     public:
-        void setDisplaySize(GLuint width, GLuint height);
-        std::pair<GLuint, GLuint> getDisplaySize() const;
-
-        void setDisplayFullscreen(GLboolean state);
-        GLboolean getDisplayFullscreen() const;
-
-        void setWindowCaption(std::string caption);
-        std::string getWindowCaption() const;
+        void setFrameResolution(GLuint width, GLuint height);
+        std::pair<GLuint, GLuint> getFrameResolution() const;
 
         std::vector<GLushort> getSupportedMsaaSamples() const;
         void setMsaaSamples(GLushort samples);
@@ -27,12 +21,9 @@ namespace puffin {
         std::pair<GLushort, GLushort> getOpenGLVersion() const;
 
     private:
-        GLboolean display_fullscreen_{false};
-        GLuint display_width_{1280};
-        GLuint display_height_{720};
-        GLushort msaa_samples_{4};
-
-        std::string window_caption_{"Puffin Engine"};        
+        GLuint frame_width_{1280};
+        GLuint frame_height_{720};
+        GLushort msaa_samples_{4};    
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
     };

@@ -7,7 +7,7 @@ using namespace puffin;
 int main() {
     try {
         EngineDemo demo;
-        demo.run();
+        demo.start();
     } 
     catch (const Exception &ex) {
         std::cerr << ex.what() << std::endl;
