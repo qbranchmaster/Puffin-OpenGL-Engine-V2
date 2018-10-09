@@ -18,8 +18,27 @@ EngineDemo::EngineDemo() : Core() {
     createRenderer();
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,
         this));
+
+    //---
+    GLuint handle = 0;
+    glGenVertexArrays(1, &handle);
+    glBindVertexArray(handle);
+    GLuint vbo = 0;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    std::vector<GLfloat> data = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f};
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(0);
+    //----
 }
 
 void EngineDemo::render() {
-     
+    //---
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);     
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //---
 }

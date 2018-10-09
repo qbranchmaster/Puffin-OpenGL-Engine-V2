@@ -7,6 +7,8 @@ Core::Core() {
     system_.reset(new System());
     window_.reset(new Window(configuration_));
     time_.reset(new Time());
+
+    mesh_manager_.reset(new MeshManager());
 }
 
 void Core::createRenderer() {    
