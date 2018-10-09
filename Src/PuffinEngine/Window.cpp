@@ -18,10 +18,8 @@ Window::Window(ConfigurationPtr configuration) {
 }
 
 Window::~Window() {
-    if (handle_) {
-        glfwTerminate();
-        handle_ = nullptr;
-    }
+    glfwTerminate();
+    handle_ = nullptr;
 }
 
 void Window::createWindow() {
