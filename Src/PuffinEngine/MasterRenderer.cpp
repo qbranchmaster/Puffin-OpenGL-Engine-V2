@@ -58,7 +58,7 @@ void MasterRenderer::stop() {
 
 void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
     if (!function) {
-        logError("MasterRenderer::assignRenderingFunction()",
+        logWarning("MasterRenderer::assignRenderingFunction()",
             "Null rendering function.");
         return;
     }

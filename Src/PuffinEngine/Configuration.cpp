@@ -25,6 +25,7 @@ void Configuration::setMsaaSamples(GLushort samples) {
 }
 
 void Configuration::setOpenGLVersion(GLushort major, GLushort minor) {
+    // TODO: Verify if version is correct
     gl_version_ = std::make_pair(major, minor);
 }
 

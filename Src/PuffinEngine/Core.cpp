@@ -5,10 +5,11 @@ using namespace puffin;
 Core::Core() {
     configuration_.reset(new Configuration());
     system_.reset(new System());
-    window_.reset(new Window(configuration_));
     time_.reset(new Time());
 
     mesh_manager_.reset(new MeshManager());
+
+    window_.reset(new Window(configuration_));
 }
 
 void Core::createRenderer() {    

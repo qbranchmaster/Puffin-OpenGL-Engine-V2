@@ -45,6 +45,12 @@
     <ClCompile Include="Src\PuffinEngine\Window.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Mesh.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\MeshManager.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\PuffinEngine\Logger.hpp">
@@ -74,5 +80,27 @@
     <ClInclude Include="Inc\PuffinEngine\Window.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\FrameBuffer.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\KeyCodes.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Mesh.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Pliki zasobów</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Data\Icon.ico">
+      <Filter>Pliki zasobów</Filter>
+    </Image>
   </ItemGroup>
 </Project>
