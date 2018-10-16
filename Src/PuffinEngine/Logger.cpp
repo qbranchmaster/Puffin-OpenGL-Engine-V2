@@ -82,13 +82,13 @@ void Logger::log(std::string source, std::string message, MessageType type) {
 
     std::string msg_type(10, ' ');
     switch (type) {
-    case MessageType::INFO:
+    case MessageType::Info:
         msg_type.replace(0, 6, "[INFO]");
         break;
-    case MessageType::WARNING:
+    case MessageType::Warning:
         msg_type.replace(0, 9, "[WARNING]");
         break;
-    case MessageType::ERROR:
+    case MessageType::Error:
         msg_type.replace(0, 7, "[ERROR]");
         break;
     }
@@ -114,13 +114,13 @@ void Logger::log(std::string source, std::string message, MessageType type) {
 }
 
 void puffin::logInfo(std::string source, std::string message) {
-    Logger::instance().log(source, message, MessageType::INFO);
+    Logger::instance().log(source, message, MessageType::Info);
 }
 
 void puffin::logWarning(std::string source, std::string message) {
-    Logger::instance().log(source, message, MessageType::WARNING);
+    Logger::instance().log(source, message, MessageType::Warning);
 }
 
 void puffin::logError(std::string source, std::string message) {
-    Logger::instance().log(source, message, MessageType::ERROR);
+    Logger::instance().log(source, message, MessageType::Error);
 }

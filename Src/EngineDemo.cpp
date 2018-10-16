@@ -31,6 +31,11 @@ EngineDemo::EngineDemo() : Core() {
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(0);
+
+    TexturePtr tex(new Texture());
+    tex->loadTexture2D("Data/test.bmp");
+
+    window()->setWindowIcon("Data/test.bmp");
     //----
 }
 
@@ -39,6 +44,6 @@ void EngineDemo::render() {
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);     
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
     //---
 }

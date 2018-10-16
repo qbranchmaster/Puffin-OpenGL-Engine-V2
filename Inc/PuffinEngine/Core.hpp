@@ -9,6 +9,7 @@
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/MeshManager.hpp"
 #include "PuffinEngine/System.hpp"
+#include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Window.hpp"
 
@@ -49,7 +50,7 @@ namespace puffin {
         ConfigurationPtr configuration_;
         MasterRendererPtr master_renderer_;
         MeshManagerPtr mesh_manager_;
-        SystemPtr system_;        
+        SystemPtr system_;
         TimePtr time_;
         WindowPtr window_;
     };

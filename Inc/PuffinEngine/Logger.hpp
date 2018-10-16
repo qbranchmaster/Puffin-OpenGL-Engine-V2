@@ -10,9 +10,9 @@
 
 namespace puffin {
     enum class MessageType {
-        INFO,
-        WARNING,
-        ERROR,
+        Info,
+        Warning,
+        Error,
     };
 
     class Logger {

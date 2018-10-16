@@ -1,6 +1,7 @@
 #include "PuffinEngine/Window.hpp"
 
 #include "PuffinEngine/Exception.hpp"
+#include "PuffinEngine/Texture.hpp"
 
 using namespace puffin;
 
@@ -58,4 +59,15 @@ void Window::enableFullscreen(GLboolean state) {
 
 GLboolean Window::isFullscreen() const {
     return fullscreen_;
+}
+
+void Window::setWindowIcon(std::string path) {
+    Texture icon;
+    icon.loadTexture2D(path);
+    auto size = icon.getSize();
+    
+    img.width = size.first;
+    img.height = size.second;
+    img.pixels = icon.getRawData();
+    glfwSetWindowIcon(handle_, 1, &img);
 }
