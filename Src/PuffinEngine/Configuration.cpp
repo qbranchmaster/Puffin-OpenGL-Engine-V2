@@ -14,7 +14,7 @@ GLushort Configuration::getMsaaSamples() const {
 
 void Configuration::setMsaaSamples(GLushort samples) {
     auto supported_msaa = getSupportedMsaaSamples();
-    if (std::find(supported_msaa.begin(), supported_msaa.end(), samples) == 
+    if (std::find(supported_msaa.begin(), supported_msaa.end(), samples) ==
         supported_msaa.end()) {
         logError("Configuration::setMsaaSamples()", 
             "Invalid MSAA samples value.");
@@ -25,12 +25,20 @@ void Configuration::setMsaaSamples(GLushort samples) {
 }
 
 void Configuration::setOpenGLVersion(GLushort major, GLushort minor) {
-    // TODO: Verify if version is correct
+    // TODO: Verify if version is correct.
     gl_version_ = std::make_pair(major, minor);
 }
 
 std::pair<GLushort, GLushort> Configuration::getOpenGLVersion() const {
     return gl_version_;
+}
+
+void Configuration::enableFullscreen(GLboolean enabled) {
+    fullscreen_ = enabled;
+}
+
+GLboolean Configuration::isFullscreenEnabled() const {
+    return fullscreen_;
 }
 
 void Configuration::setFrameResolution(GLuint width, GLuint height) {

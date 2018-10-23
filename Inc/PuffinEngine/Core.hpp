@@ -7,7 +7,6 @@
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
-#include "PuffinEngine/MeshManager.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
@@ -24,10 +23,6 @@ namespace puffin {
 
         MasterRendererPtr masterRenderer() const {
             return master_renderer_;
-        }
-
-        MeshManagerPtr meshManager() const {
-            return mesh_manager_;
         }
 
         SystemPtr system() const {
@@ -49,7 +44,6 @@ namespace puffin {
     private:
         ConfigurationPtr configuration_;
         MasterRendererPtr master_renderer_;
-        MeshManagerPtr mesh_manager_;
         SystemPtr system_;
         TimePtr time_;
         WindowPtr window_;

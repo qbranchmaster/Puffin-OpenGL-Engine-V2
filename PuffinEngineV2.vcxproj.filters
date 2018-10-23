@@ -48,7 +48,7 @@
     <ClCompile Include="Src\PuffinEngine\Mesh.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
-    <ClCompile Include="Src\PuffinEngine\MeshManager.cpp">
+    <ClCompile Include="Src\PuffinEngine\Texture.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -91,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Texture.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

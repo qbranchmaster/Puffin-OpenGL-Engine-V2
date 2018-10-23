@@ -20,10 +20,14 @@ namespace puffin {
         void setOpenGLVersion(GLushort major, GLushort minor);
         std::pair<GLushort, GLushort> getOpenGLVersion() const;
 
+        void enableFullscreen(GLboolean enabled);
+        GLboolean isFullscreenEnabled() const;
+
     private:
         GLuint frame_width_{1280};
         GLuint frame_height_{720};
-        GLushort msaa_samples_{4};    
+        GLushort msaa_samples_{4};
+        GLboolean fullscreen_{false};
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
     };

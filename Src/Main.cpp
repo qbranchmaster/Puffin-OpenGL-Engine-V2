@@ -8,7 +8,7 @@ int main() {
     try {
         EngineDemo demo;
         demo.start();
-    } 
+    }
     catch (const Exception &ex) {
         std::cerr << ex.what() << std::endl;
         return 1;

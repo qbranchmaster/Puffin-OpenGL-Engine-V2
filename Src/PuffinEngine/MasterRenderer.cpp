@@ -5,10 +5,11 @@
 
 using namespace puffin;
 
-MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time, 
+MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time,
     SystemPtr system) {
     if (!window || !time || !system) {
-        throw Exception("MasterRenderer::MasterRenderer()", NULL_OBJ_MSG);
+        throw Exception("MasterRenderer::MasterRenderer()",
+            "Not initialized object.");
     }
 
     target_window_ = window;
@@ -19,15 +20,15 @@ MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time,
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        throw Exception("MasterRenderer::MasterRenderer()", 
+        throw Exception("MasterRenderer::MasterRenderer()",
             "OpenGL core initialization error.");
     }
 
-    logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " + 
+    logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         system->getGpuVendor());
-    logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " + 
+    logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " +
         system->getGpuName());
-    logInfo("MasterRenderer::MasterRenderer()", "GLSL Version: " + 
+    logInfo("MasterRenderer::MasterRenderer()", "GLSL Version: " +
         system->getGlslVersion());
 }
 
@@ -58,7 +59,7 @@ void MasterRenderer::stop() {
 
 void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
     if (!function) {
-        logWarning("MasterRenderer::assignRenderingFunction()",
+        logError("MasterRenderer::assignRenderingFunction()",
             "Null rendering function.");
         return;
     }

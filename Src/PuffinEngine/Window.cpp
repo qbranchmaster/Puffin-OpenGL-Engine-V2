@@ -1,26 +1,26 @@
 #include "PuffinEngine/Window.hpp"
 
 #include "PuffinEngine/Exception.hpp"
+#include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/Texture.hpp"
 
 using namespace puffin;
 
 Window::Window(ConfigurationPtr configuration) {
     if (!configuration) {
-        throw Exception("Window::Window()", NULL_OBJ_MSG);
+        throw Exception("Window::Window()", "Not initialized object.");
     }
 
     configuration_ = configuration;
 
     if (glfwInit() != GLFW_TRUE) {
-        throw Exception("Window::Window()", 
+        throw Exception("Window::Window()",
             "Window manager initialization error.");
     }
 }
 
 Window::~Window() {
     glfwTerminate();
-    handle_ = nullptr;
 }
 
 void Window::createWindow() {
@@ -34,7 +34,8 @@ void Window::createWindow() {
 
     handle_ = glfwCreateWindow(configuration_->getFrameResolution().first,
         configuration_->getFrameResolution().second, caption_.c_str(),
-        fullscreen_ ? glfwGetPrimaryMonitor() : nullptr, nullptr);
+        configuration_->isFullscreenEnabled() ? glfwGetPrimaryMonitor() :
+        nullptr, nullptr);
     if (!handle_) {
         throw Exception("Window::createWindow()", "Creating window error.");
     }
@@ -43,31 +44,32 @@ void Window::createWindow() {
 }
 
 void Window::setCaption(std::string caption) {
-    caption_ = caption;
-    if (handle_) {
-        glfwSetWindowTitle(handle_, caption_.c_str());
+    if (!handle_) {
+        logError("Window::setCaption()", "Window not created yet.");
+        return;
     }
+
+    caption_ = caption;
+    glfwSetWindowTitle(handle_, caption_.c_str());
 }
 
 std::string Window::getCaption() const {
     return caption_;
 }
 
-void Window::enableFullscreen(GLboolean state) {
-    fullscreen_ = state;
-}
-
-GLboolean Window::isFullscreen() const {
-    return fullscreen_;
-}
-
 void Window::setWindowIcon(std::string path) {
     Texture icon;
-    icon.loadTexture2D(path);
+    if (!icon.loadImage(path)) {
+        return;
+    }
+
+    icon.swapRedBlue();
+
+    GLFWimage img;
     auto size = icon.getSize();
-    
     img.width = size.first;
     img.height = size.second;
     img.pixels = icon.getRawData();
+
     glfwSetWindowIcon(handle_, 1, &img);
 }

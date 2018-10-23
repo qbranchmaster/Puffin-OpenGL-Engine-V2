@@ -18,34 +18,29 @@ namespace puffin {
         Texture();
         ~Texture();
 
-        void loadTexture2D(std::string path);
+        GLboolean loadImage(std::string path);
 
-        std::string getPath() const {
-            return path_;
-        }
+        GLushort getChannelsCount() const;
+        std::string getPath() const;
+        std::pair<GLuint, GLuint> getSize() const;
+        TextureType getType() const;
 
-        TextureType getType() const {
-            return type_;
-        }
+        GLubyte* getRawData() const;
 
-        std::pair<GLuint, GLuint> getSize() const {
-            return std::make_pair(width_, height_);
-        }
-
-        unsigned char* getRawData() const {
-            return img_handle_.accessPixels();
-        }
+        void freeImage();
+        void swapRedBlue();
 
     private:
-        GLuint handle_{0};
-        std::string path_;
+        void fetchChannelsCount();
 
+        GLuint handle_{0};
+        fipImage img_handle_;
+        TextureType type_{TextureType::None};
+
+        std::string path_;
         GLuint width_{0};
         GLuint height_{0};
-
-        fipImage img_handle_;
-
-        TextureType type_{TextureType::None};
+        GLushort channels_{0};
     };
 
     using TexturePtr = std::shared_ptr<Texture>;

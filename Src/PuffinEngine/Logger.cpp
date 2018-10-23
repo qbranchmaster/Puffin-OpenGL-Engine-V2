@@ -23,7 +23,10 @@ void Logger::enable(GLboolean console_enabled, std::string file_name) {
 
 void Logger::disable() {
     if (enabled_) {
-        log_file_.close();
+        if (log_file_.is_open()) {
+            log_file_.close();
+        }
+
         enabled_ = false;
     }
 }
@@ -37,7 +40,7 @@ std::string Logger::getHeader() const {
     std::string separator(header_size, '~');
     std::string header_text = "Puffin Engine Log";
     std::string header(header_size, ' ');
-    header.replace(header_size / 2 - header_text.size() / 2, 
+    header.replace(header_size / 2 - header_text.size() / 2,
         header_text.size(), header_text);
 
     return std::string(separator + "\n" + header + "\n" + separator + "\n");

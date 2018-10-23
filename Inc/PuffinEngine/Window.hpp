@@ -20,9 +20,6 @@ namespace puffin {
         void setCaption(std::string caption);
         std::string getCaption() const;
 
-        void enableFullscreen(GLboolean state);
-        GLboolean isFullscreen() const;
-
         void setWindowIcon(std::string path);
 
     private:
@@ -46,9 +43,6 @@ namespace puffin {
 
         GLFWwindow *handle_{nullptr};
         std::string caption_{"Puffin Window"};
-        GLboolean fullscreen_{false};
-
-        GLFWimage img;
 
         ConfigurationPtr configuration_;
     };
