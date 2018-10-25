@@ -77,6 +77,26 @@ void Texture::swapRedBlue() {
     }
 }
 
+void Texture::flipVertical() {
+    if (!img_handle_.accessPixels()) {
+        logError("Texture::flipVertical()",
+            "Cannot perform this operation on empty image.");
+        return;
+    }
+
+    img_handle_.flipVertical();
+}
+
+void Texture::flipHorizontal() {
+    if (!img_handle_.accessPixels()) {
+        logError("Texture::flipHorizontal()",
+            "Cannot perform this operation on empty image.");
+        return;
+    }
+
+    img_handle_.flipHorizontal();
+}
+
 GLboolean Texture::loadImage(std::string path) {
     if (path.empty()) {
         logError("Texture::loadImage()", "Empty image path.");
@@ -91,7 +111,7 @@ GLboolean Texture::loadImage(std::string path) {
         return false;
     }
 
-    type_ = TextureType::None;
+    type_ = TextureType::RawImage;
     width_ = img_handle_.getWidth();
     height_ = img_handle_.getHeight();
     fetchChannelsCount();

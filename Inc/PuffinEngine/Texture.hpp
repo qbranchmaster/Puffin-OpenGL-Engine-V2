@@ -10,6 +10,7 @@
 namespace puffin {
     enum class TextureType {
         None,
+        RawImage,
         Texture2D,
     };
 
@@ -29,6 +30,8 @@ namespace puffin {
 
         void freeImage();
         void swapRedBlue();
+        void flipVertical();
+        void flipHorizontal();
 
     private:
         void fetchChannelsCount();

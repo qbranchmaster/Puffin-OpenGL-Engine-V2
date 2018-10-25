@@ -64,6 +64,8 @@ void Window::setWindowIcon(std::string path) {
     }
 
     icon.swapRedBlue();
+    icon.flipHorizontal();
+    icon.flipVertical();
 
     GLFWimage img;
     auto size = icon.getSize();

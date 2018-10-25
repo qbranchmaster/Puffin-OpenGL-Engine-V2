@@ -37,15 +37,20 @@ EngineDemo::EngineDemo() : Core() {
 
 void EngineDemo::render() {
     //---
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    //window()->setCaption(std::to_string(time()->getFpsRate()));
     // TODO: high gpu usage 9%, change to release and check,
 
 
 
     //---
+    //updateWindowCaption();
+}
+
+void EngineDemo::updateWindowCaption() {
+    window()->setCaption("Puffin Engine Demo [FPS: " +
+        std::to_string(time()->getFpsRate()) + "]");
 }

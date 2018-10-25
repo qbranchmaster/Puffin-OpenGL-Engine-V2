@@ -8,6 +8,9 @@ public:
     EngineDemo();
 
     void render();
+
+private:
+    void updateWindowCaption();
 };
 
 #endif // ENGINE_DEMO_HPP
