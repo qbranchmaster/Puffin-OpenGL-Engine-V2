@@ -19,6 +19,7 @@ private:
     void updateWindowCaption();
     void createTimers();
     void stopTimers();
+    void pollKeyboard();
 
     puffin::MeshPtr my_mesh;
     puffin::TimerPtr fps_update_timer_;

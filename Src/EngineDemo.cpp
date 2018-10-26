@@ -24,8 +24,10 @@ EngineDemo::EngineDemo() : Core() {
 
     //---
     my_mesh.reset(new Mesh());
-    std::vector<GLfloat> data = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f};
-    my_mesh->setMeshData(data, puffin::VertexDataType::POSITION);
+    std::vector<GLfloat> data = {-0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f};
+    std::vector<GLfloat> color = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    my_mesh->setMeshData(data, 0, 3);
+    my_mesh->setMeshData(color, 1, 3);
     auto en = my_mesh->addEntity();
     en->setVerticesCount(3);
 
@@ -49,6 +51,12 @@ void EngineDemo::stopTimers() {
     fps_update_timer_->stop();
 }
 
+void EngineDemo::pollKeyboard() {
+    if (input()->keyPressed(Key::ESCAPE, false)) {
+        masterRenderer()->stop();
+    }
+}
+
 void EngineDemo::render() {
     //---
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -57,6 +65,7 @@ void EngineDemo::render() {
     my_mesh->draw(0);
     // TODO: high gpu usage 9%, change to release and check
     //---
+    pollKeyboard();
 }
 
 void EngineDemo::updateWindowCaption() {

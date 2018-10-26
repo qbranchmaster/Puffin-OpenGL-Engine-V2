@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 
 #include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Time.hpp"
@@ -16,6 +17,10 @@ namespace puffin {
 
         ConfigurationPtr configuration() const {
             return configuration_;
+        }
+
+        InputPtr input() const {
+            return input_;
         }
 
         MasterRendererPtr masterRenderer() const {
@@ -40,6 +45,7 @@ namespace puffin {
 
     private:
         ConfigurationPtr configuration_;
+        InputPtr input_;
         MasterRendererPtr master_renderer_;
         SystemPtr system_;
         TimePtr time_;

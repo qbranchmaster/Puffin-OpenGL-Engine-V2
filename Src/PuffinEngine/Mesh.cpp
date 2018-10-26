@@ -14,32 +14,21 @@ Mesh::~Mesh() {
     }
 }
 
-void Mesh::setMeshData(std::vector<GLfloat> data, VertexDataType data_type,
-    GLboolean dynamic_draw) {
-    GLboolean buff_not_set = false;
-    if (data_buffers_[data_type] == 0) {
-        glGenBuffers(1, &data_buffers_[data_type]);
-        buff_not_set = true;
+void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
+    GLuint vertex_size, GLboolean dynamic_draw, GLboolean is_indices) {
+    if (data_buffers_[index] == 0) {
+        glGenBuffers(1, &data_buffers_[index]);
     }
 
     glBindVertexArray(handle_);
-    glBindBuffer(data_type == VertexDataType::INDEX ? GL_ELEMENT_ARRAY_BUFFER :
-        GL_ARRAY_BUFFER, handle_);
+    glBindBuffer(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER :
+        GL_ARRAY_BUFFER, data_buffers_[index]);
+    glBufferData(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER :
+        GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(),
+        dynamic_draw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 
-    GLushort vertex_size = 0;
-    switch (data_type) {
-    case VertexDataType::POSITION:
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat),
-            data.data(), dynamic_draw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        vertex_size = 3;
-        break;
-    }
-
-    if (buff_not_set) {
-        glVertexAttribPointer(static_cast<GLushort>(data_type), vertex_size,
-            GL_FLOAT, GL_FALSE, 0, nullptr);
-        glEnableVertexAttribArray(static_cast<GLushort>(data_type));
-    }
+    glVertexAttribPointer(index, vertex_size, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(index);
 }
 
 MeshEntityPtr Mesh::addEntity() {

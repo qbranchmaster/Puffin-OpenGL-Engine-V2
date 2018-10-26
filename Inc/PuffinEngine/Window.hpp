@@ -11,6 +11,7 @@
 
 namespace puffin {
     class Window {
+        friend class Input;
         friend class MasterRenderer;
 
     public:

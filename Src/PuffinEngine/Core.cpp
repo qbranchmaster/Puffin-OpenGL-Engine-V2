@@ -8,6 +8,7 @@ Core::Core() {
     time_.reset(new Time());
 
     window_.reset(new Window(configuration_));
+    input_.reset(new Input(window_));
 }
 
 void Core::createRenderer() {
