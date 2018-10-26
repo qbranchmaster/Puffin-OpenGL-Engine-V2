@@ -25,15 +25,18 @@ EngineDemo::EngineDemo() : Core() {
     //---
     my_mesh.reset(new Mesh());
     std::vector<GLfloat> data = {-0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f};
-    std::vector<GLfloat> color = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    std::vector<GLfloat> coords = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
     my_mesh->setMeshData(data, 0, 3);
-    my_mesh->setMeshData(color, 1, 3);
+    my_mesh->setMeshData(coords, 1, 2);
     auto en = my_mesh->addEntity();
     en->setVerticesCount(3);
 
     basic_shader.reset(new ShaderProgram("Shaders/basic_vs.glsl",
         "Shaders/basic_fs.glsl"));
     basic_shader->activate();
+
+    basic_texture.reset(new Texture());
+    basic_texture->loadTexture2D("Data/Brick.jpg");
     //----
 }
 
@@ -61,6 +64,8 @@ void EngineDemo::render() {
     //---
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
+    basic_texture->bind();
     my_mesh->bind();
     my_mesh->draw(0);
     // TODO: high gpu usage 9%, change to release and check

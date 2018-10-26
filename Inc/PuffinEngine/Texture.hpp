@@ -20,6 +20,15 @@ namespace puffin {
         ~Texture();
 
         GLboolean loadImage(std::string path);
+        GLboolean loadTexture2D(std::string path);
+
+        void bind() {
+            switch (type_) {
+            case TextureType::Texture2D:
+                glBindTexture(GL_TEXTURE_2D, handle_);
+                break;
+            }
+        }
 
         GLushort getChannelsCount() const;
         std::string getPath() const;
