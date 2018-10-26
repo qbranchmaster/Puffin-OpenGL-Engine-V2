@@ -4,11 +4,8 @@
 #include <GL/glew.h>
 
 #include "PuffinEngine/Configuration.hpp"
-#include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/System.hpp"
-#include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Window.hpp"
 

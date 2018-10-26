@@ -20,34 +20,43 @@ EngineDemo::EngineDemo() : Core() {
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
 
-    //---
-    GLuint handle = 0;
-    glGenVertexArrays(1, &handle);
-    glBindVertexArray(handle);
-    GLuint vbo = 0;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    createTimers();
 
+    //---
+    my_mesh.reset(new Mesh());
     std::vector<GLfloat> data = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f};
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
+    my_mesh->setMeshData(data, puffin::VertexDataType::POSITION);
+    auto en = my_mesh->addEntity();
+    en->setVerticesCount(3);
+
+    basic_shader.reset(new ShaderProgram("Shaders/basic_vs.glsl",
+        "Shaders/basic_fs.glsl"));
+    basic_shader->activate();
     //----
+}
+
+EngineDemo::~EngineDemo() {
+    stopTimers();
+}
+
+void EngineDemo::createTimers() {
+    fps_update_timer_.reset(new Timer(std::bind(
+        &EngineDemo::updateWindowCaption, this)));
+    fps_update_timer_->start(1000);
+}
+
+void EngineDemo::stopTimers() {
+    fps_update_timer_->stop();
 }
 
 void EngineDemo::render() {
     //---
-    //glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);
-
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    // TODO: high gpu usage 9%, change to release and check,
-
-
-
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    my_mesh->bind();
+    my_mesh->draw(0);
+    // TODO: high gpu usage 9%, change to release and check
     //---
-    //updateWindowCaption();
 }
 
 void EngineDemo::updateWindowCaption() {
