@@ -23,6 +23,8 @@ namespace puffin {
         GLboolean loadTexture2D(std::string path);
 
         void bind() {
+            // TODO: Check if it is already bound.
+            // TODO: Add unbind.
             switch (type_) {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);

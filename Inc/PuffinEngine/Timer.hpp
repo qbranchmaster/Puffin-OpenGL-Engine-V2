@@ -54,7 +54,7 @@ namespace puffin {
         void timerThread() {
             while (running_) {
                 timeout_func_();
-                std::this_thread::sleep_for(interval_);                
+                std::this_thread::sleep_for(interval_);
             }
         }
 

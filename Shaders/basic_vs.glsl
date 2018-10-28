@@ -5,7 +5,9 @@ layout(location = 1) in vec2 coords;
 
 out vec2 tex_coords;
 
+uniform mat4 model_matrix;
+
 void main() {
     tex_coords = coords;
-    gl_Position = vec4(position, 1.0);
+    gl_Position = model_matrix * vec4(position, 1.0);
 }

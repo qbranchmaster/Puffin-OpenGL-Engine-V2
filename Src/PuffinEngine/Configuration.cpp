@@ -16,7 +16,7 @@ void Configuration::setMsaaSamples(GLushort samples) {
     auto supported_msaa = getSupportedMsaaSamples();
     if (std::find(supported_msaa.begin(), supported_msaa.end(), samples) ==
         supported_msaa.end()) {
-        logError("Configuration::setMsaaSamples()", 
+        logError("Configuration::setMsaaSamples()",
             "Invalid MSAA samples value.");
         return;
     }

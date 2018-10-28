@@ -22,7 +22,7 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
         }
     }
     else {
-        auto pressed = glfwGetKey(target_window_->handle_, 
+        auto pressed = glfwGetKey(target_window_->handle_,
             static_cast<GLint>(key));
 
         if (pressed && key_states_[key] == false) {
@@ -38,19 +38,19 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
 }
 
 GLboolean Input::mouseKeyPressed(MouseButton button) {
-    if (glfwGetMouseButton(target_window_->handle_, 
+    if (glfwGetMouseButton(target_window_->handle_,
         static_cast<GLint>(button))) {
         return true;
     }
-    
+
     return false;
 }
 
-void Input::setCursorPosition(GLdouble x, GLdouble y) {
+void Input::setCursorPosition(GLdouble x, GLdouble y) const {
     glfwSetCursorPos(target_window_->handle_, x, y);
 }
 
-void Input::getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) {
+void Input::getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const {
     GLdouble cur_x = 0;
     GLdouble cur_y = 0;
 

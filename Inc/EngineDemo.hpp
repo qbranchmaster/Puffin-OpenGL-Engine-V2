@@ -7,7 +7,7 @@
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/Texture.hpp"
-#include "PuffinEngine/Timer.h"
+#include "PuffinEngine/Timer.hpp"
 
 class EngineDemo : public puffin::Core {
 public:

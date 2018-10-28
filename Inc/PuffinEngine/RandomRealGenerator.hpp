@@ -9,7 +9,7 @@
 namespace puffin {
     class RandomRealGenerator {
     public:
-        RandomRealGenerator(GLfloat min, GLfloat max) : 
+        RandomRealGenerator(GLfloat min, GLfloat max) :
             distribution_(min, max) {
             min_value_ = min;
             max_value_ = max;

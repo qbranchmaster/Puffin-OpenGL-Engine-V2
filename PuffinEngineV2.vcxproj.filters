@@ -51,6 +51,12 @@
     <ClCompile Include="Src\PuffinEngine\Texture.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Input.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\ShaderProgram.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\PuffinEngine\Logger.hpp">
@@ -93,6 +99,21 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="Inc\PuffinEngine\Texture.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Input.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\MeshEntity.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\ShaderProgram.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\RandomRealGenerator.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Timer.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
   </ItemGroup>

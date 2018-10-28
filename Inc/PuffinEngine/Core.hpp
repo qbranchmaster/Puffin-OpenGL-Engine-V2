@@ -1,8 +1,6 @@
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
-#include <GL/glew.h>
-
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
@@ -51,6 +49,6 @@ namespace puffin {
         TimePtr time_;
         WindowPtr window_;
     };
-} // namespace puffin 
+} // namespace puffin
 
 #endif // PUFFIN_CORE_HPP

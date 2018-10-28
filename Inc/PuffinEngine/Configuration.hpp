@@ -13,9 +13,9 @@ namespace puffin {
         void setFrameResolution(GLuint width, GLuint height);
         std::pair<GLuint, GLuint> getFrameResolution() const;
 
-        std::vector<GLushort> getSupportedMsaaSamples() const;
         void setMsaaSamples(GLushort samples);
         GLushort getMsaaSamples() const;
+        std::vector<GLushort> getSupportedMsaaSamples() const;
 
         void setOpenGLVersion(GLushort major, GLushort minor);
         std::pair<GLushort, GLushort> getOpenGLVersion() const;

@@ -14,8 +14,8 @@ namespace puffin {
 
         GLboolean keyPressed(Key key, GLboolean sticky = true);
         GLboolean mouseKeyPressed(MouseButton button);
-        void setCursorPosition(GLdouble x, GLdouble y);
-        void getCursorPosition(GLfloat &x_pos, GLfloat &y_pos);
+        void setCursorPosition(GLdouble x, GLdouble y) const;
+        void getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const;
 
     private:
         WindowPtr target_window_;

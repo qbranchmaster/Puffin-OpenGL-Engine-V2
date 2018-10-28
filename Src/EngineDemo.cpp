@@ -33,7 +33,9 @@ EngineDemo::EngineDemo() : Core() {
 
     basic_shader.reset(new ShaderProgram("Shaders/basic_vs.glsl",
         "Shaders/basic_fs.glsl"));
-    basic_shader->activate();
+    basic_shader->bind();
+    basic_shader->setUniform("color_filter", glm::vec3(0.8f, 0.3f, 0.5f));
+    basic_shader->setUniform("model_matrix", my_mesh->getModelMatrix());
 
     basic_texture.reset(new Texture());
     basic_texture->loadTexture2D("Data/Brick.jpg");

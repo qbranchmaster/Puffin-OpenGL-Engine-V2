@@ -69,6 +69,7 @@ ShaderProgram::ShaderProgram(std::string vs_path, std::string fs_path) {
         return;
     }
 
+    fetchUniforms();
     logInfo("ShaderProgram::ShaderProgram()", "Shader program link success.");
 }
 
@@ -163,4 +164,34 @@ GLint ShaderProgram::checkProgramLinkStatus() const {
     }
 
     return 0;
+}
+
+void ShaderProgram::fetchUniforms() {
+    std::vector<GLenum> properties;
+    properties.push_back(GL_NAME_LENGTH);
+    properties.push_back(GL_TYPE);
+    properties.push_back(GL_ARRAY_SIZE);
+
+    std::vector<GLint> values(properties.size());
+
+    GLint uniforms_count = 0;
+    glGetProgramInterfaceiv(handle_, GL_UNIFORM, GL_ACTIVE_RESOURCES,
+        &uniforms_count);
+
+    std::vector<GLchar> name_buffer;
+    for (GLint i = 0; i < uniforms_count; i++) {
+        glGetProgramResourceiv(handle_, GL_UNIFORM, i, properties.size(),
+            &properties[0], values.size(), NULL, &values[0]);
+
+        name_buffer.clear();
+        name_buffer.resize(values[0]);
+
+        glGetProgramResourceName(handle_, GL_UNIFORM, i, name_buffer.size(),
+            nullptr, &name_buffer[0]);
+        std::string uniform_name((GLchar*)&name_buffer[0],
+            name_buffer.size() - 1);
+
+        GLint location = glGetUniformLocation(handle_, uniform_name.c_str());
+        uniforms_[uniform_name] = location;
+    }
 }

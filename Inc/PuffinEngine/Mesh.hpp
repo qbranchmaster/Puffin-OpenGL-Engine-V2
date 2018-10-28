@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 
+#include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MeshEntity.hpp"
 
 namespace puffin {
@@ -19,9 +20,27 @@ namespace puffin {
         Mesh();
         ~Mesh();
 
-        void bind() const {
+        void bind() {
+            if (!handle_) {
+                logError("Mesh::bind()", "Cannot bind null mesh.");
+                return;
+            }
+
+            if (bound_) {
+                return;
+            }
+
             glBindVertexArray(handle_);
+            bound_ = 1;
         }
+
+        void unbind() {
+            if (bound_) {
+                glBindVertexArray(0);
+                bound_ = 0;
+            }
+        }
+
         glm::mat4 getRotationMatrix() const {
             return rotation_matrix_;
         }
@@ -42,6 +61,49 @@ namespace puffin {
             }
 
             return model_matrix_;
+        }
+
+        void setScale(const glm::vec3 &scale) {
+            scale_ = scale;
+            scale_matrix_ = glm::scale(glm::mat4(1.0f), scale_);
+            model_matrix_changed_ = true;
+        }
+
+        void translate(const glm::vec3 &translation) {
+            translation_matrix_ = glm::translate(translation_matrix_,
+                translation);
+            position_ += translation;
+            model_matrix_changed_ = true;
+        }
+
+        void setPosition(const glm::vec3 &position) {
+            translation_matrix_ = glm::mat4(1.0f);
+            position_ = glm::vec3(0.0f, 0.0f, 0.0f);
+            translate(position);
+        }
+
+        void zeroTranslation() {
+            translation_matrix_ = glm::mat4(1.0f);
+            model_matrix_changed_ = true;
+        }
+
+        glm::vec3 getPosition() const {
+            return position_;
+        }
+
+        void rotate(GLfloat angle, const glm::vec3 &axis) {
+            rotation_matrix_ = glm::rotate(rotation_matrix_, angle, axis);
+            model_matrix_changed_ = true;
+        }
+
+        void setRotationAngle(GLfloat angle, const glm::vec3 &axis) {
+            rotation_matrix_ = glm::mat4(1.0f);
+            rotate(angle, axis);
+        }
+
+        void zeroRotation() {
+            rotation_matrix_ = glm::mat4(1.0f);
+            model_matrix_changed_ = true;
         }
 
         void setMeshData(std::vector<GLfloat> data, GLuint index,
@@ -66,6 +128,8 @@ namespace puffin {
         GLuint handle_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
+
+        GLboolean bound_{0};
 
         GLboolean model_matrix_changed_{false};
         glm::mat4 model_matrix_{1.0f};

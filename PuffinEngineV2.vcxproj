@@ -88,7 +88,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libs\FreeImage\Wrapper\FreeImagePlus\dist\x32;C:\Libs\FreeImage\Dist\x32;C:\Libs\glfw\include;C:\Libs\glew\include;C:\Users\sebas\Documents\Projekty\PuffinEngineV2\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libs\glm;C:\Libs\FreeImage\Wrapper\FreeImagePlus\dist\x32;C:\Libs\FreeImage\Dist\x32;C:\Libs\glfw\include;C:\Libs\glew\include;C:\Users\sebas\Documents\Projekty\PuffinEngineV2\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -146,7 +146,9 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\PuffinEngine\Configuration.cpp" />
     <ClCompile Include="Src\PuffinEngine\Core.cpp" />
+    <ClCompile Include="Src\PuffinEngine\Input.cpp" />
     <ClCompile Include="Src\PuffinEngine\Mesh.cpp" />
+    <ClCompile Include="Src\PuffinEngine\ShaderProgram.cpp" />
     <ClCompile Include="Src\PuffinEngine\Texture.cpp" />
     <ClCompile Include="Src\PuffinEngine\Window.cpp" />
     <ClCompile Include="Src\PuffinEngine\Logger.cpp" />
@@ -158,9 +160,14 @@
     <ClInclude Include="Inc\PuffinEngine\Configuration.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Core.hpp" />
     <ClInclude Include="Inc\PuffinEngine\FrameBuffer.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\Input.hpp" />
     <ClInclude Include="Inc\PuffinEngine\KeyCodes.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Mesh.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\MeshEntity.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\RandomRealGenerator.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\ShaderProgram.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Texture.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\Timer.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Window.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Exception.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Logger.hpp" />

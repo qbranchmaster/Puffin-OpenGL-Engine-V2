@@ -49,6 +49,6 @@ namespace puffin {
     };
 
     using WindowPtr = std::shared_ptr<Window>;
-} // namespace puffin 
+} // namespace puffin
 
 #endif // PUFFIN_WINDOW_HPP
