@@ -28,7 +28,7 @@ void Window::createWindow() {
     auto target_monitor = monitors[configuration_->getTargetMonitorIndex()];
     handle_ = glfwCreateWindow(configuration_->getFrameResolution().first,
         configuration_->getFrameResolution().second, caption_.c_str(),
-        configuration_->isFullscreenEnabled() ? target_monitor : nullptr, 
+        configuration_->isFullscreenEnabled() ? target_monitor : nullptr,
         nullptr);
     if (!handle_) {
         throw Exception("Window::createWindow()", "Creating window error.");
@@ -69,6 +69,29 @@ void Window::setWindowIcon(std::string path) {
     img.pixels = icon.getRawData();
 
     glfwSetWindowIcon(handle_, 1, &img);
+}
+
+void Window::setWindowCursor(std::string path) {
+    Texture cursor;
+    if (!cursor.loadImage(path)) {
+        return;
+    }
+
+    // TODO: Finish this function, cursor is not working correctly.
+
+    //cursor.flipHorizontal();
+    cursor.flipVertical();
+
+    GLFWimage cur;
+    auto size = cursor.getSize();
+    cur.width = size.first;
+    cur.height = size.second;
+    cur.pixels = cursor.getRawData();
+
+    double x_pos, y_pos;
+    glfwGetCursorPos(handle_, &x_pos, &y_pos);
+    GLFWcursor *c = glfwCreateCursor(&cur, x_pos, y_pos);
+    glfwSetCursor(handle_, c);
 }
 
 void Window::setPosition(GLint x, GLint y) {

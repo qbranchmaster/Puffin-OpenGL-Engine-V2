@@ -46,9 +46,21 @@ std::string System::getMonitorName(GLushort index) const {
     return std::string(tmp_name);
 }
 
+std::pair<GLuint, GLuint> System::getMonitorSize(GLushort index) const {
+    GLint count = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    if (index >= count) {
+        logError("System::getMonitorSize()", "Monitor index out of range.");
+        return std::make_pair(0, 0);
+    }
+
+    auto vid_mode = glfwGetVideoMode(monitors[index]);
+    return std::make_pair(vid_mode->width, vid_mode->height);
+}
+
 void System::initGlfw() const {
     if (glfwInit() != GLFW_TRUE) {
-        throw Exception("System::initGlfw()", 
+        throw Exception("System::initGlfw()",
             "Window manager initialization error.");
     }
 }
@@ -60,7 +72,7 @@ void System::terminateGlfw() const {
 void System::initGl() const {
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        throw Exception("System::initGl()", 
+        throw Exception("System::initGl()",
             "OpenGL core initialization error.");
     }
 }

@@ -25,10 +25,12 @@ MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time,
         system_->getGpuName());
     logInfo("MasterRenderer::MasterRenderer()", "GLSL Version: " +
         system_->getGlslVersion());
-    
-    for (GLushort i = 0; i < system->getMonitorsCount(); i++) {
-        logInfo("MasterRenderer::MasterRenderer()", "Monitor #" + 
-            std::to_string(i) + " name: " + system_->getMonitorName(i));
+
+    for (GLushort i = 0; i < system_->getMonitorsCount(); i++) {
+        logInfo("MasterRenderer::MasterRenderer()", "Monitor #" +
+            std::to_string(i) + " name: " + system_->getMonitorName(i) +
+            ", size = " + std::to_string(system_->getMonitorSize(i).first) +
+            "x" + std::to_string(system_->getMonitorSize(i).second));
     }
 }
 

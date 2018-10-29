@@ -21,6 +21,7 @@ namespace puffin {
 
         GLushort getMonitorsCount() const;
         std::string getMonitorName(GLushort index) const;
+        std::pair<GLuint, GLuint> getMonitorSize(GLushort index) const;
 
     private:
         void initGlfw() const;
