@@ -88,12 +88,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libs\glm;C:\Libs\FreeImage\Wrapper\FreeImagePlus\dist\x32;C:\Libs\FreeImage\Dist\x32;C:\Libs\glfw\include;C:\Libs\glew\include;C:\Users\sebas\Documents\Projekty\PuffinEngineV2\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libs\PuffinEngineV2\Inc;D:\Libs\glm;D:\Libs\glfw-3.2.1\include;D:\Libs\glew-2.1.0\include;D:\Libs\FreeImage\Wrapper\FreeImagePlus\dist\x32;D:\Libs\FreeImage\Dist\x32;C:\Libs\glm;C:\Libs\FreeImage\Wrapper\FreeImagePlus\dist\x32;C:\Libs\FreeImage\Dist\x32;C:\Libs\glfw\include;C:\Libs\glew\include;C:\Users\sebas\Documents\Projekty\PuffinEngineV2\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Libs\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libs\binary;C:\Libs\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenGL32.lib;glfw3.lib;glew32d.lib;FreeImaged.lib;FreeImagePlusd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
