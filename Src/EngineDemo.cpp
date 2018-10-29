@@ -20,6 +20,7 @@ EngineDemo::EngineDemo() : Core() {
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
+    //window()->setPosition(1920, 36);
 
     createTimers();
 

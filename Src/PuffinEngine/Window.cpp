@@ -35,6 +35,7 @@ void Window::createWindow() {
     }
 
     glfwMakeContextCurrent(handle_);
+    getPosition();
 }
 
 void Window::setCaption(std::string caption) {
@@ -68,4 +69,15 @@ void Window::setWindowIcon(std::string path) {
     img.pixels = icon.getRawData();
 
     glfwSetWindowIcon(handle_, 1, &img);
+}
+
+void Window::setPosition(GLint x, GLint y) {
+    glfwSetWindowPos(handle_, x, y);
+}
+
+std::pair<GLint, GLint> Window::getPosition() {
+    GLint x, y;
+    glfwGetWindowPos(handle_, &x, &y);
+    position_ = std::make_pair(x, y);
+    return position_;
 }

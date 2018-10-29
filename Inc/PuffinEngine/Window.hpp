@@ -22,6 +22,9 @@ namespace puffin {
 
         void setWindowIcon(std::string path);
 
+        void setPosition(GLint x, GLint y);
+        std::pair<GLint, GLint> getPosition();
+
     private:
         void createWindow();
 
@@ -43,6 +46,8 @@ namespace puffin {
 
         GLFWwindow *handle_{nullptr};
         std::string caption_{"Puffin Window"};
+
+        std::pair<GLint, GLint> position_;
 
         ConfigurationPtr configuration_;
     };
