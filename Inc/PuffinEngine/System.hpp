@@ -9,10 +9,23 @@
 
 namespace puffin {
     class System {
+        friend class MasterRenderer;
+
     public:
+        System();
+        ~System();
+
         std::string getGpuVendor() const;
         std::string getGpuName() const;
         std::string getGlslVersion() const;
+
+        GLushort getMonitorsCount() const;
+        std::string getMonitorName(GLushort index) const;
+
+    private:
+        void initGlfw() const;
+        void terminateGlfw() const;
+        void initGl() const;
     };
 
     using SystemPtr = std::shared_ptr<System>;

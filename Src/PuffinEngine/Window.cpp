@@ -12,15 +12,6 @@ Window::Window(ConfigurationPtr configuration) {
     }
 
     configuration_ = configuration;
-
-    if (glfwInit() != GLFW_TRUE) {
-        throw Exception("Window::Window()",
-            "Window manager initialization error.");
-    }
-}
-
-Window::~Window() {
-    glfwTerminate();
 }
 
 void Window::createWindow() {
@@ -32,10 +23,13 @@ void Window::createWindow() {
     glfwWindowHint(GLFW_SAMPLES, configuration_->getMsaaSamples());
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
+    GLint count = 0;
+    auto monitors = glfwGetMonitors(&count);
+    auto target_monitor = monitors[configuration_->getTargetMonitorIndex()];
     handle_ = glfwCreateWindow(configuration_->getFrameResolution().first,
         configuration_->getFrameResolution().second, caption_.c_str(),
-        configuration_->isFullscreenEnabled() ? glfwGetPrimaryMonitor() :
-        nullptr, nullptr);
+        configuration_->isFullscreenEnabled() ? target_monitor : nullptr, 
+        nullptr);
     if (!handle_) {
         throw Exception("Window::createWindow()", "Creating window error.");
     }

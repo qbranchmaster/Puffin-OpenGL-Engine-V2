@@ -7,9 +7,13 @@
 #include <string>
 #include <vector>
 
+#include "PuffinEngine/System.hpp"
+
 namespace puffin {
     class Configuration {
     public:
+        Configuration(SystemPtr system);
+
         void setFrameResolution(GLuint width, GLuint height);
         std::pair<GLuint, GLuint> getFrameResolution() const;
 
@@ -23,11 +27,17 @@ namespace puffin {
         void enableFullscreen(GLboolean enabled);
         GLboolean isFullscreenEnabled() const;
 
+        void setTargetMonitorIndex(GLushort index);
+        GLushort getTargetMonitorIndex() const;
+
     private:
+        SystemPtr system_;
+
         GLuint frame_width_{1280};
         GLuint frame_height_{720};
         GLushort msaa_samples_{4};
         GLboolean fullscreen_{false};
+        GLushort monitor_index_{0};
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
     };

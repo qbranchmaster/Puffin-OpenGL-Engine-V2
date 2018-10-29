@@ -3,10 +3,10 @@
 using namespace puffin;
 
 Core::Core() {
-    configuration_.reset(new Configuration());
     system_.reset(new System());
     time_.reset(new Time());
-
+    
+    configuration_.reset(new Configuration(system_));
     window_.reset(new Window(configuration_));
     input_.reset(new Input(window_));
 }

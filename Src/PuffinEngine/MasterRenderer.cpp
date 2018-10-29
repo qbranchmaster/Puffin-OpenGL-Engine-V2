@@ -17,19 +17,19 @@ MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time,
     system_ = system;
 
     target_window_->createWindow();
-
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        throw Exception("MasterRenderer::MasterRenderer()",
-            "OpenGL core initialization error.");
-    }
+    system_->initGl();
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
-        system->getGpuVendor());
+        system_->getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " +
-        system->getGpuName());
+        system_->getGpuName());
     logInfo("MasterRenderer::MasterRenderer()", "GLSL Version: " +
-        system->getGlslVersion());
+        system_->getGlslVersion());
+    
+    for (GLushort i = 0; i < system->getMonitorsCount(); i++) {
+        logInfo("MasterRenderer::MasterRenderer()", "Monitor #" + 
+            std::to_string(i) + " name: " + system_->getMonitorName(i));
+    }
 }
 
 void MasterRenderer::start() {

@@ -16,7 +16,6 @@ namespace puffin {
 
     public:
         Window(ConfigurationPtr configuration);
-        ~Window();
 
         void setCaption(std::string caption);
         std::string getCaption() const;

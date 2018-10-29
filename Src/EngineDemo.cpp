@@ -12,6 +12,7 @@ EngineDemo::EngineDemo() : Core() {
     configuration()->setMsaaSamples(4);
     configuration()->setOpenGLVersion(4, 0);
     configuration()->enableFullscreen(false);
+    configuration()->setTargetMonitorIndex(0);
 
     createRenderer();
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,

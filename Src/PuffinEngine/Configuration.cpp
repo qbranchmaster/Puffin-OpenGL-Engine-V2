@@ -1,8 +1,18 @@
 #include "PuffinEngine/Configuration.hpp"
 
+#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
+
+Configuration::Configuration(SystemPtr system) {
+    if (!system) {
+        throw Exception("Configuration::Configuration()",
+            "Not initialized object.");
+    }
+
+    system_ = system;
+}
 
 std::vector<GLushort> Configuration::getSupportedMsaaSamples() const {
     return {2, 4, 8, 16};
@@ -39,6 +49,20 @@ void Configuration::enableFullscreen(GLboolean enabled) {
 
 GLboolean Configuration::isFullscreenEnabled() const {
     return fullscreen_;
+}
+
+void Configuration::setTargetMonitorIndex(GLushort index) {
+    if (index >= system_->getMonitorsCount()) {
+        logError("Configuration::setTargetMonitorIndex()", 
+            "Monitor index out of range.");
+        return;
+    }
+
+    monitor_index_ = index;
+}
+
+GLushort Configuration::getTargetMonitorIndex() const {
+    return monitor_index_;
 }
 
 void Configuration::setFrameResolution(GLuint width, GLuint height) {
