@@ -1,0 +1,2 @@
+- przeliczyc sobie macierze transfomracji na kartce i sprawdzic kolejnosc wykonywania obliczen
+- zrobic to samo z macierzami widoku kamery, zrozumiec je wreszcie

@@ -1,5 +1,5 @@
-#ifndef PUFFIN_RANDOM_REAL_GENERATOR_H
-#define PUFFIN_RANDOM_REAL_GENERATOR_H
+#ifndef PUFFIN_RANDOM_GENERATOR_H
+#define PUFFIN_RANDOM_GENERATOR_H
 
 #include <GL/glew.h>
 
@@ -7,9 +7,9 @@
 #include <random>
 
 namespace puffin {
-    class RandomRealGenerator {
+    class RandomGenerator {
     public:
-        RandomRealGenerator(GLfloat min, GLfloat max) :
+        RandomGenerator(GLfloat min, GLfloat max) :
             distribution_(min, max) {
             min_value_ = min;
             max_value_ = max;
@@ -35,7 +35,7 @@ namespace puffin {
         GLfloat max_value_{0.0f};
     };
 
-    using RandomRealGeneratorPtr = std::shared_ptr<RandomRealGenerator>;
+    using RandomGeneratorPtr = std::shared_ptr<RandomGenerator>;
 } // namespace puffin
 
-#endif // PUFFIN_RANDOM_REAL_GENERATOR_H
+#endif // PUFFIN_RANDOM_GENERATOR_H

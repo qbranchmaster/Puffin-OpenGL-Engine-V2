@@ -146,6 +146,7 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\PuffinEngine\Configuration.cpp" />
     <ClCompile Include="Src\PuffinEngine\Core.cpp" />
+    <ClCompile Include="Src\PuffinEngine\FrameBuffer.cpp" />
     <ClCompile Include="Src\PuffinEngine\Input.cpp" />
     <ClCompile Include="Src\PuffinEngine\Mesh.cpp" />
     <ClCompile Include="Src\PuffinEngine\ShaderProgram.cpp" />
@@ -164,7 +165,7 @@
     <ClInclude Include="Inc\PuffinEngine\KeyCodes.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Mesh.hpp" />
     <ClInclude Include="Inc\PuffinEngine\MeshEntity.hpp" />
-    <ClInclude Include="Inc\PuffinEngine\RandomRealGenerator.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\RandomGenerator.hpp" />
     <ClInclude Include="Inc\PuffinEngine\ShaderProgram.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Texture.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Timer.hpp" />

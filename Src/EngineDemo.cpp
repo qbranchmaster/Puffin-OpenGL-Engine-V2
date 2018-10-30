@@ -27,17 +27,33 @@ EngineDemo::EngineDemo() : Core() {
 
     //---
     my_mesh.reset(new Mesh());
-    std::vector<GLfloat> data = {-0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f};
-    std::vector<GLfloat> coords = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
+    std::vector<GLfloat> data = {
+        -0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
+
+    std::vector<GLfloat> coords = {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+    };
+
     my_mesh->setMeshData(data, 0, 3);
     my_mesh->setMeshData(coords, 1, 2);
     auto en = my_mesh->addEntity();
-    en->setVerticesCount(3);
+    en->setVerticesCount(6);
 
     basic_shader.reset(new ShaderProgram("Shaders/basic_vs.glsl",
         "Shaders/basic_fs.glsl"));
     basic_shader->bind();
-    basic_shader->setUniform("color_filter", glm::vec3(0.8f, 0.3f, 0.5f));
+    basic_shader->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
     basic_shader->setUniform("model_matrix", my_mesh->getModelMatrix());
 
     basic_texture.reset(new Texture());
@@ -67,7 +83,7 @@ void EngineDemo::pollKeyboard() {
 
 void EngineDemo::render() {
     //---
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     basic_texture->bind();

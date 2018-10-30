@@ -8,8 +8,11 @@
 namespace puffin {
     class FrameBuffer {
     public:
+        FrameBuffer();
+        ~FrameBuffer();
 
     private:
+        GLuint handle_{0};
     };
 
     using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

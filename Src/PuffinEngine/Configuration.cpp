@@ -53,7 +53,7 @@ GLboolean Configuration::isFullscreenEnabled() const {
 
 void Configuration::setTargetMonitorIndex(GLushort index) {
     if (index >= system_->getMonitorsCount()) {
-        logError("Configuration::setTargetMonitorIndex()", 
+        logError("Configuration::setTargetMonitorIndex()",
             "Monitor index out of range.");
         return;
     }
