@@ -1,43 +1,47 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/MasterRenderer.hpp"
 
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/System.hpp"
+#include "PuffinEngine/Time.hpp"
 
 using namespace puffin;
 
-MasterRenderer::MasterRenderer(WindowPtr window, TimePtr time,
-    SystemPtr system) {
-    if (!window || !time || !system) {
+MasterRenderer::MasterRenderer(WindowPtr window) {
+    if (!window) {
         throw Exception("MasterRenderer::MasterRenderer()",
             "Not initialized object.");
     }
 
     target_window_ = window;
-    time_ = time;
-    system_ = system;
-
     target_window_->createWindow();
-    system_->initGl();
+    System::instance().initGl();
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
-        system_->getGpuVendor());
+        System::instance().getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " +
-        system_->getGpuName());
+        System::instance().getGpuName());
     logInfo("MasterRenderer::MasterRenderer()", "GLSL Version: " +
-        system_->getGlslVersion());
+        System::instance().getGlslVersion());
 
-    for (GLushort i = 0; i < system_->getMonitorsCount(); i++) {
+    for (GLushort i = 0; i < System::instance().getMonitorsCount(); i++) {
         logInfo("MasterRenderer::MasterRenderer()", "Monitor #" +
-            std::to_string(i) + " name: " + system_->getMonitorName(i) +
-            ", size = " + std::to_string(system_->getMonitorSize(i).first) +
-            "x" + std::to_string(system_->getMonitorSize(i).second));
+            std::to_string(i) + " name: " +
+            System::instance().getMonitorName(i) + ", size = " +
+            std::to_string(System::instance().getMonitorSize(i).first) +
+            "x" + std::to_string(System::instance().getMonitorSize(i).second));
     }
 }
 
 void MasterRenderer::start() {
     rendering_enabled_ = true;
     while (rendering_enabled_) {
-        time_->startDeltaMeasure();
+        Time::instance().startDeltaMeasure();
 
         if (rendering_function_) {
             rendering_function_();
@@ -46,13 +50,16 @@ void MasterRenderer::start() {
         target_window_->pollEvents();
         target_window_->swapBuffers();
 
-        time_->endDeltaMeasure();
-        time_->update();
+        Time::instance().endDeltaMeasure();
+        Time::instance().update();
 
         if (target_window_->isClosing()) {
             stop();
         }
     }
+
+    // TODO: Find better place for it.
+    System::instance().terminateGlfw();
 }
 
 void MasterRenderer::stop() {

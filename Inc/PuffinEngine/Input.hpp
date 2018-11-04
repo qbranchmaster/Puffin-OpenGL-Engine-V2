@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_INPUT_HPP
 #define PUFFIN_INPUT_HPP
 
@@ -14,7 +19,7 @@ namespace puffin {
 
         GLboolean keyPressed(Key key, GLboolean sticky = true);
         GLboolean mouseKeyPressed(MouseButton button);
-        void setCursorPosition(GLdouble x, GLdouble y) const;
+        void setCursorPosition(GLfloat x, GLfloat y) const;
         void getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const;
 
     private:

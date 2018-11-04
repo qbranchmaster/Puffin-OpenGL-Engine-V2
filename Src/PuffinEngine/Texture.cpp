@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Texture.hpp"
 
 #include "PuffinEngine/Logger.hpp"
@@ -49,7 +54,7 @@ void Texture::fetchChannelsCount() {
     }
 
     channels_ = img_handle_.getBitsPerPixel() / 8;
-    if (channels_ == 0) {
+    if (channels_ == 0) { // 4 / 8 = 0.5, so int type = 0
         // Image is not empty, but has less bits per pixel than 8, so in fact,
         // it has only one channel.
         channels_ = 1;
@@ -127,20 +132,30 @@ GLboolean Texture::loadTexture2D(std::string path) {
 
     type_ = TextureType::Texture2D;
 
+    // TODO: Do it better.
     glActiveTexture(GL_TEXTURE0);
+    // TODO: Use bind().
     glBindTexture(GL_TEXTURE_2D, handle_);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
         GL_UNSIGNED_BYTE, img_handle_.accessPixels());
 
-    // TODO ----
-//    glGenerateMipmap(GL_TEXTURE_2D);
+    // TODO: Add functions for setting texture filter and generate mipmap.
+    // glGenerateMipmap(GL_TEXTURE_2D);
     // Default filter for opengl is linear, so it is needed to have mipmap generated
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // ----------
 
     logInfo("Texture::loadTexture2D()", "Texture 2D [" + path + "] loaded.");
-
     return true;
+}
+
+GLFWimage Texture::toGlfwImage() const {
+    // TODO: Finish this function.
+    GLFWimage img;
+    img.width = width_;
+    img.height = height_;
+    img.pixels = getRawData();
+    return img;
 }

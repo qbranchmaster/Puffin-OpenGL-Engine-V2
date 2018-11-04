@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Mesh.hpp"
 
 #include "PuffinEngine/Logger.hpp"
@@ -20,15 +25,16 @@ void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
         glGenBuffers(1, &data_buffers_[index]);
     }
 
-    glBindVertexArray(handle_);
-    glBindBuffer(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER :
-        GL_ARRAY_BUFFER, data_buffers_[index]);
-    glBufferData(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER :
-        GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(),
-        dynamic_draw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    bind();
+    glBindBuffer(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER,
+        data_buffers_[index]);
+    glBufferData(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER,
+        data.size() * sizeof(GLfloat), data.data(), dynamic_draw ?
+        GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 
     glVertexAttribPointer(index, vertex_size, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(index);
+    unbind();
 }
 
 MeshEntityPtr Mesh::addEntity() {

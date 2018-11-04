@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_MESH_ENTITY_HPP
 #define PUFFIN_MESH_ENTITY_HPP
 

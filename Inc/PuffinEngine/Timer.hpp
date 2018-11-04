@@ -1,5 +1,10 @@
-#ifndef PUFFIN_TIMER_H
-#define PUFFIN_TIMER_H
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
+#ifndef PUFFIN_TIMER_HPP
+#define PUFFIN_TIMER_HPP
 
 #include <GL/glew.h>
 
@@ -68,4 +73,4 @@ namespace puffin {
     using TimerPtr = std::shared_ptr<Timer>;
 } // namespace puffin
 
-#endif // PUFFIN_TIMER_H
+#endif // PUFFIN_TIMER_HPP

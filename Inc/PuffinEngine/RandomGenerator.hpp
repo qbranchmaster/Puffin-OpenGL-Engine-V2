@@ -1,5 +1,10 @@
-#ifndef PUFFIN_RANDOM_GENERATOR_H
-#define PUFFIN_RANDOM_GENERATOR_H
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
+#ifndef PUFFIN_RANDOM_GENERATOR_HPP
+#define PUFFIN_RANDOM_GENERATOR_HPP
 
 #include <GL/glew.h>
 
@@ -38,4 +43,4 @@ namespace puffin {
     using RandomGeneratorPtr = std::shared_ptr<RandomGenerator>;
 } // namespace puffin
 
-#endif // PUFFIN_RANDOM_GENERATOR_H
+#endif // PUFFIN_RANDOM_GENERATOR_HPP

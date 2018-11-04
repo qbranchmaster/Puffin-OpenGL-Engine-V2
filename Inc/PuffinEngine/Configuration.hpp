@@ -1,18 +1,23 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_CONFIGURATION_HPP
 #define PUFFIN_CONFIGURATION_HPP
 
 #include <GL/glew.h>
 
-#include <memory>
 #include <string>
 #include <vector>
-
-#include "PuffinEngine/System.hpp"
 
 namespace puffin {
     class Configuration {
     public:
-        Configuration(SystemPtr system);
+        static Configuration& instance() {
+            static Configuration singleton;
+            return singleton;
+        }
 
         void setFrameResolution(GLuint width, GLuint height);
         std::pair<GLuint, GLuint> getFrameResolution() const;
@@ -31,10 +36,12 @@ namespace puffin {
         GLushort getTargetMonitorIndex() const;
 
     private:
-        SystemPtr system_;
+        Configuration() {}
+        Configuration(const Configuration &) = delete;
+        void operator=(const Configuration &) = delete;
 
-        GLuint frame_width_{1280};
-        GLuint frame_height_{720};
+        GLuint frame_width_{640};
+        GLuint frame_height_{480};
         GLushort msaa_samples_{4};
         GLboolean fullscreen_{false};
         GLushort monitor_index_{0};

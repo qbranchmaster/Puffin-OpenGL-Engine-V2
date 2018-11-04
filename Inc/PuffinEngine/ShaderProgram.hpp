@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_SHADER_PROGRAM_HPP
 #define PUFFIN_SHADER_PROGRAM_HPP
 
@@ -18,7 +23,7 @@
 namespace puffin {
     class ShaderProgram {
     public:
-        ShaderProgram(std::string vs_path, std::string fs_path);
+        ShaderProgram();
         ~ShaderProgram();
 
         void bind() {
@@ -43,6 +48,8 @@ namespace puffin {
             }
         }
 
+        void loadShaders(std::string vs_path, std::string fs_path);
+
         void setUniform(std::string uniform_name, const glm::mat4 &value) {
             bind();
             auto location = getUniformLocation(uniform_name);
@@ -53,6 +60,7 @@ namespace puffin {
             }
 
             glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+            unbind();
         }
 
         void setUniform(std::string uniform_name, const glm::vec3 &value) {
@@ -65,6 +73,7 @@ namespace puffin {
             }
 
             glUniform3fv(location, 1, glm::value_ptr(value));
+            unbind();
         }
 
         void setUniform(std::string uniform_name, const glm::vec4 &value) {
@@ -77,6 +86,7 @@ namespace puffin {
             }
 
             glUniform4fv(location, 1, glm::value_ptr(value));
+            unbind();
         }
 
         void setUniform(std::string uniform_name, GLint value) {
@@ -89,6 +99,7 @@ namespace puffin {
             }
 
             glUniform1iv(location, 1, &value);
+            unbind();
         }
 
         void setUniform(std::string uniform_name, GLfloat value) {
@@ -101,6 +112,7 @@ namespace puffin {
             }
 
             glUniform1fv(location, 1, &value);
+            unbind();
         }
 
     private:

@@ -1,41 +1,30 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Window.hpp"
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Texture.hpp"
 
 using namespace puffin;
 
-Window::Window(ConfigurationPtr configuration) {
-    if (!configuration) {
-        throw Exception("Window::Window()", "Not initialized object.");
-    }
-
-    configuration_ = configuration;
+Window::Window() {
+    System::instance().initGlfw();
 }
 
-void Window::createWindow() {
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, configuration_->
-        getOpenGLVersion().first);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, configuration_->
-        getOpenGLVersion().second);
-    glfwWindowHint(GLFW_SAMPLES, configuration_->getMsaaSamples());
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+void Window::setPosition(GLint x, GLint y) {
+    glfwSetWindowPos(handle_, x, y);
+}
 
-    GLint count = 0;
-    auto monitors = glfwGetMonitors(&count);
-    auto target_monitor = monitors[configuration_->getTargetMonitorIndex()];
-    handle_ = glfwCreateWindow(configuration_->getFrameResolution().first,
-        configuration_->getFrameResolution().second, caption_.c_str(),
-        configuration_->isFullscreenEnabled() ? target_monitor : nullptr,
-        nullptr);
-    if (!handle_) {
-        throw Exception("Window::createWindow()", "Creating window error.");
-    }
-
-    glfwMakeContextCurrent(handle_);
-    getPosition();
+std::pair<GLint, GLint> Window::getPosition() const {
+    GLint x = 0, y = 0;
+    glfwGetWindowPos(handle_, &x, &y);
+    return std::make_pair(x, y);
 }
 
 void Window::setCaption(std::string caption) {
@@ -52,7 +41,31 @@ std::string Window::getCaption() const {
     return caption_;
 }
 
-void Window::setWindowIcon(std::string path) {
+void Window::createWindow() {
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,
+        Configuration::instance().getOpenGLVersion().first);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,
+        Configuration::instance().getOpenGLVersion().second);
+    glfwWindowHint(GLFW_SAMPLES, Configuration::instance().getMsaaSamples());
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+    GLint count = 0;
+    auto monitors = glfwGetMonitors(&count);
+    auto target_monitor = monitors[Configuration::instance().
+        getTargetMonitorIndex()];
+    auto wnd_size = Configuration::instance().getFrameResolution();
+    handle_ = glfwCreateWindow(wnd_size.first, wnd_size.second,
+        caption_.c_str(), Configuration::instance().isFullscreenEnabled() ?
+        target_monitor : nullptr, nullptr);
+    if (!handle_) {
+        throw Exception("Window::createWindow()", "Creating window error.");
+    }
+
+    glfwMakeContextCurrent(handle_);
+}
+
+void Window::setWindowIcon(std::string path) const {
     Texture icon;
     if (!icon.loadImage(path)) {
         return;
@@ -62,45 +75,5 @@ void Window::setWindowIcon(std::string path) {
     icon.flipHorizontal();
     icon.flipVertical();
 
-    GLFWimage img;
-    auto size = icon.getSize();
-    img.width = size.first;
-    img.height = size.second;
-    img.pixels = icon.getRawData();
-
-    glfwSetWindowIcon(handle_, 1, &img);
-}
-
-void Window::setWindowCursor(std::string path) {
-    Texture cursor;
-    if (!cursor.loadImage(path)) {
-        return;
-    }
-
-    // TODO: Finish this function, cursor is not working correctly.
-
-    //cursor.flipHorizontal();
-    cursor.flipVertical();
-
-    GLFWimage cur;
-    auto size = cursor.getSize();
-    cur.width = size.first;
-    cur.height = size.second;
-    cur.pixels = cursor.getRawData();
-
-    double x_pos, y_pos;
-    glfwGetCursorPos(handle_, &x_pos, &y_pos);
-    GLFWcursor *c = glfwCreateCursor(&cur, x_pos, y_pos);
-    glfwSetCursor(handle_, c);
-}
-
-void Window::setPosition(GLint x, GLint y) {
-    glfwSetWindowPos(handle_, x, y);
-}
-
-std::pair<GLint, GLint> Window::getPosition() {
-    GLint x, y;
-    glfwGetWindowPos(handle_, &x, &y);
-    position_ = std::make_pair(x, y);
-    return position_;
+    glfwSetWindowIcon(handle_, 1, &icon.toGlfwImage());
 }

@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_KEY_CODES_HPP
 #define PUFFIN_KEY_CODES_HPP
 

@@ -1,22 +1,29 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_SYSTEM_HPP
 #define PUFFIN_SYSTEM_HPP
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <memory>
 #include <string>
 
 namespace puffin {
     class System {
         friend class MasterRenderer;
+        friend class Window;
 
     public:
-        System();
-        ~System();
+        static System& instance() {
+            static System singleton;
+            return singleton;
+        }
 
-        std::string getGpuVendor() const;
         std::string getGpuName() const;
+        std::string getGpuVendor() const;
         std::string getGlslVersion() const;
 
         GLushort getMonitorsCount() const;
@@ -24,12 +31,14 @@ namespace puffin {
         std::pair<GLuint, GLuint> getMonitorSize(GLushort index) const;
 
     private:
+        System() {}
+        System(const System &) = delete;
+        void operator=(const System &) = delete;
+
         void initGlfw() const;
         void terminateGlfw() const;
         void initGl() const;
     };
-
-    using SystemPtr = std::shared_ptr<System>;
 } // namespace puffin
 
 #endif // PUFFIN_SYSTEM_HPP

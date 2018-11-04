@@ -1,18 +1,19 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Core.hpp"
 
 using namespace puffin;
 
 Core::Core() {
-    system_.reset(new System());
-    time_.reset(new Time());
-
-    configuration_.reset(new Configuration(system_));
-    window_.reset(new Window(configuration_));
+    window_.reset(new Window());
     input_.reset(new Input(window_));
 }
 
 void Core::createRenderer() {
-    master_renderer_.reset(new MasterRenderer(window_, time_, system_));
+    master_renderer_.reset(new MasterRenderer(window_));
 }
 
 void Core::start() const {

@@ -1,17 +1,14 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/System.hpp"
 
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
-
-System::System() {
-    initGlfw();
-}
-
-System::~System() {
-    terminateGlfw();
-}
 
 std::string System::getGpuVendor() const {
     const GLubyte *data = glGetString(GL_VENDOR);
@@ -26,6 +23,25 @@ std::string System::getGpuName() const {
 std::string System::getGlslVersion() const {
     const GLubyte *data = glGetString(GL_SHADING_LANGUAGE_VERSION);
     return std::string(reinterpret_cast<const char*>(data));
+}
+
+void System::initGlfw() const {
+    if (glfwInit() != GLFW_TRUE) {
+        throw Exception("System::initGlfw()",
+            "Window manager initialization error.");
+    }
+}
+
+void System::terminateGlfw() const {
+    glfwTerminate();
+}
+
+void System::initGl() const {
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK) {
+        throw Exception("System::initGl()",
+            "OpenGL core initialization error.");
+    }
 }
 
 GLushort System::getMonitorsCount() const {
@@ -56,23 +72,4 @@ std::pair<GLuint, GLuint> System::getMonitorSize(GLushort index) const {
 
     auto vid_mode = glfwGetVideoMode(monitors[index]);
     return std::make_pair(vid_mode->width, vid_mode->height);
-}
-
-void System::initGlfw() const {
-    if (glfwInit() != GLFW_TRUE) {
-        throw Exception("System::initGlfw()",
-            "Window manager initialization error.");
-    }
-}
-
-void System::terminateGlfw() const {
-    glfwTerminate();
-}
-
-void System::initGl() const {
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        throw Exception("System::initGl()",
-            "OpenGL core initialization error.");
-    }
 }

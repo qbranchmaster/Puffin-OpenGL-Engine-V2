@@ -1,16 +1,25 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_TIME_HPP
 #define PUFFIN_TIME_HPP
 
 #include <GL/glew.h>
 
 #include <chrono>
-#include <memory>
 
 namespace puffin {
     class Time {
         friend class MasterRenderer;
 
     public:
+        static Time& instance() {
+            static Time singleton;
+            return singleton;
+        }
+
         GLint getFpsRate() const {
             return frame_rate_;
         }
@@ -20,6 +29,10 @@ namespace puffin {
         }
 
     private:
+        Time() {}
+        Time(const Time &) = delete;
+        void operator=(const Time &) = delete;
+
         void startDeltaMeasure() {
             delta_t0_ = std::chrono::system_clock::now();
         }
@@ -51,8 +64,6 @@ namespace puffin {
         GLdouble delta_{0.0};
         GLint frame_rate_{0};
     };
-
-    using TimePtr = std::shared_ptr<Time>;
 } // namespace puffin
 
 #endif // PUFFIN_TIME_HPP

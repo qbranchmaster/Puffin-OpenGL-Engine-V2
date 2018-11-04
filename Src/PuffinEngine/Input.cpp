@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Input.hpp"
 
 #include "PuffinEngine/Exception.hpp"
@@ -46,7 +51,7 @@ GLboolean Input::mouseKeyPressed(MouseButton button) {
     return false;
 }
 
-void Input::setCursorPosition(GLdouble x, GLdouble y) const {
+void Input::setCursorPosition(GLfloat x, GLfloat y) const {
     glfwSetCursorPos(target_window_->handle_, x, y);
 }
 

@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_MASTER_RENDERER_HPP
 #define PUFFIN_MASTER_RENDERER_HPP
 
@@ -6,14 +11,12 @@
 #include <functional>
 #include <memory>
 
-#include "PuffinEngine/System.hpp"
-#include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window, TimePtr time, SystemPtr system);
+        MasterRenderer(WindowPtr window);
 
         void start();
         void stop();
@@ -23,8 +26,6 @@ namespace puffin {
         GLboolean rendering_enabled_{false};
         std::function<void()> rendering_function_{nullptr};
 
-        SystemPtr system_;
-        TimePtr time_;
         WindowPtr target_window_;
     };
 

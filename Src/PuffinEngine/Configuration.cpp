@@ -1,20 +1,17 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/Configuration.hpp"
 
-#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/System.hpp"
 
 using namespace puffin;
 
-Configuration::Configuration(SystemPtr system) {
-    if (!system) {
-        throw Exception("Configuration::Configuration()",
-            "Not initialized object.");
-    }
-
-    system_ = system;
-}
-
 std::vector<GLushort> Configuration::getSupportedMsaaSamples() const {
+    // TODO: Move to System class.
     return {2, 4, 8, 16};
 }
 
@@ -51,16 +48,6 @@ GLboolean Configuration::isFullscreenEnabled() const {
     return fullscreen_;
 }
 
-void Configuration::setTargetMonitorIndex(GLushort index) {
-    if (index >= system_->getMonitorsCount()) {
-        logError("Configuration::setTargetMonitorIndex()",
-            "Monitor index out of range.");
-        return;
-    }
-
-    monitor_index_ = index;
-}
-
 GLushort Configuration::getTargetMonitorIndex() const {
     return monitor_index_;
 }
@@ -72,4 +59,14 @@ void Configuration::setFrameResolution(GLuint width, GLuint height) {
 
 std::pair<GLuint, GLuint> Configuration::getFrameResolution() const {
     return std::make_pair(frame_width_, frame_height_);
+}
+
+void Configuration::setTargetMonitorIndex(GLushort index) {
+    if (index >= System::instance().getMonitorsCount()) {
+        logError("Configuration::setTargetMonitorIndex()",
+            "Monitor index out of range.");
+        return;
+    }
+
+    monitor_index_ = index;
 }

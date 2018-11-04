@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_MESH_HPP
 #define PUFFIN_MESH_HPP
 
@@ -113,7 +118,7 @@ namespace puffin {
         MeshEntityPtr getEntity(GLuint index) const;
         GLuint getEntitiesCount() const;
 
-        // TODO ----
+        // TODO: Move it somewhere else.
         void draw(GLuint index) {
             if (index >= entities_.size()) {
                 return;
@@ -122,14 +127,12 @@ namespace puffin {
             auto entity = entities_[index];
             glDrawArrays(GL_TRIANGLES, 0, entity->getVerticesCount());
         }
-        // -----
 
     private:
         GLuint handle_{0};
+        GLboolean bound_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
-
-        GLboolean bound_{0};
 
         GLboolean model_matrix_changed_{false};
         glm::mat4 model_matrix_{1.0f};

@@ -1,7 +1,14 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #ifndef PUFFIN_TEXTURE_HPP
 #define PUFFIN_TEXTURE_HPP
 
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <FreeImagePlus.h>
 
 #include <memory>
@@ -36,13 +43,14 @@ namespace puffin {
         std::string getPath() const;
         std::pair<GLuint, GLuint> getSize() const;
         TextureType getType() const;
-
         GLubyte* getRawData() const;
 
         void freeImage();
         void swapRedBlue();
         void flipVertical();
         void flipHorizontal();
+
+        GLFWimage toGlfwImage() const;
 
     private:
         void fetchChannelsCount();

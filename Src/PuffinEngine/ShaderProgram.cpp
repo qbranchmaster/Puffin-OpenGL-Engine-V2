@@ -1,27 +1,40 @@
+/*
+* Puffin OpenGL Engine
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "PuffinEngine/ShaderProgram.hpp"
 
 #include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
 
-ShaderProgram::ShaderProgram(std::string vs_path, std::string fs_path) {
-    if (vs_path.empty() || fs_path.empty()) {
-        logError("ShaderProgram::ShaderProgram()", "Empty shader file path.");
-        return;
-    }
-
+puffin::ShaderProgram::ShaderProgram() {
     handle_vs_ = glCreateShader(GL_VERTEX_SHADER);
     handle_fs_ = glCreateShader(GL_FRAGMENT_SHADER);
-    if (!handle_vs_ || !handle_fs_) {
-        logError("ShaderProgram::ShaderProgram()",
-            "Creating shader component error.");
-        return;
-    }
 
     handle_ = glCreateProgram();
-    if (!handle_) {
-        logError("ShaderProgram::ShaderProgram()",
-            "Creating shader program error.");
+}
+
+ShaderProgram::~ShaderProgram() {
+    if (handle_vs_) {
+        glDetachShader(handle_, handle_vs_);
+        glDeleteShader(handle_vs_);
+    }
+
+    if (handle_fs_) {
+        glDetachShader(handle_, handle_fs_);
+        glDeleteShader(handle_fs_);
+    }
+
+    if (handle_) {
+        glDeleteProgram(handle_);
+    }
+}
+
+void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
+    if (vs_path.empty() || fs_path.empty()) {
+        logError("ShaderProgram::loadShaders()", "Empty shader file path.");
         return;
     }
 
@@ -40,7 +53,7 @@ ShaderProgram::ShaderProgram(std::string vs_path, std::string fs_path) {
 
         std::string shader_data;
         if (loadShaderCode(*file_ptr, shader_data)) {
-            logError("ShaderProgram::ShaderProgram()",
+            logError("ShaderProgram::loadShaders()",
                 "Reading shader file [" + *file_ptr + "] error.");
             return;
         }
@@ -49,44 +62,26 @@ ShaderProgram::ShaderProgram(std::string vs_path, std::string fs_path) {
         glShaderSource(*handle_ptr, 1, &shader_code, nullptr);
 
         GLint result = compileShader(*handle_ptr);
-        logInfo("ShaderProgram::ShaderProgram()", "Shader file [" +
-            *file_ptr + "] compile message:\n" +
-            getShaderCompileMessage(*handle_ptr));
+        logInfo("ShaderProgram::loadShaders()", "Shader file [" + *file_ptr +
+            "] compile message:\n" + getShaderCompileMessage(*handle_ptr));
 
         if (result) {
-            logError("ShaderProgram::ShaderProgram()", "Shader file [" +
+            logError("ShaderProgram::loadShaders()", "Shader file [" +
                 *file_ptr + "] compile error.");
             return;
         }
 
-        logInfo("ShaderProgram::ShaderProgram()", "Shader file [" +
+        logInfo("ShaderProgram::loadShaders()", "Shader file [" +
             *file_ptr + "] compile success.");
     }
 
     if (linkProgram()) {
-        logError("ShaderProgram::ShaderProgram()",
-            "Shader program link error.");
+        logError("ShaderProgram::loadShaders()", "Shader program link error.");
         return;
     }
 
     fetchUniforms();
-    logInfo("ShaderProgram::ShaderProgram()", "Shader program link success.");
-}
-
-ShaderProgram::~ShaderProgram() {
-    if (handle_vs_) {
-        glDetachShader(handle_, handle_vs_);
-        glDeleteShader(handle_vs_);
-    }
-
-    if (handle_fs_) {
-        glDetachShader(handle_, handle_fs_);
-        glDeleteShader(handle_fs_);
-    }
-
-    if (handle_) {
-        glDeleteProgram(handle_);
-    }
+    logInfo("ShaderProgram::loadShaders()", "Shader program link success.");
 }
 
 GLint ShaderProgram::loadShaderCode(std::string file_path,
