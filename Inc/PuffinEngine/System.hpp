@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -10,11 +10,13 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace puffin {
     class System {
+        friend class Core;
         friend class MasterRenderer;
-        friend class Window;
 
     public:
         static System& instance() {
@@ -29,6 +31,7 @@ namespace puffin {
         GLushort getMonitorsCount() const;
         std::string getMonitorName(GLushort index) const;
         std::pair<GLuint, GLuint> getMonitorSize(GLushort index) const;
+        std::vector<GLushort> getSupportedMsaaSamples() const;
 
     private:
         System() {}

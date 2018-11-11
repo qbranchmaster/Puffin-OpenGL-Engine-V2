@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -10,17 +10,17 @@
 
 using namespace puffin;
 
-std::vector<GLushort> Configuration::getSupportedMsaaSamples() const {
-    // TODO: Move to System class.
-    return {2, 4, 8, 16};
+void Configuration::setFrameResolution(GLuint width, GLuint height) {
+    frame_width_ = width;
+    frame_height_ = height;
 }
 
-GLushort Configuration::getMsaaSamples() const {
-    return msaa_samples_;
+std::pair<GLuint, GLuint> Configuration::getFrameResolution() const {
+    return std::make_pair(frame_width_, frame_height_);
 }
 
 void Configuration::setMsaaSamples(GLushort samples) {
-    auto supported_msaa = getSupportedMsaaSamples();
+    auto supported_msaa = System::instance().getSupportedMsaaSamples();
     if (std::find(supported_msaa.begin(), supported_msaa.end(), samples) ==
         supported_msaa.end()) {
         logError("Configuration::setMsaaSamples()",
@@ -29,6 +29,10 @@ void Configuration::setMsaaSamples(GLushort samples) {
     }
 
     msaa_samples_ = samples;
+}
+
+GLushort Configuration::getMsaaSamples() const {
+    return msaa_samples_;
 }
 
 void Configuration::setOpenGLVersion(GLushort major, GLushort minor) {
@@ -48,19 +52,6 @@ GLboolean Configuration::isFullscreenEnabled() const {
     return fullscreen_;
 }
 
-GLushort Configuration::getTargetMonitorIndex() const {
-    return monitor_index_;
-}
-
-void Configuration::setFrameResolution(GLuint width, GLuint height) {
-    frame_width_ = width;
-    frame_height_ = height;
-}
-
-std::pair<GLuint, GLuint> Configuration::getFrameResolution() const {
-    return std::make_pair(frame_width_, frame_height_);
-}
-
 void Configuration::setTargetMonitorIndex(GLushort index) {
     if (index >= System::instance().getMonitorsCount()) {
         logError("Configuration::setTargetMonitorIndex()",
@@ -69,4 +60,8 @@ void Configuration::setTargetMonitorIndex(GLushort index) {
     }
 
     monitor_index_ = index;
+}
+
+GLushort Configuration::getTargetMonitorIndex() const {
+    return monitor_index_;
 }

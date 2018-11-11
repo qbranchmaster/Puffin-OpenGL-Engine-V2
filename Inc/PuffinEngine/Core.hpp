@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -8,12 +8,14 @@
 
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
+#include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class Core {
     public:
         Core();
+        ~Core();
 
         InputPtr input() const {
             return input_;
@@ -27,7 +29,7 @@ namespace puffin {
             return window_;
         }
 
-        void createRenderer();
+        void initialize();
         void start() const;
         void stop() const;
 

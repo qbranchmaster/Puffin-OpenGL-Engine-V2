@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -13,20 +13,6 @@
 
 using namespace puffin;
 
-Window::Window() {
-    System::instance().initGlfw();
-}
-
-void Window::setPosition(GLint x, GLint y) {
-    glfwSetWindowPos(handle_, x, y);
-}
-
-std::pair<GLint, GLint> Window::getPosition() const {
-    GLint x = 0, y = 0;
-    glfwGetWindowPos(handle_, &x, &y);
-    return std::make_pair(x, y);
-}
-
 void Window::setCaption(std::string caption) {
     if (!handle_) {
         logError("Window::setCaption()", "Window not created yet.");
@@ -39,6 +25,30 @@ void Window::setCaption(std::string caption) {
 
 std::string Window::getCaption() const {
     return caption_;
+}
+
+void Window::setPosition(GLint x, GLint y) {
+    glfwSetWindowPos(handle_, x, y);
+}
+
+std::pair<GLint, GLint> Window::getPosition() const {
+    GLint x = 0, y = 0;
+    glfwGetWindowPos(handle_, &x, &y);
+    return std::make_pair(x, y);
+}
+
+void Window::setWindowIcon(std::string path) const {
+    Texture icon;
+    if (!icon.loadImage(path)) {
+        logError("Window::setWindowIcon()", "Could not set window icon.");
+        return;
+    }
+
+    icon.swapRedBlue();
+    icon.flipHorizontal();
+    icon.flipVertical();
+
+    glfwSetWindowIcon(handle_, 1, &icon.toGlfwImage());
 }
 
 void Window::createWindow() {
@@ -63,17 +73,4 @@ void Window::createWindow() {
     }
 
     glfwMakeContextCurrent(handle_);
-}
-
-void Window::setWindowIcon(std::string path) const {
-    Texture icon;
-    if (!icon.loadImage(path)) {
-        return;
-    }
-
-    icon.swapRedBlue();
-    icon.flipHorizontal();
-    icon.flipVertical();
-
-    glfwSetWindowIcon(handle_, 1, &icon.toGlfwImage());
 }

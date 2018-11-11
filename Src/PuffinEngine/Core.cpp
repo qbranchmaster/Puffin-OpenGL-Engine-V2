@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -8,11 +8,16 @@
 using namespace puffin;
 
 Core::Core() {
-    window_.reset(new Window());
-    input_.reset(new Input(window_));
+    System::instance().initGlfw();
 }
 
-void Core::createRenderer() {
+Core::~Core() {
+    System::instance().terminateGlfw();
+}
+
+void Core::initialize() {
+    window_.reset(new Window());
+    input_.reset(new Input(window_));
     master_renderer_.reset(new MasterRenderer(window_));
 }
 

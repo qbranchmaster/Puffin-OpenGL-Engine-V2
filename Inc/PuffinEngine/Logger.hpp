@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -27,7 +27,7 @@ namespace puffin {
             return singleton;
         }
 
-        void enable(GLboolean console_enabled, std::string file_name);
+        void enable(GLboolean console_enabled, std::string file_name = "");
         void disable();
 
         void enableTimeStamp(GLboolean state);

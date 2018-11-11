@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -10,38 +10,19 @@
 
 using namespace puffin;
 
-std::string System::getGpuVendor() const {
-    const GLubyte *data = glGetString(GL_VENDOR);
+std::string System::getGpuName() const {
+    const GLubyte *data = glGetString(GL_RENDERER);
     return std::string(reinterpret_cast<const char*>(data));
 }
 
-std::string System::getGpuName() const {
-    const GLubyte *data = glGetString(GL_RENDERER);
+std::string System::getGpuVendor() const {
+    const GLubyte *data = glGetString(GL_VENDOR);
     return std::string(reinterpret_cast<const char*>(data));
 }
 
 std::string System::getGlslVersion() const {
     const GLubyte *data = glGetString(GL_SHADING_LANGUAGE_VERSION);
     return std::string(reinterpret_cast<const char*>(data));
-}
-
-void System::initGlfw() const {
-    if (glfwInit() != GLFW_TRUE) {
-        throw Exception("System::initGlfw()",
-            "Window manager initialization error.");
-    }
-}
-
-void System::terminateGlfw() const {
-    glfwTerminate();
-}
-
-void System::initGl() const {
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        throw Exception("System::initGl()",
-            "OpenGL core initialization error.");
-    }
 }
 
 GLushort System::getMonitorsCount() const {
@@ -72,4 +53,27 @@ std::pair<GLuint, GLuint> System::getMonitorSize(GLushort index) const {
 
     auto vid_mode = glfwGetVideoMode(monitors[index]);
     return std::make_pair(vid_mode->width, vid_mode->height);
+}
+
+std::vector<GLushort> System::getSupportedMsaaSamples() const {
+    return {2, 4, 8, 16};
+}
+
+void System::initGlfw() const {
+    if (glfwInit() != GLFW_TRUE) {
+        throw Exception("System::initGlfw()",
+            "Window manager initialization error.");
+    }
+}
+
+void System::terminateGlfw() const {
+    glfwTerminate();
+}
+
+void System::initGl() const {
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK) {
+        throw Exception("System::initGl()",
+            "OpenGL core initialization error.");
+    }
 }

@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -8,8 +8,7 @@
 
 #include <GL/glew.h>
 
-#include <string>
-#include <vector>
+#include <utility>
 
 namespace puffin {
     class Configuration {
@@ -24,7 +23,6 @@ namespace puffin {
 
         void setMsaaSamples(GLushort samples);
         GLushort getMsaaSamples() const;
-        std::vector<GLushort> getSupportedMsaaSamples() const;
 
         void setOpenGLVersion(GLushort major, GLushort minor);
         std::pair<GLushort, GLushort> getOpenGLVersion() const;
@@ -48,8 +46,6 @@ namespace puffin {
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
     };
-
-    using ConfigurationPtr = std::shared_ptr<Configuration>;
 } // namespace puffin
 
 #endif // PUFFIN_CONFIGURATION_HPP

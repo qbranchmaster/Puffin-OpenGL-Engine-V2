@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -21,6 +21,8 @@ void Logger::enable(GLboolean console_enabled, std::string file_name) {
 
         log_file_ << getHeader();
     }
+
+    std::cout << getHeader();
 
     console_enabled_ = console_enabled;
     enabled_ = true;

@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -18,8 +18,6 @@ namespace puffin {
         friend class MasterRenderer;
 
     public:
-        Window();
-
         void setCaption(std::string caption);
         std::string getCaption() const;
 

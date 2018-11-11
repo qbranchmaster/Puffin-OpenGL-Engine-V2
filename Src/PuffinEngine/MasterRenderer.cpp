@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -19,6 +19,7 @@ MasterRenderer::MasterRenderer(WindowPtr window) {
     }
 
     target_window_ = window;
+
     target_window_->createWindow();
     System::instance().initGl();
 
@@ -57,9 +58,6 @@ void MasterRenderer::start() {
             stop();
         }
     }
-
-    // TODO: Find better place for it.
-    System::instance().terminateGlfw();
 }
 
 void MasterRenderer::stop() {

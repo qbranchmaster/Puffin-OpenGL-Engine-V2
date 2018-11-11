@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine ver. 2.0 Demo
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include <iostream>
 
 #include "EngineDemo.hpp"

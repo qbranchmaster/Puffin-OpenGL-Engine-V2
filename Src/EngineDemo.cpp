@@ -1,3 +1,8 @@
+/*
+* Puffin OpenGL Engine ver. 2.0 Demo
+* Created by: Sebastian 'qbranchmaster' Tabaka
+*/
+
 #include "EngineDemo.hpp"
 
 using namespace puffin;
@@ -6,24 +11,20 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    logInfo("EngineDemo::EngineDemo()", "Creating PuffinEngine instance.");
+    Configuration::instance().setFrameResolution(1280, 720);
+    Configuration::instance().setMsaaSamples(4);
+    Configuration::instance().setOpenGLVersion(4, 0);
+    Configuration::instance().enableFullscreen(false);
+    Configuration::instance().setTargetMonitorIndex(0);
 
-    //configuration()->setFrameResolution(1280, 720);
-    //configuration()->setMsaaSamples(4);
-    //configuration()->setOpenGLVersion(4, 0);
-    //configuration()->enableFullscreen(false);
-    //configuration()->setTargetMonitorIndex(0);
+    initialize();
+    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,
+        this));
 
-    createRenderer();
-    //masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,
-    //    this));
+    window()->setCaption("Puffin Engine Demo");
+    window()->setWindowIcon("Data/Icon.ico");
 
-    //window()->setCaption("Puffin Engine Demo");
-    //window()->setWindowIcon("Data/Icon.ico");
-    ////window()->setWindowCursor("Data/Cursor.png");
-    ////window()->setPosition(1920, 36);
-
-    //createTimers();
+    createTimers();
 
     ////---
     //my_mesh.reset(new Mesh());
@@ -62,23 +63,23 @@ EngineDemo::EngineDemo() : Core() {
 }
 
 EngineDemo::~EngineDemo() {
-    //stopTimers();
+    stopTimers();
 }
 
 void EngineDemo::createTimers() {
-    //fps_update_timer_.reset(new Timer(std::bind(
-    //    &EngineDemo::updateWindowCaption, this)));
-    //fps_update_timer_->start(1000);
+    fps_update_timer_.reset(new Timer(std::bind(
+        &EngineDemo::updateWindowCaption, this)));
+    fps_update_timer_->start(1000);
 }
 
 void EngineDemo::stopTimers() {
-    //fps_update_timer_->stop();
+    fps_update_timer_->stop();
 }
 
 void EngineDemo::pollKeyboard() {
-    //if (input()->keyPressed(Key::ESCAPE, false)) {
-    //    masterRenderer()->stop();
-    //}
+    if (input()->keyPressed(Key::ESCAPE, false)) {
+        masterRenderer()->stop();
+    }
 }
 
 void EngineDemo::render() {
@@ -91,10 +92,11 @@ void EngineDemo::render() {
     //my_mesh->draw(0);
     //// TODO: high gpu usage 9%, change to release and check
     ////---
-    //pollKeyboard();
+
+    pollKeyboard();
 }
 
 void EngineDemo::updateWindowCaption() {
-    /*window()->setCaption("Puffin Engine Demo [FPS: " +
-        std::to_string(time()->getFpsRate()) + "]");*/
+    window()->setCaption("Puffin Engine Demo [FPS: " +
+        std::to_string(Time::instance().getFpsRate()) + "]");
 }
