@@ -1,11 +1,9 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Mesh.hpp"
-
-#include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
 

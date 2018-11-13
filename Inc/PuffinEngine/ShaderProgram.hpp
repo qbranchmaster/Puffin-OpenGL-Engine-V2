@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class ShaderProgram {
@@ -33,19 +34,13 @@ namespace puffin {
                 return;
             }
 
-            if (bound_) {
+            if (StateMachine::instance().bound_shader_program_handle_ ==
+                handle_) {
                 return;
             }
 
             glUseProgram(handle_);
-            bound_ = 1;
-        }
-
-        void unbind() {
-            if (bound_) {
-                glUseProgram(0);
-                bound_ = 0;
-            }
+            StateMachine::instance().bound_shader_program_handle_ = handle_;
         }
 
         void loadShaders(std::string vs_path, std::string fs_path);
@@ -60,7 +55,6 @@ namespace puffin {
             }
 
             glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
-            unbind();
         }
 
         void setUniform(std::string uniform_name, const glm::vec3 &value) {
@@ -73,7 +67,6 @@ namespace puffin {
             }
 
             glUniform3fv(location, 1, glm::value_ptr(value));
-            unbind();
         }
 
         void setUniform(std::string uniform_name, const glm::vec4 &value) {
@@ -86,7 +79,6 @@ namespace puffin {
             }
 
             glUniform4fv(location, 1, glm::value_ptr(value));
-            unbind();
         }
 
         void setUniform(std::string uniform_name, GLint value) {
@@ -99,7 +91,6 @@ namespace puffin {
             }
 
             glUniform1iv(location, 1, &value);
-            unbind();
         }
 
         void setUniform(std::string uniform_name, GLfloat value) {
@@ -112,7 +103,6 @@ namespace puffin {
             }
 
             glUniform1fv(location, 1, &value);
-            unbind();
         }
 
     private:
@@ -137,8 +127,6 @@ namespace puffin {
         GLuint handle_{0};
         GLuint handle_vs_{0};
         GLuint handle_fs_{0};
-
-        GLboolean bound_{0};
 
         std::unordered_map<std::string, GLint> uniforms_;
     };

@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -13,6 +13,10 @@
 
 #include <memory>
 #include <string>
+#include <utility>
+
+#include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     enum class TextureType {
@@ -30,12 +34,44 @@ namespace puffin {
         GLboolean loadTexture2D(std::string path);
 
         void bind() {
-            // TODO: Check if it is already bound.
-            // TODO: Add unbind.
+            if (!handle_) {
+                logError("Texture::bind()", "Cannot bind null texture.");
+                return;
+            }
+
+            if (type_ == TextureType::None || type_ == TextureType::RawImage) {
+                logError("Texture::bind()", "Cannot bind this texture type.");
+                return;
+            }
+
+            if (StateMachine::instance().bound_texture_[
+                static_cast<GLushort>(type_)] == handle_) {
+                return;
+            }
+
             switch (type_) {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);
                 break;
+            default:
+                break;
+            }
+
+            StateMachine::instance().bound_texture_[
+                static_cast<GLushort>(type_)] = handle_;
+        }
+
+        void unbind() {
+            if (StateMachine::instance().bound_texture_[
+                static_cast<GLushort>(type_)] == handle_) {
+                switch (type_) {
+                case TextureType::Texture2D:
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                    break;
+                }
+
+                StateMachine::instance().bound_texture_[
+                    static_cast<GLushort>(type_)] = 0;
             }
         }
 

@@ -26,40 +26,41 @@ EngineDemo::EngineDemo() : Core() {
 
     createTimers();
 
-    ////---
-    //my_mesh.reset(new Mesh());
-    //std::vector<GLfloat> data = {
-    //    -0.5f, 0.5f, 0.0f,
-    //    -0.5f, -0.5f, 0.0f,
-    //    0.5f, 0.5f, 0.0f,
-    //    0.5f, 0.5f, 0.0f,
-    //    -0.5f, -0.5f, 0.0f,
-    //    0.5f, -0.5f, 0.0f
-    //};
+    // ---
+    std::vector<GLfloat> data = {
+        -0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
 
-    //std::vector<GLfloat> coords = {
-    //    0.0f, 1.0f,
-    //    0.0f, 0.0f,
-    //    1.0f, 1.0f,
-    //    1.0f, 1.0f,
-    //    0.0f, 0.0f,
-    //    1.0f, 0.0f,
-    //};
+    std::vector<GLfloat> coords = {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+    };
 
-    //my_mesh->setMeshData(data, 0, 3);
-    //my_mesh->setMeshData(coords, 1, 2);
-    //auto en = my_mesh->addEntity();
-    //en->setVerticesCount(6);
+    my_mesh_.reset(new Mesh());
+    my_mesh_->setMeshData(data, 0, 3);
+    my_mesh_->setMeshData(coords, 1, 2);
+    auto entity = my_mesh_->addEntity();
+    entity->setVerticesCount(6);
+    my_mesh_->translate(glm::vec3(0.5f, 0.0f, 0.0f));
 
-    //basic_shader = shaderProgramManager()->createShaderProgram();
-    //basic_shader->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
-    //basic_shader->bind();
-    //basic_shader->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
-    //basic_shader->setUniform("model_matrix", my_mesh->getModelMatrix());
+    basic_shader_.reset(new ShaderProgram());
+    basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
+    basic_shader_->bind();
+    basic_shader_->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
+    basic_shader_->setUniform("model_matrix", my_mesh_->getModelMatrix());
 
-    //basic_texture.reset(new Texture());
-    //basic_texture->loadTexture2D("Data/Brick.jpg");
-    //----
+    basic_texture_.reset(new Texture());
+    basic_texture_->loadTexture2D("Data/Brick.jpg");
+    // ----
 }
 
 EngineDemo::~EngineDemo() {
@@ -83,15 +84,15 @@ void EngineDemo::pollKeyboard() {
 }
 
 void EngineDemo::render() {
-    //---
-    //glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //glActiveTexture(GL_TEXTURE0);
-    //basic_texture->bind();
-    //my_mesh->bind();
-    //my_mesh->draw(0);
-    //// TODO: high gpu usage 9%, change to release and check
-    ////---
+    // ---
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
+    basic_texture_->bind();
+    my_mesh_->bind();
+    my_mesh_->draw(0);
+    // TODO: High CPU usage ~9%, why?
+    // ---
 
     pollKeyboard();
 }

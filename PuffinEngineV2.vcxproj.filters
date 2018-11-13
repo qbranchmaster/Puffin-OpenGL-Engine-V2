@@ -119,6 +119,9 @@
     <ClInclude Include="Inc\PuffinEngine\RandomGenerator.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\StateMachine.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

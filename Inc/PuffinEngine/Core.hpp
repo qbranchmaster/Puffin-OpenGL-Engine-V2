@@ -21,6 +21,8 @@ namespace puffin {
             return input_;
         }
 
+        // TODO: Is it needed for a user? assignRenderingFunction() can
+        // be also in other place.
         MasterRendererPtr masterRenderer() const {
             return master_renderer_;
         }

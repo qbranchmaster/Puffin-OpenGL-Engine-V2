@@ -167,6 +167,7 @@
     <ClInclude Include="Inc\PuffinEngine\MeshEntity.hpp" />
     <ClInclude Include="Inc\PuffinEngine\RandomGenerator.hpp" />
     <ClInclude Include="Inc\PuffinEngine\ShaderProgram.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\StateMachine.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Texture.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Timer.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Window.hpp" />

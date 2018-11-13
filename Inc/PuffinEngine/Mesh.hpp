@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -18,6 +18,7 @@
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MeshEntity.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class Mesh {
@@ -31,18 +32,18 @@ namespace puffin {
                 return;
             }
 
-            if (bound_) {
+            if (StateMachine::instance().bound_mesh_handle_ == handle_) {
                 return;
             }
 
             glBindVertexArray(handle_);
-            bound_ = 1;
+            StateMachine::instance().bound_mesh_handle_ = handle_;
         }
 
         void unbind() {
-            if (bound_) {
+            if (StateMachine::instance().bound_mesh_handle_ == handle_) {
                 glBindVertexArray(0);
-                bound_ = 0;
+                StateMachine::instance().bound_mesh_handle_ = 0;
             }
         }
 
@@ -130,7 +131,6 @@ namespace puffin {
 
     private:
         GLuint handle_{0};
-        GLboolean bound_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
 

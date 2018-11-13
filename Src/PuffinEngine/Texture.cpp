@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -61,6 +61,8 @@ void Texture::fetchChannelsCount() {
     }
 }
 
+// TODO: This function only works on FreeImage image. Is should also work on
+// texture.
 void Texture::swapRedBlue() {
     if (!img_handle_.accessPixels()) {
         logError("Texture::swapRedBlue()",

@@ -10,9 +10,9 @@
 #include "PuffinEngine/Core.hpp"
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
-//#include "PuffinEngine/Mesh.hpp"
-//#include "PuffinEngine/ShaderProgram.hpp"
-//#include "PuffinEngine/Texture.hpp"
+#include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Timer.hpp"
 
@@ -31,9 +31,11 @@ private:
 
     puffin::TimerPtr fps_update_timer_;
 
-    //puffin::MeshPtr my_mesh;
-    //puffin::ShaderProgramPtr basic_shader;
-    //puffin::TexturePtr basic_texture;
+    // ---
+    puffin::MeshPtr my_mesh_;
+    puffin::ShaderProgramPtr basic_shader_;
+    puffin::TexturePtr basic_texture_;
+    // ---
 };
 
 #endif // ENGINE_DEMO_HPP
