@@ -21,6 +21,8 @@ namespace puffin {
         void setFrameResolution(GLuint width, GLuint height);
         std::pair<GLuint, GLuint> getFrameResolution() const;
 
+        GLfloat getFrameAspect() const;
+
         void setMsaaSamples(GLushort samples);
         GLushort getMsaaSamples() const;
 

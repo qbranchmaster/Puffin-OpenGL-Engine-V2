@@ -60,6 +60,9 @@
     <ClCompile Include="Src\PuffinEngine\FrameBuffer.cpp">
       <Filter>Pliki źródłowe\PuffinEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Src\PuffinEngine\Camera.cpp">
+      <Filter>Pliki źródłowe\PuffinEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\PuffinEngine\Logger.hpp">
@@ -120,6 +123,9 @@
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
     <ClInclude Include="Inc\PuffinEngine\StateMachine.hpp">
+      <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PuffinEngine\Camera.hpp">
       <Filter>Pliki nagłówkowe\PuffinEngine</Filter>
     </ClInclude>
   </ItemGroup>

@@ -65,3 +65,8 @@ void Configuration::setTargetMonitorIndex(GLushort index) {
 GLushort Configuration::getTargetMonitorIndex() const {
     return monitor_index_;
 }
+
+GLfloat Configuration::getFrameAspect() const {
+    return static_cast<GLfloat>(frame_width_) /
+        static_cast<GLfloat>(frame_height_);
+}

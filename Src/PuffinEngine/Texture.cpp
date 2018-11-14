@@ -5,8 +5,6 @@
 
 #include "PuffinEngine/Texture.hpp"
 
-#include "PuffinEngine/Logger.hpp"
-
 using namespace puffin;
 
 Texture::Texture() {

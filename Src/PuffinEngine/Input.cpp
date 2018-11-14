@@ -6,7 +6,6 @@
 #include "PuffinEngine/Input.hpp"
 
 #include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
 

@@ -5,8 +5,6 @@
 
 #include "PuffinEngine/ShaderProgram.hpp"
 
-#include "PuffinEngine/Logger.hpp"
-
 using namespace puffin;
 
 puffin::ShaderProgram::ShaderProgram() {

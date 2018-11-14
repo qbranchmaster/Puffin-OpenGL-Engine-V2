@@ -6,6 +6,7 @@
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
+#include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/System.hpp"
@@ -16,6 +17,10 @@ namespace puffin {
     public:
         Core();
         ~Core();
+
+        CameraPtr camera() const {
+            return camera_;
+        }
 
         InputPtr input() const {
             return input_;
@@ -36,6 +41,7 @@ namespace puffin {
         void stop() const;
 
     private:
+        CameraPtr camera_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;
         WindowPtr window_;

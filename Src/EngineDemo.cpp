@@ -56,7 +56,11 @@ EngineDemo::EngineDemo() : Core() {
     basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
     basic_shader_->bind();
     basic_shader_->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
-    basic_shader_->setUniform("model_matrix", my_mesh_->getModelMatrix());
+    basic_shader_->setUniform("matrices.model_matrix", my_mesh_->getModelMatrix());
+
+    camera()->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
+    basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
 
     basic_texture_.reset(new Texture());
     basic_texture_->loadTexture2D("Data/Brick.jpg");
@@ -91,7 +95,6 @@ void EngineDemo::render() {
     basic_texture_->bind();
     my_mesh_->bind();
     my_mesh_->draw(0);
-    // TODO: High CPU usage ~9%, why?
     // ---
 
     pollKeyboard();

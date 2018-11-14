@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="Src\EngineDemo.cpp" />
     <ClCompile Include="Src\Main.cpp" />
+    <ClCompile Include="Src\PuffinEngine\Camera.cpp" />
     <ClCompile Include="Src\PuffinEngine\Configuration.cpp" />
     <ClCompile Include="Src\PuffinEngine\Core.cpp" />
     <ClCompile Include="Src\PuffinEngine\FrameBuffer.cpp" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\EngineDemo.hpp" />
+    <ClInclude Include="Inc\PuffinEngine\Camera.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Configuration.hpp" />
     <ClInclude Include="Inc\PuffinEngine\Core.hpp" />
     <ClInclude Include="Inc\PuffinEngine\FrameBuffer.hpp" />

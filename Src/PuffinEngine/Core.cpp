@@ -18,6 +18,7 @@ Core::~Core() {
 void Core::initialize() {
     window_.reset(new Window());
     input_.reset(new Input(window_));
+    camera_.reset(new Camera());
     master_renderer_.reset(new MasterRenderer(window_));
 }
 
