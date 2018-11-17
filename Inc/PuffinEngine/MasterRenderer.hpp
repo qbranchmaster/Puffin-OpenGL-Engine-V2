@@ -11,12 +11,13 @@
 #include <functional>
 #include <memory>
 
+#include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window);
+        MasterRenderer(WindowPtr window, CameraPtr camera);
 
         void start();
         void stop();
@@ -26,6 +27,7 @@ namespace puffin {
         GLboolean rendering_enabled_{false};
         std::function<void()> rendering_function_{nullptr};
 
+        CameraPtr camera_;
         WindowPtr target_window_;
     };
 

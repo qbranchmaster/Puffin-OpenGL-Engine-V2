@@ -19,7 +19,7 @@ void Core::initialize() {
     window_.reset(new Window());
     input_.reset(new Input(window_));
     camera_.reset(new Camera());
-    master_renderer_.reset(new MasterRenderer(window_));
+    master_renderer_.reset(new MasterRenderer(window_, camera_));
 }
 
 void Core::start() const {

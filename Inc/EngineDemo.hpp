@@ -28,6 +28,9 @@ private:
     void createTimers();
     void stopTimers();
     void pollKeyboard();
+    void pollMouse();
+    void moveCamera();
+    void rotateCamera();
 
     puffin::TimerPtr fps_update_timer_;
 

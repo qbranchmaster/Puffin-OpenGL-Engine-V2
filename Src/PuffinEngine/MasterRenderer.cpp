@@ -12,12 +12,13 @@
 
 using namespace puffin;
 
-MasterRenderer::MasterRenderer(WindowPtr window) {
-    if (!window) {
+MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera) {
+    if (!window || !camera) {
         throw Exception("MasterRenderer::MasterRenderer()",
             "Not initialized object.");
     }
 
+    camera_ = camera;
     target_window_ = window;
 
     target_window_->createWindow();
@@ -53,6 +54,8 @@ void MasterRenderer::start() {
 
         Time::instance().endDeltaMeasure();
         Time::instance().update();
+
+        camera_->update(Time::instance().getDelta());
 
         if (target_window_->isClosing()) {
             stop();
