@@ -20,14 +20,9 @@
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/StateMachine.hpp"
+#include "PuffinEngine/TextureDefs.hpp"
 
 namespace puffin {
-    enum class TextureType {
-        None,
-        RawImage,
-        Texture2D,
-    };
-
     class Texture {
     public:
         Texture();
@@ -91,12 +86,16 @@ namespace puffin {
 
         GLFWimage toGlfwImage() const;
 
+        void generateMipmap();
+        void setFilter(TextureFilter filter);
+
     private:
         void fetchChannelsCount();
 
         GLuint handle_{0};
         fipImage img_handle_;
         TextureType type_{TextureType::None};
+        GLboolean has_mipmap_{false};
 
         std::string path_;
         GLuint width_{0};

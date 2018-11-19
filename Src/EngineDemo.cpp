@@ -27,7 +27,7 @@ EngineDemo::EngineDemo() : Core() {
     createTimers();
 
     camera()->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    camera()->setFov(0.95f);
+    camera()->setFov(0.785f);
 
     // ---
     std::vector<GLfloat> data = {
@@ -66,6 +66,7 @@ EngineDemo::EngineDemo() : Core() {
 
     basic_texture_.reset(new Texture());
     basic_texture_->loadTexture2D("Data/Brick.jpg");
+    basic_texture_->setFilter(puffin::TextureFilter::TRILINEAR);
     // ----
 }
 

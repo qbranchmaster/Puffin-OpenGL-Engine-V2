@@ -10,6 +10,10 @@
 
 using namespace puffin;
 
+Configuration::Configuration() {
+    initDefaultTextureFilter();
+}
+
 void Configuration::setFrameResolution(GLuint width, GLuint height) {
     frame_width_ = width;
     frame_height_ = height;
@@ -64,6 +68,36 @@ void Configuration::setTargetMonitorIndex(GLushort index) {
 
 GLushort Configuration::getTargetMonitorIndex() const {
     return monitor_index_;
+}
+
+void Configuration::setDefaultTextureFilter(TextureType type,
+    TextureFilter filter) {
+    switch (type) {
+    case TextureType::Texture2D:
+        switch (filter) {
+        case TextureFilter::NEAREST:
+        case TextureFilter::BILINEAR:
+        case TextureFilter::BILINEAR_WITH_MIPMAPS:
+        case TextureFilter::TRILINEAR:
+            default_texture_filter_[type] = filter;
+            break;
+        default:
+            logError("Configuration::setDefaultTextureFilter()",
+                "Invalid texture type.");
+            break;
+        }
+        break;
+    }
+}
+
+TextureFilter Configuration::getDefaultTextureFilter(TextureType type) {
+    return default_texture_filter_[type];
+}
+
+void Configuration::initDefaultTextureFilter() {
+    default_texture_filter_[TextureType::Texture2D] = TextureFilter::BILINEAR;
+
+    // TODO: Init None and Image2D
 }
 
 GLfloat Configuration::getFrameAspect() const {

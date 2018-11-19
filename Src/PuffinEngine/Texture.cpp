@@ -159,3 +159,52 @@ GLFWimage Texture::toGlfwImage() const {
     img.pixels = getRawData();
     return img;
 }
+
+void Texture::generateMipmap() {
+    if (has_mipmap_) {
+        return;
+    }
+
+    if (type_ != TextureType::Texture2D) {
+        logError("Texture::generateMipmap()", "Invalid texture type.");
+        return;
+    }
+
+    bind();
+    glGenerateMipmap(GL_TEXTURE_2D);
+    has_mipmap_ = true;
+}
+
+void Texture::setFilter(TextureFilter filter) {
+    bind();
+
+    switch (type_) {
+    case TextureType::Texture2D:
+        switch (filter) {
+        case TextureFilter::NEAREST:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            break;
+        case TextureFilter::BILINEAR:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case TextureFilter::BILINEAR_WITH_MIPMAPS:
+            generateMipmap();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                GL_LINEAR_MIPMAP_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case TextureFilter::TRILINEAR:
+            generateMipmap();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        }
+        break;
+    default:
+        logError("Texture::setFilter()", "Invalid texture type.");
+        break;
+    }
+}

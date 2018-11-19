@@ -8,7 +8,10 @@
 
 #include <GL/glew.h>
 
+#include <map>
 #include <utility>
+
+#include "PuffinEngine/TextureDefs.hpp"
 
 namespace puffin {
     class Configuration {
@@ -35,10 +38,15 @@ namespace puffin {
         void setTargetMonitorIndex(GLushort index);
         GLushort getTargetMonitorIndex() const;
 
+        void setDefaultTextureFilter(TextureType type, TextureFilter filter);
+        TextureFilter getDefaultTextureFilter(TextureType type);
+
     private:
-        Configuration() {}
+        Configuration();
         Configuration(const Configuration &) = delete;
         void operator=(const Configuration &) = delete;
+
+        void initDefaultTextureFilter();
 
         GLuint frame_width_{640};
         GLuint frame_height_{480};
@@ -47,6 +55,8 @@ namespace puffin {
         GLushort monitor_index_{0};
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
+
+        std::map<TextureType, TextureFilter> default_texture_filter_;
     };
 } // namespace puffin
 

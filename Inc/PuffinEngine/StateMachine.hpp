@@ -27,8 +27,8 @@ namespace puffin {
         StateMachine(const StateMachine &) = delete;
         void operator=(const StateMachine &) = delete;
 
-        GLuint bound_mesh_handle_;
-        GLuint bound_shader_program_handle_;
+        GLuint bound_mesh_handle_{0};
+        GLuint bound_shader_program_handle_{0};
         std::unordered_map<GLushort, GLuint> bound_texture_;
     };
 } // namespace puffin
