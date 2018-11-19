@@ -1,5 +1,7 @@
 Debug/*
 Release/*
+Build/*
+build/*
 .vs/*
 *.log
 *.aps
