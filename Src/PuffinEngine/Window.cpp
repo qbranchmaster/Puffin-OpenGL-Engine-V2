@@ -74,3 +74,9 @@ void Window::createWindow() {
 
     glfwMakeContextCurrent(handle_);
 }
+
+void Window::destroyWindow() {
+    if (handle_) {
+        glfwDestroyWindow(handle_);
+    }
+}

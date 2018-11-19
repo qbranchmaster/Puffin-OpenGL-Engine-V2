@@ -28,6 +28,7 @@ namespace puffin {
 
     private:
         void createWindow();
+        void destroyWindow();
 
         GLboolean isClosing() const {
             if (glfwWindowShouldClose(handle_)) {

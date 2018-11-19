@@ -40,6 +40,10 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera) {
     }
 }
 
+MasterRenderer::~MasterRenderer() {
+    target_window_->destroyWindow();
+}
+
 void MasterRenderer::start() {
     rendering_enabled_ = true;
     while (rendering_enabled_) {
