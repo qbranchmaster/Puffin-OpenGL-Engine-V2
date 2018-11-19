@@ -6,6 +6,9 @@
 #ifndef PUFFIN_TEXTURE_HPP
 #define PUFFIN_TEXTURE_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
