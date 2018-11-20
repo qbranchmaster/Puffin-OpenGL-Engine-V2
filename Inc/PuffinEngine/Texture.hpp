@@ -36,6 +36,12 @@ namespace puffin {
         TRILINEAR,
     };
 
+    enum class TextureWrap {
+        REPEAT,
+        CLAMP_TO_EDGE,
+        CLAMP_TO_BORDER,
+    };
+
     class Texture {
     public:
         Texture();
