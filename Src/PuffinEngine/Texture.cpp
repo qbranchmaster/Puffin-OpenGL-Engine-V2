@@ -50,12 +50,6 @@ GLushort Texture::getChannelsCount() const {
 }
 
 void Texture::fetchChannelsCount() {
-    if (!img_handle_.accessPixels()) {
-        logError("Texture::fetchChannelsCount()",
-            "Cannot perform this operation on empty image.");
-        return;
-    }
-
     channels_ = img_handle_.getBitsPerPixel() / 8;
     if (channels_ == 0) { // 4 / 8 = 0.5, so int type = 0
         // Image is not empty, but has less bits per pixel than 8, so in fact,
@@ -182,7 +176,12 @@ GLboolean Texture::loadTexture2D(std::string path) {
 }
 
 GLFWimage Texture::toGlfwImage() const {
-    // TODO: Finish this function.
+    if (!img_handle_.accessPixels()) {
+        logError("Texture::toGlfwImage()",
+            "Cannot perform this operation on empty image.");
+        return GLFWimage{};
+    }
+
     GLFWimage img;
     img.width = width_;
     img.height = height_;
@@ -190,8 +189,6 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
-// TODO: This function only works on FreeImage image. Is should also work on
-// texture.
 void Texture::swapRedBlue() {
     if (!img_handle_.accessPixels()) {
         logError("Texture::swapRedBlue()",
@@ -211,6 +208,10 @@ void Texture::swapRedBlue() {
             std::swap(line[x], line[x + 2]);
         }
     }
+
+    if (type_ != TextureType::RawImage) {
+        // TODO: bind texture and set texture data.
+    }
 }
 
 void Texture::flipVertical() {
@@ -221,6 +222,10 @@ void Texture::flipVertical() {
     }
 
     img_handle_.flipVertical();
+
+    if (type_ != TextureType::RawImage) {
+        // TODO: bind texture and set texture data.
+    }
 }
 
 void Texture::flipHorizontal() {
@@ -231,4 +236,8 @@ void Texture::flipHorizontal() {
     }
 
     img_handle_.flipHorizontal();
+
+    if (type_ != TextureType::RawImage) {
+        // TODO: bind texture and set texture data.
+    }
 }
