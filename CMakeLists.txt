@@ -35,37 +35,46 @@ source_group("Demo\\Src" FILES ${DEMO_SRC})
 source_group("Demo\\Include" FILES ${DEMO_H})
 
 # Includes and libraries
+set(GLEW_INC_PATH "" CACHE PATH "GLEW include path")
+set(GLFW_INC_PATH "" CACHE PATH "GLFW include path")
+set(GLM_INC_PATH "" CACHE PATH "GLM include path")
+set(FREE_IMAGE_INC_PATH "" CACHE PATH "FreeImage include path")
+set(FREE_IMAGE_WRAP_INC_PATH "" CACHE PATH "FreeImage Wrapper include path")
+
+set(LIBS_BINARY_PATH "" CACHE PATH "Libs binaries path")
+
 if (UNIX)
     # TODO
 endif (UNIX)
 if (MSVC)
     include_directories(include
                         "${CMAKE_SOURCE_DIR}/Inc"
-                        "D:/Libs/FreeImage/Dist/x32"
-                        "D:/Libs/FreeImage/Wrapper/FreeImagePlus/dist/x32"
-                        "D:/Libs/glew/include"
-                        "D:/Libs/glfw/include"
-                        "D:/Libs/glm"
+                        ${GLEW_INC_PATH}
+                        ${GLFW_INC_PATH}
+                        ${GLM_INC_PATH}
+                        ${FREE_IMAGE_INC_PATH}
+                        ${FREE_IMAGE_WRAP_INC_PATH}
                         )
 
-    link_directories("D:/Libs/binary")
+    link_directories(${LIBS_BINARY_PATH})
 endif (MSVC)
 
 # Build configuration
-add_executable(PuffinEngineV2 ${PUFFIN_ENGINE_INC} ${PUFFIN_ENGINE_SRC} ${DEMO_SRC} ${DEMO_H})
+add_executable(PuffinEngineV2 ${PUFFIN_ENGINE_INC} ${PUFFIN_ENGINE_SRC}
+               ${DEMO_SRC} ${DEMO_H})
 
 if (UNIX)
     # TODO
 endif (UNIX)
 if (MSVC)
-    target_link_libraries(PuffinEngineV2 OpenGL32.lib FreeImaged.lib FreeImagePlusd.lib glew32d.lib
-                          glfw3.lib)
+    target_link_libraries(PuffinEngineV2 OpenGL32.lib FreeImaged.lib
+	                      FreeImagePlusd.lib glew32d.lib glfw3.lib)
 endif (MSVC)
 
 set_target_properties(PuffinEngineV2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                       ${PROJECT_BINARY_DIR}/bin)
 
 if (MSVC)
-    set_target_properties(PuffinEngineV2 PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
-                          "${CMAKE_SOURCE_DIR}")
+    set_target_properties(PuffinEngineV2 PROPERTIES
+	                      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 endif (MSVC)
