@@ -66,7 +66,7 @@ EngineDemo::EngineDemo() : Core() {
 
     basic_texture_.reset(new Texture());
     basic_texture_->loadTexture2D("Data/Brick.jpg");
-    basic_texture_->setFilter(puffin::TextureFilter::TRILINEAR);
+    basic_texture_->setTextureFilter(puffin::TextureFilter::TRILINEAR);
     // ----
 }
 

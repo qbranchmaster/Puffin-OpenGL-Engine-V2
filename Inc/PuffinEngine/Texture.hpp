@@ -14,19 +14,35 @@
 
 #include <FreeImagePlus.h>
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/StateMachine.hpp"
-#include "PuffinEngine/TextureDefs.hpp"
 
 namespace puffin {
+    enum class TextureType {
+        None,
+        RawImage,
+        Texture2D,
+    };
+
+    enum class TextureFilter {
+        NEAREST,
+        BILINEAR,
+        BILINEAR_WITH_MIPMAPS,
+        TRILINEAR,
+    };
+
     class Texture {
     public:
         Texture();
         ~Texture();
+
+        static void setDefaultTextureFilter(TextureType type,
+            TextureFilter filter);
 
         GLboolean loadImage(std::string path);
         GLboolean loadTexture2D(std::string path);
@@ -83,11 +99,11 @@ namespace puffin {
         void swapRedBlue();
         void flipVertical();
         void flipHorizontal();
+        void generateMipmap();
 
         GLFWimage toGlfwImage() const;
 
-        void generateMipmap();
-        void setFilter(TextureFilter filter);
+        void setTextureFilter(TextureFilter filter);
 
     private:
         void fetchChannelsCount();
@@ -101,6 +117,8 @@ namespace puffin {
         GLuint width_{0};
         GLuint height_{0};
         GLushort channels_{0};
+
+        static std::map<TextureType, TextureFilter> default_texture_filter_;
     };
 
     using TexturePtr = std::shared_ptr<Texture>;

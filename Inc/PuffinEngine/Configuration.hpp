@@ -11,8 +11,6 @@
 #include <map>
 #include <utility>
 
-#include "PuffinEngine/TextureDefs.hpp"
-
 namespace puffin {
     class Configuration {
     public:
@@ -38,11 +36,8 @@ namespace puffin {
         void setTargetMonitorIndex(GLushort index);
         GLushort getTargetMonitorIndex() const;
 
-        void setDefaultTextureFilter(TextureType type, TextureFilter filter);
-        TextureFilter getDefaultTextureFilter(TextureType type);
-
     private:
-        Configuration();
+        Configuration() {}
         Configuration(const Configuration &) = delete;
         void operator=(const Configuration &) = delete;
 
@@ -55,8 +50,6 @@ namespace puffin {
         GLushort monitor_index_{0};
 
         std::pair<GLushort, GLushort> gl_version_{4, 0};
-
-        std::map<TextureType, TextureFilter> default_texture_filter_;
     };
 } // namespace puffin
 
