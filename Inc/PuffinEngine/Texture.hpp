@@ -27,6 +27,7 @@ namespace puffin {
         None,
         RawImage,
         Texture2D,
+        TextureCube,
     };
 
     enum class TextureFilter {
