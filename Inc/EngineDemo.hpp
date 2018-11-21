@@ -12,6 +12,7 @@
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/Skybox.hpp"
 #include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Timer.hpp"
@@ -36,8 +37,11 @@ private:
 
     // ---
     puffin::MeshPtr my_mesh_;
+    puffin::SkyboxPtr skybox_;
     puffin::ShaderProgramPtr basic_shader_;
+    puffin::ShaderProgramPtr skybox_shader_;
     puffin::TexturePtr basic_texture_;
+    puffin::TexturePtr skybox_texture_;
     // ---
 };
 

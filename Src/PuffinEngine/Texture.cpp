@@ -9,7 +9,8 @@ using namespace puffin;
 
 // Initialize default texture filter.
 std::map<TextureType, TextureFilter> Texture::default_texture_filter_ = {
-    {TextureType::Texture2D, TextureFilter::NEAREST}
+    {TextureType::Texture2D, TextureFilter::BILINEAR},
+    {TextureType::TextureCube, TextureFilter::BILINEAR}
 };
 
 Texture::Texture() {
@@ -57,6 +58,14 @@ void Texture::fetchChannelsCount() {
         channels_ = 1;
     }
 }
+GLboolean Texture::loadImageRaw(std::string path) {
+    if (!loadImage(path)) {
+        return false;
+    }
+
+    type_ = TextureType::RawImage;
+    return true;
+}
 
 GLboolean Texture::loadImage(std::string path) {
     if (path.empty()) {
@@ -64,15 +73,13 @@ GLboolean Texture::loadImage(std::string path) {
         return false;
     }
 
-    path_ = path;
-
-    if (!img_handle_.load(path_.c_str())) {
+    if (!img_handle_.load(path.c_str())) {
         logError("Texture::loadImage()", "Error loading image from file [" +
-            path_ + "].");
+            path + "].");
         return false;
     }
 
-    type_ = TextureType::RawImage;
+    path_ = path;
     width_ = img_handle_.getWidth();
     height_ = img_handle_.getHeight();
     fetchChannelsCount();
@@ -115,6 +122,52 @@ void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
     }
 }
 
+void Texture::setTextureWrap(TextureWrap wrap_mode) {
+    bind();
+
+    switch (type_) {
+    case TextureType::Texture2D:
+        switch (wrap_mode) {
+        case TextureWrap::REPEAT:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            break;
+        case TextureWrap::CLAMP_TO_BORDER:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                GL_CLAMP_TO_BORDER);
+            break;
+        case TextureWrap::CLAMP_TO_EDGE:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                GL_CLAMP_TO_EDGE);
+            break;
+        }
+        break;
+    case TextureType::TextureCube:
+        switch (wrap_mode) {
+        case TextureWrap::CLAMP_TO_EDGE:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
+                GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
+                GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
+                GL_CLAMP_TO_EDGE);
+            break;
+        default:
+            logError("Texture::setTextureWrap()",
+                "Not supported texture wrap.");
+            break;
+        }
+        break;
+    default:
+        logError("Texture::setTextureWrap()", "Invalid texture type.");
+        break;
+    }
+}
+
 void Texture::setTextureFilter(TextureFilter filter) {
     bind();
 
@@ -143,35 +196,78 @@ void Texture::setTextureFilter(TextureFilter filter) {
             break;
         }
         break;
+    case TextureType::TextureCube:
+        switch (filter) {
+        case TextureFilter::BILINEAR:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,
+                GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
+                GL_LINEAR);
+            break;
+        default:
+            logError("Texture::setTextureFilter()",
+                "Not supported texture filter.");
+            break;
+        }
+        break;
     default:
         logError("Texture::setTextureFilter()", "Invalid texture type.");
         break;
     }
 }
 
-GLboolean Texture::loadTexture2D(std::string path) {
+GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     if (!loadImage(path)) {
         return false;
     }
 
     type_ = TextureType::Texture2D;
-
-    // TODO: Do it better.
-    glActiveTexture(GL_TEXTURE0);
-    // TODO: Use bind().
-    glBindTexture(GL_TEXTURE_2D, handle_);
+    bind();
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
         GL_UNSIGNED_BYTE, img_handle_.accessPixels());
 
-    // TODO: Add functions for setting texture filter and generate mipmap.
-    // glGenerateMipmap(GL_TEXTURE_2D);
-    // Default filter for opengl is linear, so it is needed to have mipmap generated
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    // ----------
+    setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
+
+    if (auto_free) {
+        freeImage();
+    }
 
     logInfo("Texture::loadTexture2D()", "Texture 2D [" + path + "] loaded.");
+    return true;
+}
+
+void Texture::setTexture2DData(void *data) {
+    if (type_ != TextureType::Texture2D) {
+        logError("Texture::setTexture2DData()", "Invalid texture type.");
+        return;
+    }
+
+    bind();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
+        GL_UNSIGNED_BYTE, data);
+}
+
+GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
+    type_ = TextureType::TextureCube;
+    bind();
+
+    for (GLushort i = 0; i < 6; i++) {
+        if (!loadImage(paths[i])) {
+            return false;
+        }
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_,
+            height_, 0, GL_BGR, GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+        freeImage();
+
+        logInfo("Texture::loadTextureCube()", "Texture [" + paths[i] +
+            "] loaded.");
+    }
+
+    setTextureFilter(default_texture_filter_[TextureType::TextureCube]);
+    setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
+
     return true;
 }
 
@@ -209,8 +305,8 @@ void Texture::swapRedBlue() {
         }
     }
 
-    if (type_ != TextureType::RawImage) {
-        // TODO: bind texture and set texture data.
+    if (type_ == TextureType::Texture2D) {
+        setTexture2DData(img_handle_.accessPixels());
     }
 }
 
@@ -223,8 +319,8 @@ void Texture::flipVertical() {
 
     img_handle_.flipVertical();
 
-    if (type_ != TextureType::RawImage) {
-        // TODO: bind texture and set texture data.
+    if (type_ == TextureType::Texture2D) {
+        setTexture2DData(img_handle_.accessPixels());
     }
 }
 
@@ -237,7 +333,7 @@ void Texture::flipHorizontal() {
 
     img_handle_.flipHorizontal();
 
-    if (type_ != TextureType::RawImage) {
-        // TODO: bind texture and set texture data.
+    if (type_ == TextureType::Texture2D) {
+        setTexture2DData(img_handle_.accessPixels());
     }
 }

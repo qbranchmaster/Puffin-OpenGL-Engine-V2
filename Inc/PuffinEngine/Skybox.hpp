@@ -6,6 +6,8 @@
 #ifndef PUFFIN_SKYBOX_HPP
 #define PUFFIN_SKYBOX_HPP
 
+#include <memory>
+
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Texture.hpp"
 
@@ -34,6 +36,8 @@ namespace puffin {
 
         TexturePtr texture_;
     };
+
+    using SkyboxPtr = std::shared_ptr<Skybox>;
 } // namespace puffin
 
 #endif // PUFFIN_SKYBOX_HPP

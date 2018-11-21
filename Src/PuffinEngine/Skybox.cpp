@@ -51,6 +51,10 @@ Skybox::Skybox() : Mesh() {
         -1.0f, -1.0f,  1.0f,
         1.0f, -1.0f,  1.0f
     };
+
+    setMeshData(data, 0, 3);
+    auto entity = addEntity();
+    entity->setVerticesCount(36);
 }
 
 void Skybox::setTexture(TexturePtr texture) {

@@ -189,7 +189,7 @@ namespace puffin {
             /*view_matrix_ = rotation_matrix_ * glm::translate(glm::mat4(1.0f),
                 -position_);*/
 
-            //view_matrix_static_ = glm::mat4(glm::mat3(view_matrix_));
+            view_matrix_static_ = glm::mat4(glm::mat3(view_matrix_));
             //view_matrix_inverted_ = glm::inverse(view_matrix_);
         }
 

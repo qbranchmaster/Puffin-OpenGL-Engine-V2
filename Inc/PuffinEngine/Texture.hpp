@@ -14,6 +14,7 @@
 
 #include <FreeImagePlus.h>
 
+#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -51,8 +52,9 @@ namespace puffin {
         static void setDefaultTextureFilter(TextureType type,
             TextureFilter filter);
 
-        GLboolean loadImage(std::string path);
-        GLboolean loadTexture2D(std::string path);
+        GLboolean loadImageRaw(std::string path);
+        GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
+        GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
         void bind() {
             if (!handle_) {
@@ -74,6 +76,9 @@ namespace puffin {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);
                 break;
+            case TextureType::TextureCube:
+                glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
+                break;
             default:
                 break;
             }
@@ -88,6 +93,9 @@ namespace puffin {
                 switch (type_) {
                 case TextureType::Texture2D:
                     glBindTexture(GL_TEXTURE_2D, 0);
+                    break;
+                case TextureType::TextureCube:
+                    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
                     break;
                 }
 
@@ -111,9 +119,12 @@ namespace puffin {
         GLFWimage toGlfwImage() const;
 
         void setTextureFilter(TextureFilter filter);
+        void setTextureWrap(TextureWrap wrap_mode);
 
     private:
+        GLboolean loadImage(std::string path);
         void fetchChannelsCount();
+        void setTexture2DData(void *data);
 
         GLuint handle_{0};
         fipImage img_handle_;

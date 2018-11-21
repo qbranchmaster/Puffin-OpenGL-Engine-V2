@@ -11,7 +11,7 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    Configuration::instance().setFrameResolution(1280, 720);
+    Configuration::instance().setFrameResolution(240, 120);
     Configuration::instance().setMsaaSamples(4);
     Configuration::instance().setOpenGLVersion(4, 0);
     Configuration::instance().enableFullscreen(false);
@@ -22,7 +22,7 @@ EngineDemo::EngineDemo() : Core() {
         this));
 
     window()->setCaption("Puffin Engine Demo");
-    window()->setWindowIcon("Data/Icon.ico");
+    window()->setWindowIcon("DemoData/Icon.ico");
 
     createTimers();
 
@@ -55,18 +55,32 @@ EngineDemo::EngineDemo() : Core() {
     entity->setVerticesCount(6);
     my_mesh_->translate(glm::vec3(0.5f, 0.0f, 0.0f));
 
+    skybox_.reset(new Skybox());
+    skybox_->setFilterColor(glm::vec3(0.8f, 0.5f, 0.5f));
+
     basic_shader_.reset(new ShaderProgram());
     basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
     basic_shader_->bind();
     basic_shader_->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
     basic_shader_->setUniform("matrices.model_matrix", my_mesh_->getModelMatrix());
 
+    skybox_shader_.reset(new ShaderProgram());
+    skybox_shader_->loadShaders("Shaders/SkyboxVS.glsl", "Shaders/SkyboxFS.glsl");
+
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
     basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
 
     basic_texture_.reset(new Texture());
-    basic_texture_->loadTexture2D("Data/Brick.jpg");
-    basic_texture_->setTextureFilter(puffin::TextureFilter::TRILINEAR);
+    basic_texture_->loadTexture2D("DemoData/Brick.jpg");
+
+    skybox_texture_.reset(new Texture());
+    skybox_texture_->loadTextureCube({
+        "DemoData/Skybox/right.png",
+        "DemoData/Skybox/left.png",
+        "DemoData/Skybox/up.png",
+        "DemoData/Skybox/down.png",
+        "DemoData/Skybox/back.png",
+        "DemoData/Skybox/front.png"});
     // ----
 }
 
@@ -99,8 +113,20 @@ void EngineDemo::pollMouse() {
 void EngineDemo::render() {
     // ---
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glActiveTexture(GL_TEXTURE0);
+
+    skybox_shader_->bind();
+    skybox_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrixStatic());
+    skybox_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
+    skybox_shader_->setUniform("matrices.model_matrix", skybox_->getModelMatrix());
+    skybox_shader_->setUniform("color.filter_color", skybox_->getFilterColor());
+    skybox_texture_->bind();
+    skybox_->bind();
+    skybox_->draw(0);
+
+    basic_shader_->bind();
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
     basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
 
@@ -116,6 +142,8 @@ void EngineDemo::render() {
 void EngineDemo::updateWindowCaption() {
     window()->setCaption("Puffin Engine Demo [FPS: " +
         std::to_string(Time::instance().getFpsRate()) + "]");
+
+
 }
 
 void EngineDemo::moveCamera() {
