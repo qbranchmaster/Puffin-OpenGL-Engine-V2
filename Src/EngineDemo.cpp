@@ -11,7 +11,7 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    Configuration::instance().setFrameResolution(240, 120);
+    Configuration::instance().setFrameResolution(1280, 720);
     Configuration::instance().setMsaaSamples(4);
     Configuration::instance().setOpenGLVersion(4, 0);
     Configuration::instance().enableFullscreen(false);
@@ -56,7 +56,7 @@ EngineDemo::EngineDemo() : Core() {
     my_mesh_->translate(glm::vec3(0.5f, 0.0f, 0.0f));
 
     skybox_.reset(new Skybox());
-    skybox_->setFilterColor(glm::vec3(0.8f, 0.5f, 0.5f));
+    skybox_->setFilterColor(glm::vec3(0.9f, 0.9f, 0.9f));
 
     basic_shader_.reset(new ShaderProgram());
     basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
@@ -75,12 +75,12 @@ EngineDemo::EngineDemo() : Core() {
 
     skybox_texture_.reset(new Texture());
     skybox_texture_->loadTextureCube({
-        "DemoData/Skybox/right.png",
-        "DemoData/Skybox/left.png",
-        "DemoData/Skybox/up.png",
-        "DemoData/Skybox/down.png",
-        "DemoData/Skybox/back.png",
-        "DemoData/Skybox/front.png"});
+        "DemoData/Skybox/right.jpg",
+        "DemoData/Skybox/left.jpg",
+        "DemoData/Skybox/up.jpg",
+        "DemoData/Skybox/down.jpg",
+        "DemoData/Skybox/back.jpg",
+        "DemoData/Skybox/front.jpg"});
     // ----
 }
 
@@ -142,8 +142,6 @@ void EngineDemo::render() {
 void EngineDemo::updateWindowCaption() {
     window()->setCaption("Puffin Engine Demo [FPS: " +
         std::to_string(Time::instance().getFpsRate()) + "]");
-
-
 }
 
 void EngineDemo::moveCamera() {
@@ -172,7 +170,7 @@ void EngineDemo::rotateCamera() {
     static GLfloat cursor_x = 0.0f;
     static GLfloat cursor_y = 0.0f;
 
-    constexpr GLfloat mouse_speed = 0.005f;
+    constexpr GLfloat mouse_speed = 0.001f;
 
     if (input()->mouseKeyPressed(MouseButton::LEFT)) {
         GLfloat cur_x = 0.0f;
