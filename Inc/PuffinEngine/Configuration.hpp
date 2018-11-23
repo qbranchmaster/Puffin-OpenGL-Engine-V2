@@ -41,8 +41,6 @@ namespace puffin {
         Configuration(const Configuration &) = delete;
         void operator=(const Configuration &) = delete;
 
-        void initDefaultTextureFilter();
-
         GLuint frame_width_{640};
         GLuint frame_height_{480};
         GLushort msaa_samples_{4};
