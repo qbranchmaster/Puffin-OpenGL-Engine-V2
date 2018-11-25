@@ -18,7 +18,6 @@ namespace puffin {
     class MasterRenderer {
     public:
         MasterRenderer(WindowPtr window, CameraPtr camera);
-        ~MasterRenderer();
 
         void start();
         void stop();

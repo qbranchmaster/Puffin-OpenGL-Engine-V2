@@ -39,7 +39,6 @@ private:
     puffin::MeshPtr my_mesh_;
     puffin::SkyboxPtr skybox_;
     puffin::ShaderProgramPtr basic_shader_;
-    puffin::ShaderProgramPtr skybox_shader_;
     puffin::TexturePtr basic_texture_;
     puffin::TexturePtr skybox_texture_;
     // ---

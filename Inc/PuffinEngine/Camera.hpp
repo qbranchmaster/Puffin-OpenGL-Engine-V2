@@ -212,11 +212,11 @@ namespace puffin {
             rotation_matrix_inverted_ = glm::inverse(rotation_matrix_);
         }
 
-        void update(GLdouble detla_time) {
+        void update(GLdouble delta_time) {
             translate(direction_ * ahead_speed_ *
-                static_cast<float>(detla_time));
+                static_cast<float>(delta_time));
             translate(right_ * side_speed_ *
-                static_cast<float>(detla_time));
+                static_cast<float>(delta_time));
 
             ahead_speed_ *= move_resistance_factor_;
             side_speed_ *= move_resistance_factor_;

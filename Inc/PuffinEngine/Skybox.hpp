@@ -16,14 +16,6 @@ namespace puffin {
     public:
         Skybox();
 
-        void setFilterColor(const glm::vec3 &color) {
-            filter_color_ = color;
-        }
-
-        glm::vec3 getFilterColor() const {
-            return filter_color_;
-        }
-
         void setTexture(TexturePtr texture);
 
         TexturePtr getTexture() const {
@@ -31,7 +23,6 @@ namespace puffin {
         }
 
     private:
-        glm::vec3 filter_color_{1.0f, 1.0f, 1.0f};
         GLfloat rotation_angle_{0.0f};
 
         TexturePtr texture_;

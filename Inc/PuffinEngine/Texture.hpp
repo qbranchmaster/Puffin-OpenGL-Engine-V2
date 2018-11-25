@@ -51,6 +51,8 @@ namespace puffin {
 
         static void setDefaultTextureFilter(TextureType type,
             TextureFilter filter);
+        static void setTextureSlot(GLushort slot_index);
+        static void unbindAllTextures(TextureType type);
 
         GLboolean loadImageRaw(std::string path);
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
@@ -137,6 +139,7 @@ namespace puffin {
         GLushort channels_{0};
 
         static std::map<TextureType, TextureFilter> default_texture_filter_;
+        static GLushort active_slot_;
     };
 
     using TexturePtr = std::shared_ptr<Texture>;

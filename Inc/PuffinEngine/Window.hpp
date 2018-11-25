@@ -21,6 +21,9 @@ namespace puffin {
         friend class MasterRenderer;
 
     public:
+        Window();
+        ~Window();
+
         void setCaption(std::string caption);
         std::string getCaption() const;
 

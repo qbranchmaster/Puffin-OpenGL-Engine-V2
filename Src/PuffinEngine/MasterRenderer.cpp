@@ -21,9 +21,6 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera) {
     camera_ = camera;
     target_window_ = window;
 
-    target_window_->createWindow();
-    System::instance().initGl();
-
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " +
@@ -38,10 +35,6 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera) {
             std::to_string(System::instance().getMonitorSize(i).first) +
             "x" + std::to_string(System::instance().getMonitorSize(i).second));
     }
-}
-
-MasterRenderer::~MasterRenderer() {
-    target_window_->destroyWindow();
 }
 
 void MasterRenderer::start() {

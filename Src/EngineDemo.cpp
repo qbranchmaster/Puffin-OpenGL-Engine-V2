@@ -55,23 +55,19 @@ EngineDemo::EngineDemo() : Core() {
     entity->setVerticesCount(6);
     my_mesh_->translate(glm::vec3(0.5f, 0.0f, 0.0f));
 
-    skybox_.reset(new Skybox());
-    skybox_->setFilterColor(glm::vec3(0.9f, 0.9f, 0.9f));
-
     basic_shader_.reset(new ShaderProgram());
     basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
     basic_shader_->bind();
     basic_shader_->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
     basic_shader_->setUniform("matrices.model_matrix", my_mesh_->getModelMatrix());
 
-    skybox_shader_.reset(new ShaderProgram());
-    skybox_shader_->loadShaders("Shaders/SkyboxVS.glsl", "Shaders/SkyboxFS.glsl");
-
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
     basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
 
     basic_texture_.reset(new Texture());
     basic_texture_->loadTexture2D("DemoData/Brick.jpg");
+
+    skybox_.reset(new Skybox());
 
     skybox_texture_.reset(new Texture());
     skybox_texture_->loadTextureCube({
@@ -81,6 +77,10 @@ EngineDemo::EngineDemo() : Core() {
         "DemoData/Skybox/down.jpg",
         "DemoData/Skybox/back.jpg",
         "DemoData/Skybox/front.jpg"});
+
+    skybox_->setTexture(skybox_texture_);
+
+    skyboxRenderer()->setFilterColor(glm::vec3(0.5f, 0.3f, 0.6f));
     // ----
 }
 
@@ -117,14 +117,7 @@ void EngineDemo::render() {
 
     glActiveTexture(GL_TEXTURE0);
 
-    skybox_shader_->bind();
-    skybox_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrixStatic());
-    skybox_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
-    skybox_shader_->setUniform("matrices.model_matrix", skybox_->getModelMatrix());
-    skybox_shader_->setUniform("color.filter_color", skybox_->getFilterColor());
-    skybox_texture_->bind();
-    skybox_->bind();
-    skybox_->draw(0);
+    skyboxRenderer()->render(skybox_);
 
     basic_shader_->bind();
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
@@ -170,7 +163,7 @@ void EngineDemo::rotateCamera() {
     static GLfloat cursor_x = 0.0f;
     static GLfloat cursor_y = 0.0f;
 
-    constexpr GLfloat mouse_speed = 0.001f;
+    constexpr GLfloat mouse_speed = 0.002f;
 
     if (input()->mouseKeyPressed(MouseButton::LEFT)) {
         GLfloat cur_x = 0.0f;

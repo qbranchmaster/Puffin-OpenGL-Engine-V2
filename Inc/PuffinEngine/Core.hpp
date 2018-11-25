@@ -9,6 +9,8 @@
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
+#include "PuffinEngine/RenderSettings.hpp"
+#include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Window.hpp"
 
@@ -32,6 +34,14 @@ namespace puffin {
             return master_renderer_;
         }
 
+        RenderSettingsPtr renderSettings() const {
+            return render_settings_;
+        }
+
+        SkyboxRendererPtr skyboxRenderer() const {
+            return skybox_renderer_;
+        }
+
         WindowPtr window() const {
             return window_;
         }
@@ -44,6 +54,8 @@ namespace puffin {
         CameraPtr camera_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;
+        RenderSettingsPtr render_settings_;
+        SkyboxRendererPtr skybox_renderer_;
         WindowPtr window_;
     };
 } // namespace puffin

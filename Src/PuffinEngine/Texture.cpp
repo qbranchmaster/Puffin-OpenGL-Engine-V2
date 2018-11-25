@@ -13,6 +13,8 @@ std::map<TextureType, TextureFilter> Texture::default_texture_filter_ = {
     {TextureType::TextureCube, TextureFilter::BILINEAR}
 };
 
+GLushort Texture::active_slot_ = 0;
+
 Texture::Texture() {
     glGenTextures(1, &handle_);
 }
@@ -120,6 +122,30 @@ void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
         }
         break;
     }
+}
+
+void Texture::setTextureSlot(GLushort slot_index) {
+    if (slot_index != active_slot_) {
+        glActiveTexture(GL_TEXTURE0 + slot_index);
+        active_slot_ = slot_index;
+    }
+}
+
+void Texture::unbindAllTextures(TextureType type) {
+    if (type == TextureType::None || type == TextureType::RawImage) {
+        return;
+    }
+
+    switch (type) {
+    case TextureType::Texture2D:
+        glBindTexture(GL_TEXTURE_2D, 0);
+        break;
+    case TextureType::TextureCube:
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        break;
+    }
+
+    StateMachine::instance().bound_texture_[static_cast<GLushort>(type)] = 0;
 }
 
 void Texture::setTextureWrap(TextureWrap wrap_mode) {
