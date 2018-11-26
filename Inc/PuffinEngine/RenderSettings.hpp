@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 
@@ -19,6 +20,10 @@ namespace puffin {
             face_cull_.reset(new FaceCull());
         }
 
+        AlphaBlendPtr alphaBlend() const {
+            return alpha_blend_;
+        }
+
         DepthTestPtr depthTest() const {
             return depth_test_;
         }
@@ -28,6 +33,7 @@ namespace puffin {
         }
 
     private:
+        AlphaBlendPtr alpha_blend_;
         DepthTestPtr depth_test_;
         FaceCullPtr face_cull_;
     };

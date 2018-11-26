@@ -29,6 +29,9 @@ EngineDemo::EngineDemo() : Core() {
     camera()->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
     camera()->setFov(0.785f);
 
+    Texture::setDefaultTextureFilter(TextureType::Texture2D,
+        TextureFilter::TRILINEAR);
+
     // ---
     std::vector<GLfloat> data = {
         -0.5f, 0.5f, 0.0f,
@@ -80,7 +83,7 @@ EngineDemo::EngineDemo() : Core() {
 
     skybox_->setTexture(skybox_texture_);
 
-    skyboxRenderer()->setFilterColor(glm::vec3(0.5f, 0.3f, 0.6f));
+    skyboxRenderer()->setFilterColor(glm::vec3(1.0f, 1.0f, 1.0f));
     // ----
 }
 
