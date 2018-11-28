@@ -73,3 +73,11 @@ void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
 
     rendering_function_ = function;
 }
+
+void MasterRenderer::drawScene(ScenePtr scene) {
+    if (!scene) {
+        return;
+    }
+
+
+}

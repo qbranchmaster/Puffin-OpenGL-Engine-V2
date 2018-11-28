@@ -58,7 +58,7 @@ namespace puffin {
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
-        void bind() {
+        void bind() const {
             if (!handle_) {
                 logError("Texture::bind()", "Cannot bind null texture.");
                 return;
@@ -89,7 +89,7 @@ namespace puffin {
                 static_cast<GLushort>(type_)] = handle_;
         }
 
-        void unbind() {
+        void unbind() const {
             if (StateMachine::instance().bound_texture_[
                 static_cast<GLushort>(type_)] == handle_) {
                 switch (type_) {

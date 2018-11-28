@@ -26,7 +26,7 @@ namespace puffin {
         Mesh();
         ~Mesh();
 
-        void bind() {
+        void bind() const {
             if (!handle_) {
                 logError("Mesh::bind()", "Cannot bind null mesh.");
                 return;
@@ -40,7 +40,7 @@ namespace puffin {
             StateMachine::instance().bound_mesh_handle_ = handle_;
         }
 
-        void unbind() {
+        void unbind() const {
             if (StateMachine::instance().bound_mesh_handle_ == handle_) {
                 glBindVertexArray(0);
                 StateMachine::instance().bound_mesh_handle_ = 0;

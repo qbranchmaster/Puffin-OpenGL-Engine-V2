@@ -12,6 +12,7 @@
 
 namespace puffin {
     class StateMachine {
+        friend class FrameBuffer;
         friend class Mesh;
         friend class ShaderProgram;
         friend class Texture;
@@ -29,6 +30,7 @@ namespace puffin {
 
         GLuint bound_mesh_handle_{0};
         GLuint bound_shader_program_handle_{0};
+        GLuint bound_frame_buffer_{0};
         std::unordered_map<GLushort, GLuint> bound_texture_;
     };
 } // namespace puffin

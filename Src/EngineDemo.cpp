@@ -33,6 +33,8 @@ EngineDemo::EngineDemo() : Core() {
         TextureFilter::TRILINEAR);
 
     // ---
+    scene_.reset(new Scene());
+
     std::vector<GLfloat> data = {
         -0.5f, 0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f,
@@ -84,6 +86,8 @@ EngineDemo::EngineDemo() : Core() {
     skybox_->setTexture(skybox_texture_);
 
     skyboxRenderer()->setFilterColor(glm::vec3(1.0f, 1.0f, 1.0f));
+
+    scene_->setSkybox(skybox_);
     // ----
 }
 
@@ -115,12 +119,15 @@ void EngineDemo::pollMouse() {
 
 void EngineDemo::render() {
     // ---
+    auto size = Configuration::instance().getFrameResolution();
+    glViewport(0, 0, size.first, size.second);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
 
-    skyboxRenderer()->render(skybox_);
+    //skyboxRenderer()->render(skybox_);
+    masterRenderer()->drawScene(scene_);
 
     basic_shader_->bind();
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());

@@ -6,16 +6,19 @@
 #ifndef ENGINE_DEMO_HPP
 #define ENGINE_DEMO_HPP
 
+// ---
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Core.hpp"
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/Skybox.hpp"
 #include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Timer.hpp"
+// ---
 
 class EngineDemo : public puffin::Core {
 public:
@@ -37,6 +40,7 @@ private:
 
     // ---
     puffin::MeshPtr my_mesh_;
+    puffin::ScenePtr scene_;
     puffin::SkyboxPtr skybox_;
     puffin::ShaderProgramPtr basic_shader_;
     puffin::TexturePtr basic_texture_;

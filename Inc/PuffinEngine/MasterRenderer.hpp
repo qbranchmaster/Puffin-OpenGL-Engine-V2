@@ -12,6 +12,7 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
@@ -22,6 +23,8 @@ namespace puffin {
         void start();
         void stop();
         void assignRenderingFunction(std::function<void()> function);
+
+        void drawScene(ScenePtr scene);
 
     private:
         GLboolean rendering_enabled_{false};

@@ -1,5 +1,5 @@
 /*
-* Puffin OpenGL Engine
+* Puffin OpenGL Engine ver. 2.0
 * Created by: Sebastian 'qbranchmaster' Tabaka
 */
 
@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class FrameBuffer {
@@ -18,34 +19,38 @@ namespace puffin {
         FrameBuffer();
         ~FrameBuffer();
 
-        void bind() {
+        void bind() const {
             if (!handle_) {
                 logError("FrameBuffer::bind()",
                     "Cannot bind null framebuffer.");
                 return;
             }
 
-            if (bound_) {
+            if (StateMachine::instance().bound_frame_buffer_ == handle_) {
                 return;
             }
 
             glBindFramebuffer(GL_FRAMEBUFFER, handle_);
-            bound_ = 1;
+            StateMachine::instance().bound_frame_buffer_ = handle_;
         }
 
-        void unbind() {
-            if (bound_) {
+        void unbind() const {
+            if (StateMachine::instance().bound_frame_buffer_ == handle_) {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                bound_ = 0;
+                StateMachine::instance().bound_frame_buffer_ = 0;
             }
         }
 
-        // TODO: After adding StateMachine this function should be const.
-        GLboolean isComplete();
+        void addTextureBuffer(GLuint width, GLuint height);
+        void addRenderBuffer(GLuint width, GLuint height);
+
+        GLboolean isComplete() const;
 
     private:
         GLuint handle_{0};
-        GLboolean bound_{0};
+
+        GLuint rgb_texture_buffer_handle_{0};
+        GLuint depth_render_buffer_handle_{0};
     };
 
     using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
