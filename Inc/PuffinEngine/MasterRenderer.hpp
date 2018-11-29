@@ -13,12 +13,14 @@
 
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Scene.hpp"
+#include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window, CameraPtr camera);
+        MasterRenderer(WindowPtr window, CameraPtr camera,
+            SkyboxRendererPtr skybox_renderer);
 
         void start();
         void stop();
@@ -31,6 +33,7 @@ namespace puffin {
         std::function<void()> rendering_function_{nullptr};
 
         CameraPtr camera_;
+        SkyboxRendererPtr skybox_renderer_;
         WindowPtr target_window_;
     };
 

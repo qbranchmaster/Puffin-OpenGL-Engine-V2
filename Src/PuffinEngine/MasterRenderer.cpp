@@ -12,14 +12,16 @@
 
 using namespace puffin;
 
-MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera) {
-    if (!window || !camera) {
+MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
+    SkyboxRendererPtr skybox_renderer) {
+    if (!window || !camera || !skybox_renderer) {
         throw Exception("MasterRenderer::MasterRenderer()",
             "Not initialized object.");
     }
 
     camera_ = camera;
     target_window_ = window;
+    skybox_renderer_ = skybox_renderer;
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());
@@ -46,8 +48,8 @@ void MasterRenderer::start() {
             rendering_function_();
         }
 
-        target_window_->pollEvents();
         target_window_->swapBuffers();
+        target_window_->pollEvents();
 
         Time::instance().endDeltaMeasure();
         Time::instance().update();
@@ -79,5 +81,5 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         return;
     }
 
-
+    skybox_renderer_->render(scene->active_skybox_);
 }

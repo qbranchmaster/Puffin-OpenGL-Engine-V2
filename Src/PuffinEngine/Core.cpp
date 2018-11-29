@@ -25,8 +25,9 @@ void Core::initialize() {
 
     render_settings_.reset(new RenderSettings());
 
-    master_renderer_.reset(new MasterRenderer(window_, camera_));
     skybox_renderer_.reset(new SkyboxRenderer(render_settings_, camera_));
+    master_renderer_.reset(new MasterRenderer(window_, camera_,
+        skybox_renderer_));
 }
 
 void Core::start() const {

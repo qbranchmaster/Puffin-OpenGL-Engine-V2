@@ -126,7 +126,6 @@ void EngineDemo::render() {
 
     glActiveTexture(GL_TEXTURE0);
 
-    //skyboxRenderer()->render(skybox_);
     masterRenderer()->drawScene(scene_);
 
     basic_shader_->bind();

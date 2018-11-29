@@ -12,6 +12,8 @@
 
 namespace puffin {
     class Scene {
+        friend class MasterRenderer;
+
     public:
         void setSkybox(SkyboxPtr skybox) {
             active_skybox_ = skybox;
