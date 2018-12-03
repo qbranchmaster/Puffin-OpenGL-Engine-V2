@@ -5,6 +5,7 @@
 
 #include "PuffinEngine/MasterRenderer.hpp"
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/System.hpp"
@@ -13,15 +14,15 @@
 using namespace puffin;
 
 MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
-    SkyboxRendererPtr skybox_renderer) {
-    if (!window || !camera || !skybox_renderer) {
+    RenderSettingsPtr render_settings) {
+    if (!window || !camera || !render_settings) {
         throw Exception("MasterRenderer::MasterRenderer()",
             "Not initialized object.");
     }
 
     camera_ = camera;
     target_window_ = window;
-    skybox_renderer_ = skybox_renderer;
+    render_settings_ = render_settings;
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());
@@ -37,6 +38,36 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
             std::to_string(System::instance().getMonitorSize(i).first) +
             "x" + std::to_string(System::instance().getMonitorSize(i).second));
     }
+
+    skybox_renderer_.reset(new SkyboxRenderer(render_settings_, camera_));
+
+    createFrameBuffer();
+    loadShaders();
+
+    screen_mesh_.reset(new Mesh());
+    std::vector<GLfloat> positions = {
+        -1.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f
+    };
+
+    std::vector<GLfloat> texture_coords = {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f
+    };
+
+    screen_mesh_->setMeshData(positions, 0, 3);
+    screen_mesh_->setMeshData(texture_coords, 1, 2);
+
+    auto entity = screen_mesh_->addEntity();
+    entity->setVerticesCount(6);
 }
 
 void MasterRenderer::start() {
@@ -81,5 +112,46 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         return;
     }
 
+    default_frame_buffer_->bind();
     skybox_renderer_->render(scene->active_skybox_);
+
+    default_frame_buffer_->unbind();
+
+    default_shader_program_->bind();
+    setShadersUniforms();
+    glBindTexture(GL_TEXTURE_2D, default_frame_buffer_->getRgbBufferTexture()->getHandle());
+    screen_mesh_->bind();
+    screen_mesh_->draw(0);
+}
+
+void MasterRenderer::createFrameBuffer() {
+    default_frame_buffer_.reset(new FrameBuffer());
+    auto size = Configuration::instance().getFrameResolution();
+    default_frame_buffer_->addTextureBuffer(size.first, size.second);
+    default_frame_buffer_->addTextureBuffer(size.first, size.second);
+
+    if (!default_frame_buffer_->isComplete()) {
+        throw Exception("MasterRenderer::createFrameBuffer()",
+            "Error creating default frame buffer.");
+    }
+}
+
+void MasterRenderer::setShadersUniforms() {
+    if (render_settings_->postprocess()->has_changed_) {
+        default_shader_program_->setUniform("color.effect",
+            static_cast<GLint>(render_settings_->postprocess()->getEffect()));
+        default_shader_program_->setUniform("color.kernel_size",
+            render_settings_->postprocess()->getKernelSize());
+        default_shader_program_->setUniform("color.tint_color",
+            render_settings_->postprocess()->getTintColor());
+        default_shader_program_->setUniform("color.screen_texture", 0);
+
+        render_settings_->postprocess()->has_changed_ = false;
+    }
+}
+
+void MasterRenderer::loadShaders() {
+    default_shader_program_.reset(new ShaderProgram());
+    default_shader_program_->loadShaders("Shaders/Master.vert",
+        "Shaders/Master.frag");
 }

@@ -12,7 +12,11 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/FrameBuffer.hpp"
+#include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
+#include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/Window.hpp"
 
@@ -20,7 +24,7 @@ namespace puffin {
     class MasterRenderer {
     public:
         MasterRenderer(WindowPtr window, CameraPtr camera,
-            SkyboxRendererPtr skybox_renderer);
+            RenderSettingsPtr render_settings);
 
         void start();
         void stop();
@@ -29,10 +33,18 @@ namespace puffin {
         void drawScene(ScenePtr scene);
 
     private:
+        void loadShaders();
+        void createFrameBuffer();
+        void setShadersUniforms();
+
         GLboolean rendering_enabled_{false};
         std::function<void()> rendering_function_{nullptr};
 
         CameraPtr camera_;
+        FrameBufferPtr default_frame_buffer_;
+        MeshPtr screen_mesh_;
+        RenderSettingsPtr render_settings_;
+        ShaderProgramPtr default_shader_program_;
         SkyboxRendererPtr skybox_renderer_;
         WindowPtr target_window_;
     };

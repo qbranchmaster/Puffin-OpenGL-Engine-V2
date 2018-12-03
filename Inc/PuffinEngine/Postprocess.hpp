@@ -26,13 +26,21 @@ namespace puffin {
     };
 
     class Postprocess {
+        friend class MasterRenderer;
+
     public:
         void setEffect(PostprocessEffect effect) {
             effect_ = effect;
+            has_changed_ = true;
+        }
+
+        PostprocessEffect getEffect() const {
+            return effect_;
         }
 
         void setTintColor(const glm::vec3 &color) {
             tint_color_ = color;
+            has_changed_ = true;
         }
 
         glm::vec3 getTintColor() const {
@@ -47,6 +55,7 @@ namespace puffin {
             }
 
             kernel_size_ = size;
+            has_changed_ = true;
         }
 
         GLfloat getKernelSize() const {
@@ -58,6 +67,8 @@ namespace puffin {
 
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
+
+        GLboolean has_changed_{true};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

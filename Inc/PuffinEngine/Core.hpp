@@ -38,10 +38,6 @@ namespace puffin {
             return render_settings_;
         }
 
-        SkyboxRendererPtr skyboxRenderer() const {
-            return skybox_renderer_;
-        }
-
         WindowPtr window() const {
             return window_;
         }
@@ -55,7 +51,6 @@ namespace puffin {
         InputPtr input_;
         MasterRendererPtr master_renderer_;
         RenderSettingsPtr render_settings_;
-        SkyboxRendererPtr skybox_renderer_;
         WindowPtr window_;
     };
 } // namespace puffin

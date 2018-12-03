@@ -33,9 +33,6 @@ namespace puffin {
         std::pair<GLint, GLint> getPosition() const;
 
     private:
-        void createWindow();
-        void destroyWindow();
-
         GLboolean isClosing() const {
             if (glfwWindowShouldClose(handle_)) {
                 return true;

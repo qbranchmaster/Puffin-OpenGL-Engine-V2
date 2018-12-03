@@ -32,6 +32,8 @@ EngineDemo::EngineDemo() : Core() {
     Texture::setDefaultTextureFilter(TextureType::Texture2D,
         TextureFilter::TRILINEAR);
 
+    renderSettings()->postprocess()->setEffect(PostprocessEffect::SHARPEN);
+
     // ---
     scene_.reset(new Scene());
 
@@ -84,8 +86,9 @@ EngineDemo::EngineDemo() : Core() {
         "DemoData/Skybox/front.jpg"});
 
     skybox_->setTexture(skybox_texture_);
+    //skybox_->translate(glm::vec3(3, 3, 3));
 
-    skyboxRenderer()->setFilterColor(glm::vec3(1.0f, 1.0f, 1.0f));
+    //skyboxRenderer()->setFilterColor(glm::vec3(1.0f, 1.0f, 1.0f));
 
     scene_->setSkybox(skybox_);
     // ----

@@ -194,6 +194,19 @@ void Texture::setTextureWrap(TextureWrap wrap_mode) {
     }
 }
 
+void Texture::setTextureBorderColor(const glm::vec4 & color) {
+    bind();
+
+    GLfloat border_color[] = {
+        glm::clamp(color.r, 0.0f, 1.0f),
+        glm::clamp(color.g, 0.0f, 1.0f),
+        glm::clamp(color.b, 0.0f, 1.0f),
+        glm::clamp(color.a, 0.0f, 1.0f)
+    };
+
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
+}
+
 void Texture::setTextureFilter(TextureFilter filter) {
     bind();
 
@@ -250,7 +263,7 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     type_ = TextureType::Texture2D;
     bind();
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB,
         GL_UNSIGNED_BYTE, img_handle_.accessPixels());
 
     setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
@@ -295,6 +308,20 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
     setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
 
     return true;
+}
+
+void Texture::createTextureBuffer(GLuint width, GLuint height) {
+    type_ = TextureType::Texture2D;
+
+    bind();
+
+    width_ = width;
+    height_ = height;
+
+    setTexture2DData(nullptr);
+    setTextureFilter(TextureFilter::BILINEAR);
+
+    unbind();
 }
 
 GLFWimage Texture::toGlfwImage() const {

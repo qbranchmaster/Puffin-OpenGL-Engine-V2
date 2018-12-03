@@ -22,6 +22,10 @@ namespace puffin {
             return texture_;
         }
 
+        //void translate(const glm::vec3 &translation) = delete;
+
+        // TODO: Add function delete.
+
     private:
         GLfloat rotation_angle_{0.0f};
 

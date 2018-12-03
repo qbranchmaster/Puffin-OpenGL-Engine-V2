@@ -14,6 +14,8 @@
 
 #include <FreeImagePlus.h>
 
+#include <glm/glm.hpp>
+
 #include <array>
 #include <map>
 #include <memory>
@@ -57,6 +59,8 @@ namespace puffin {
         GLboolean loadImageRaw(std::string path);
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
+
+        void createTextureBuffer(GLuint width, GLuint height);
 
         void bind() const {
             if (!handle_) {
@@ -122,6 +126,11 @@ namespace puffin {
 
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
+        void setTextureBorderColor(const glm::vec4 &color);
+
+        GLuint getHandle() const {
+            return handle_;
+        }
 
     private:
         GLboolean loadImage(std::string path);

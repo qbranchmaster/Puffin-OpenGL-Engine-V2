@@ -11,7 +11,9 @@
 #include <memory>
 
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/RenderBuffer.hpp"
 #include "PuffinEngine/StateMachine.hpp"
+#include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
     class FrameBuffer {
@@ -22,7 +24,7 @@ namespace puffin {
         void bind() const {
             if (!handle_) {
                 logError("FrameBuffer::bind()",
-                    "Cannot bind null framebuffer.");
+                    "Cannot bind null frame buffer.");
                 return;
             }
 
@@ -46,11 +48,15 @@ namespace puffin {
 
         GLboolean isComplete() const;
 
+        TexturePtr getRgbBufferTexture() const {
+            return rgb_buffer_;
+        }
+
     private:
         GLuint handle_{0};
 
-        GLuint rgb_texture_buffer_handle_{0};
-        GLuint depth_render_buffer_handle_{0};
+        TexturePtr rgb_buffer_;
+        RenderBufferPtr depth_buffer_;
     };
 
     using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

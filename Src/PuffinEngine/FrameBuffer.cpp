@@ -18,38 +18,28 @@ FrameBuffer::~FrameBuffer() {
 }
 
 void FrameBuffer::addTextureBuffer(GLuint width, GLuint height) {
-    if (!rgb_texture_buffer_handle_) {
-        glGenTextures(1, &rgb_texture_buffer_handle_);
+    if (!rgb_buffer_) {
+        rgb_buffer_.reset(new Texture());
     }
 
-    glBindTexture(GL_TEXTURE_2D, rgb_texture_buffer_handle_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-        GL_UNSIGNED_BYTE, nullptr);
-
-    // TODO: Check nearest.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    rgb_buffer_->createTextureBuffer(width, height);
 
     bind();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        rgb_texture_buffer_handle_, 0);
+        rgb_buffer_->getHandle(), 0);
     unbind();
 }
 
 void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
-    if (!depth_render_buffer_handle_) {
-        glGenRenderbuffers(1, &depth_render_buffer_handle_);
+    if (!depth_buffer_) {
+        depth_buffer_.reset(new RenderBuffer());
     }
 
-    glBindRenderbuffer(GL_RENDERBUFFER, depth_render_buffer_handle_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    depth_buffer_->create(width, height);
 
     bind();
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, depth_render_buffer_handle_);
+        GL_RENDERBUFFER, depth_buffer_->getHandle());
     unbind();
 }
 
@@ -59,5 +49,6 @@ GLboolean FrameBuffer::isComplete() const {
         return false;
     }
 
+    unbind();
     return true;
 }
