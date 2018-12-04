@@ -14,6 +14,7 @@
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/PostprocessRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
@@ -29,6 +30,15 @@ namespace puffin {
         void start();
         void stop();
         void assignRenderingFunction(std::function<void()> function);
+
+        void assingPostprocessRenderer(PostprocessRendererPtr renderer) {
+            if (!renderer) {
+                // logerror
+                return;
+            }
+
+            postprocess_renderer_ = renderer;
+        }
 
         void drawScene(ScenePtr scene);
 
@@ -47,6 +57,8 @@ namespace puffin {
         ShaderProgramPtr default_shader_program_;
         SkyboxRendererPtr skybox_renderer_;
         WindowPtr target_window_;
+
+        PostprocessRendererPtr postprocess_renderer_;
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;

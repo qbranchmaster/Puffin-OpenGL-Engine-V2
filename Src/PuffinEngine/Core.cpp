@@ -1,9 +1,11 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Core.hpp"
+
+#include <memory>
 
 using namespace puffin;
 
@@ -17,7 +19,6 @@ Core::~Core() {
 
 void Core::initialize() {
     window_.reset(new Window());
-
     System::instance().initGl();
 
     camera_.reset(new Camera());
@@ -27,6 +28,10 @@ void Core::initialize() {
 
     master_renderer_.reset(new MasterRenderer(window_, camera_,
         render_settings_));
+
+    default_postprocess_renderer_.reset(new DefaultPostprocessRenderer());
+
+    master_renderer_->assingPostprocessRenderer(std::static_pointer_cast<PostprocessRenderer>(default_postprocess_renderer_));
 }
 
 void Core::start() const {

@@ -79,6 +79,10 @@ void MasterRenderer::start() {
             rendering_function_();
         }
 
+        if (postprocess_renderer_) {
+            postprocess_renderer_->render();
+        }
+
         target_window_->swapBuffers();
         target_window_->pollEvents();
 

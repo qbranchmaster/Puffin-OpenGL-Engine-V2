@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_RENDER_BUFFER_HPP
 #define PUFFIN_RENDER_BUFFER_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>
@@ -26,7 +29,7 @@ namespace puffin {
             }
         }
 
-        void bind() {
+        void bind() const {
             if (!handle_) {
                 logError("RenderBuffer::bind()",
                     "Cannot bind null render buffer.");
@@ -50,9 +53,22 @@ namespace puffin {
 
         void create(GLuint width, GLuint height) {
             bind();
+
+            width_ = width;
+            height_ = height;
+
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-                width, height);
+                width_, height_);
+
             unbind();
+        }
+
+        GLuint getWidth() const {
+            return width_;
+        }
+
+        GLuint getHeight() const {
+            return height_;
         }
 
         GLuint getHandle() const {
@@ -61,6 +77,9 @@ namespace puffin {
 
     private:
         GLuint handle_{0};
+
+        GLuint width_{0};
+        GLuint height_{0};
     };
 
     using RenderBufferPtr = std::shared_ptr<RenderBuffer>;

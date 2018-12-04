@@ -1,16 +1,16 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
-#include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Window.hpp"
 
@@ -28,8 +28,6 @@ namespace puffin {
             return input_;
         }
 
-        // TODO: Is it needed for a user? assignRenderingFunction() can
-        // be also in other place.
         MasterRendererPtr masterRenderer() const {
             return master_renderer_;
         }
@@ -48,6 +46,7 @@ namespace puffin {
 
     private:
         CameraPtr camera_;
+        DefaultPostprocessRendererPtr default_postprocess_renderer_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;
         RenderSettingsPtr render_settings_;

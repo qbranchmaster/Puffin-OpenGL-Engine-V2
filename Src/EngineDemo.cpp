@@ -5,6 +5,8 @@
 
 #include "EngineDemo.hpp"
 
+#include "PuffinEngine/PostprocessRenderer.hpp"
+
 using namespace puffin;
 
 EngineDemo::EngineDemo() : Core() {
@@ -110,7 +112,7 @@ void EngineDemo::stopTimers() {
 
 void EngineDemo::pollKeyboard() {
     if (input()->keyPressed(Key::ESCAPE, false)) {
-        masterRenderer()->stop();
+        stop();
     }
 
     moveCamera();
