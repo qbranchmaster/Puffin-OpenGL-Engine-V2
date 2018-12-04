@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_FACE_CULL_HPP
 #define PUFFIN_FACE_CULL_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>
@@ -76,7 +79,11 @@ namespace puffin {
             culled_side_ = culled_side;
         }
 
-    protected:
+        CulledSide getCulledSide() const {
+            return culled_side_;
+        }
+
+    private:
         GLboolean enabled_{false};
         CulledSide culled_side_{CulledSide::BACK};
     };

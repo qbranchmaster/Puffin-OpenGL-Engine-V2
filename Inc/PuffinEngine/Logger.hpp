@@ -1,17 +1,22 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_LOGGER_HPP
 #define PUFFIN_LOGGER_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#include "PuffinEngine/Exception.hpp"
 
 namespace puffin {
     enum class MessageType {

@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_INPUT_HPP
@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 
+#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/KeyCodes.hpp"
 #include "PuffinEngine/Window.hpp"
 

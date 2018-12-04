@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_SHADER_PROGRAM_HPP
 #define PUFFIN_SHADER_PROGRAM_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
@@ -27,10 +30,10 @@ namespace puffin {
         ShaderProgram();
         ~ShaderProgram();
 
-        void bind() {
+        void activate() {
             if (!handle_) {
-                logError("ShaderProgram::bind()",
-                    "Cannot bind null shader program.");
+                logError("ShaderProgram::activate()",
+                    "Cannot activate null shader program.");
                 return;
             }
 
@@ -46,7 +49,7 @@ namespace puffin {
         void loadShaders(std::string vs_path, std::string fs_path);
 
         void setUniform(std::string uniform_name, const glm::mat4 &value) {
-            bind();
+            activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()", "Uniform [" +
@@ -58,7 +61,7 @@ namespace puffin {
         }
 
         void setUniform(std::string uniform_name, const glm::vec3 &value) {
-            bind();
+            activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()", "Uniform [" +
@@ -70,7 +73,7 @@ namespace puffin {
         }
 
         void setUniform(std::string uniform_name, const glm::vec4 &value) {
-            bind();
+            activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()", "Uniform [" +
@@ -82,7 +85,7 @@ namespace puffin {
         }
 
         void setUniform(std::string uniform_name, GLint value) {
-            bind();
+            activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()", "Uniform [" +
@@ -94,7 +97,7 @@ namespace puffin {
         }
 
         void setUniform(std::string uniform_name, GLfloat value) {
-            bind();
+            activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()", "Uniform [" +
@@ -111,18 +114,13 @@ namespace puffin {
         GLint compileShader(GLuint shader_handle) const;
         GLint checkShaderCompileStatus(GLuint shader_handle) const;
         std::string getShaderCompileMessage(GLuint shader_handle) const;
+
         GLint linkProgram() const;
         GLint checkProgramLinkStatus() const;
+        std::string getProgramLinkMessage() const;
+
         void fetchUniforms();
-
-        GLint getUniformLocation(std::string uniform_name) const {
-            auto location = uniforms_.find(uniform_name);
-            if (location == uniforms_.end()) {
-                return -1;
-            }
-
-            return location->second;
-        }
+        GLint getUniformLocation(std::string uniform_name) const;
 
         GLuint handle_{0};
         GLuint handle_vs_{0};

@@ -85,7 +85,7 @@ void MasterRenderer::start() {
         Time::instance().endDeltaMeasure();
         Time::instance().update();
 
-        camera_->update(Time::instance().getDelta());
+        camera_->updateSpeed(Time::instance().getDelta());
 
         if (target_window_->isClosing()) {
             stop();
@@ -113,11 +113,12 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 
     default_frame_buffer_->bind();
-    skybox_renderer_->render(scene->active_skybox_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    skybox_renderer_->render(scene->getSkybox());
 
     default_frame_buffer_->unbind();
-
-    default_shader_program_->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    default_shader_program_->activate();
     setShadersUniforms();
     glBindTexture(GL_TEXTURE_2D, default_frame_buffer_->getRgbBufferTexture()->getHandle());
     screen_mesh_->bind();
@@ -126,9 +127,10 @@ void MasterRenderer::drawScene(ScenePtr scene) {
 
 void MasterRenderer::createFrameBuffer() {
     default_frame_buffer_.reset(new FrameBuffer());
-    auto size = Configuration::instance().getFrameResolution();
-    default_frame_buffer_->addTextureBuffer(size.first, size.second);
-    default_frame_buffer_->addTextureBuffer(size.first, size.second);
+    auto w = Configuration::instance().getFrameWidth();
+    auto h = Configuration::instance().getFrameHeight();
+    default_frame_buffer_->addTextureBuffer(w, h);
+    default_frame_buffer_->addTextureBuffer(w, h);
 
     if (!default_frame_buffer_->isComplete()) {
         throw Exception("MasterRenderer::createFrameBuffer()",
@@ -137,7 +139,7 @@ void MasterRenderer::createFrameBuffer() {
 }
 
 void MasterRenderer::setShadersUniforms() {
-    if (render_settings_->postprocess()->has_changed_) {
+    if (1) {
         default_shader_program_->setUniform("color.effect",
             static_cast<GLint>(render_settings_->postprocess()->getEffect()));
         default_shader_program_->setUniform("color.kernel_size",
@@ -145,8 +147,6 @@ void MasterRenderer::setShadersUniforms() {
         default_shader_program_->setUniform("color.tint_color",
             render_settings_->postprocess()->getTintColor());
         default_shader_program_->setUniform("color.screen_texture", 0);
-
-        render_settings_->postprocess()->has_changed_ = false;
     }
 }
 

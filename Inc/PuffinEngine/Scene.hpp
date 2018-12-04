@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_SCENE_HPP
@@ -12,11 +12,13 @@
 
 namespace puffin {
     class Scene {
-        friend class MasterRenderer;
-
     public:
         void setSkybox(SkyboxPtr skybox) {
             active_skybox_ = skybox;
+        }
+
+        SkyboxPtr getSkybox() const {
+            return active_skybox_;
         }
 
     private:

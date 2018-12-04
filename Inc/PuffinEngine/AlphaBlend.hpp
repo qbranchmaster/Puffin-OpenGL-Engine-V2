@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_ALPHA_BLEND_HPP
 #define PUFFIN_ALPHA_BLEND_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>
@@ -69,7 +72,11 @@ namespace puffin {
             blend_function_ = function;
         }
 
-    protected:
+        BlendFunction getBlendFunction() const {
+            return blend_function_;
+        }
+
+    private:
         GLboolean enabled_{false};
         BlendFunction blend_function_{BlendFunction::NORMAL};
     };

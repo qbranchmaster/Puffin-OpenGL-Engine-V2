@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_STATE_MACHINE_HPP
@@ -33,6 +33,7 @@ namespace puffin {
         GLuint bound_shader_program_handle_{0};
         GLuint bound_frame_buffer_{0};
         GLuint bound_render_buffer_{0};
+
         std::unordered_map<GLushort, GLuint> bound_texture_;
     };
 } // namespace puffin

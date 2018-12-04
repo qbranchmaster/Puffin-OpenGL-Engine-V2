@@ -27,12 +27,12 @@ EngineDemo::EngineDemo() : Core() {
     createTimers();
 
     camera()->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    camera()->setFov(0.785f);
+    camera()->setFov(0.85f);
 
     Texture::setDefaultTextureFilter(TextureType::Texture2D,
         TextureFilter::TRILINEAR);
 
-    renderSettings()->postprocess()->setEffect(PostprocessEffect::SHARPEN);
+    renderSettings()->postprocess()->setEffect(PostprocessEffect::GRAYSCALE);
 
     // ---
     scene_.reset(new Scene());
@@ -64,7 +64,7 @@ EngineDemo::EngineDemo() : Core() {
 
     basic_shader_.reset(new ShaderProgram());
     basic_shader_->loadShaders("Shaders/basic_vs.glsl", "Shaders/basic_fs.glsl");
-    basic_shader_->bind();
+    basic_shader_->activate();
     basic_shader_->setUniform("color_filter", glm::vec3(1.0f, 1.0f, 1.0f));
     basic_shader_->setUniform("matrices.model_matrix", my_mesh_->getModelMatrix());
 
@@ -122,8 +122,8 @@ void EngineDemo::pollMouse() {
 
 void EngineDemo::render() {
     // ---
-    auto size = Configuration::instance().getFrameResolution();
-    glViewport(0, 0, size.first, size.second);
+    glViewport(0, 0, Configuration::instance().getFrameWidth(),
+        Configuration::instance().getFrameHeight());
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -131,7 +131,7 @@ void EngineDemo::render() {
 
     masterRenderer()->drawScene(scene_);
 
-    basic_shader_->bind();
+    basic_shader_->activate();
     basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
     basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
 

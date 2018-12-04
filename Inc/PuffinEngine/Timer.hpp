@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_TIMER_HPP
 #define PUFFIN_TIMER_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <chrono>
@@ -65,9 +68,8 @@ namespace puffin {
 
         GLboolean running_{false};
         std::chrono::milliseconds interval_{0};
-        TimeoutCallback timeout_func_{nullptr};
-
         std::thread thread_;
+        TimeoutCallback timeout_func_{nullptr};
     };
 
     using TimerPtr = std::shared_ptr<Timer>;

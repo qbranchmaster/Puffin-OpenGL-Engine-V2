@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_POSTPROCESS_HPP
 #define PUFFIN_POSTPROCESS_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
@@ -26,12 +29,9 @@ namespace puffin {
     };
 
     class Postprocess {
-        friend class MasterRenderer;
-
     public:
         void setEffect(PostprocessEffect effect) {
             effect_ = effect;
-            has_changed_ = true;
         }
 
         PostprocessEffect getEffect() const {
@@ -39,8 +39,10 @@ namespace puffin {
         }
 
         void setTintColor(const glm::vec3 &color) {
-            tint_color_ = color;
-            has_changed_ = true;
+            tint_color_ = glm::vec3(
+                glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f),
+                glm::clamp(color.b, 0.0f, 1.0f));
         }
 
         glm::vec3 getTintColor() const {
@@ -49,13 +51,11 @@ namespace puffin {
 
         void setKernelSize(GLfloat size) {
             if (size <= 0.0f) {
-                logError("Postprocess::setKernelSize()",
-                    "Invalid postprocess kernel size.");
+                logError("Postprocess::setKernelSize()", "Invalid value.");
                 return;
             }
 
             kernel_size_ = size;
-            has_changed_ = true;
         }
 
         GLfloat getKernelSize() const {
@@ -67,8 +67,6 @@ namespace puffin {
 
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
-
-        GLboolean has_changed_{true};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

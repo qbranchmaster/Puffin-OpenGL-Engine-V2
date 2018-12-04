@@ -30,7 +30,7 @@ void SkyboxRenderer::render(SkyboxPtr skybox) {
     }
 
     // Configure shader.
-    default_shader_program_->bind();
+    default_shader_program_->activate();
     setShadersUniforms(skybox);
 
     // Configure render parameters.

@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_WINDOW_HPP
@@ -15,6 +15,12 @@
 #include <memory>
 #include <string>
 
+#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/Exception.hpp"
+#include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/System.hpp"
+#include "PuffinEngine/Texture.hpp"
+
 namespace puffin {
     class Window {
         friend class Input;
@@ -25,7 +31,10 @@ namespace puffin {
         ~Window();
 
         void setCaption(std::string caption);
-        std::string getCaption() const;
+
+        std::string getCaption() const {
+            return caption_;
+        }
 
         void setWindowIcon(std::string path) const;
 

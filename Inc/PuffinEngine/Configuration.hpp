@@ -1,15 +1,21 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_CONFIGURATION_HPP
 #define PUFFIN_CONFIGURATION_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <map>
 #include <utility>
+
+#include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/System.hpp"
 
 namespace puffin {
     class Configuration {
@@ -20,21 +26,43 @@ namespace puffin {
         }
 
         void setFrameResolution(GLuint width, GLuint height);
-        std::pair<GLuint, GLuint> getFrameResolution() const;
 
-        GLfloat getFrameAspect() const;
+        GLuint getFrameWidth() const {
+            return frame_width_;
+        }
+
+        GLuint getFrameHeight() const {
+            return frame_height_;
+        }
+
+        GLfloat getFrameAspect() const {
+            return static_cast<GLfloat>(frame_width_) /
+                static_cast<GLfloat>(frame_height_);
+        }
 
         void setMsaaSamples(GLushort samples);
-        GLushort getMsaaSamples() const;
+
+        GLushort getMsaaSamples() const {
+            return msaa_samples_;
+        }
 
         void setOpenGLVersion(GLushort major, GLushort minor);
-        std::pair<GLushort, GLushort> getOpenGLVersion() const;
+
+        std::pair<GLushort, GLushort> getOpenGLVersion() const {
+            return gl_version_;
+        }
 
         void enableFullscreen(GLboolean enabled);
-        GLboolean isFullscreenEnabled() const;
+
+        GLboolean isFullscreenEnabled() const {
+            return fullscreen_;
+        }
 
         void setTargetMonitorIndex(GLushort index);
-        GLushort getTargetMonitorIndex() const;
+
+        GLushort getTargetMonitorIndex() const {
+            return monitor_index_;
+        }
 
     private:
         Configuration() {}

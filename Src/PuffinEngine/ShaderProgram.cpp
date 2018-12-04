@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/ShaderProgram.hpp"
@@ -32,7 +32,7 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
     if (vs_path.empty() || fs_path.empty()) {
-        logError("ShaderProgram::loadShaders()", "Empty shader file path.");
+        logError("ShaderProgram::loadShaders()", "Invalid value.");
         return;
     }
 
@@ -75,6 +75,8 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
 
     if (linkProgram()) {
         logError("ShaderProgram::loadShaders()", "Shader program link error.");
+        logInfo("ShaderProgram::loadShaders()",
+            "Shader program link message:\n" + getProgramLinkMessage());
         return;
     }
 
@@ -159,6 +161,21 @@ GLint ShaderProgram::checkProgramLinkStatus() const {
     return 0;
 }
 
+std::string ShaderProgram::getProgramLinkMessage() const {
+    GLint log_size = 256;
+    glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &log_size);
+
+    std::string link_msg;
+    if (log_size > 1) {
+        GLchar *log_text = new GLchar[log_size];
+        glGetProgramInfoLog(handle_, log_size, nullptr, log_text);
+        link_msg = std::string(log_text);
+        delete log_text;
+    }
+
+    return link_msg;
+}
+
 void ShaderProgram::fetchUniforms() {
     std::vector<GLenum> properties;
     properties.push_back(GL_NAME_LENGTH);
@@ -187,4 +204,13 @@ void ShaderProgram::fetchUniforms() {
         GLint location = glGetUniformLocation(handle_, uniform_name.c_str());
         uniforms_[uniform_name] = location;
     }
+}
+
+GLint ShaderProgram::getUniformLocation(std::string uniform_name) const {
+    auto location = uniforms_.find(uniform_name);
+    if (location == uniforms_.end()) {
+        return -1;
+    }
+
+    return location->second;
 }

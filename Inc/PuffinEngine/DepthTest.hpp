@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_DEPTH_TEST_HPP
 #define PUFFIN_DEPTH_TEST_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>
@@ -50,7 +53,7 @@ namespace puffin {
             return depth_mask_enabled_;
         }
 
-    protected:
+    private:
         GLboolean enabled_{false};
         GLboolean depth_mask_enabled_{false};
     };

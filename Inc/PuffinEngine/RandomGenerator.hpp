@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_RANDOM_GENERATOR_HPP
 #define PUFFIN_RANDOM_GENERATOR_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>
@@ -32,7 +35,7 @@ namespace puffin {
             return distribution_(random_engine_);
         }
 
-    protected:
+    private:
         std::default_random_engine random_engine_{};
         std::uniform_real_distribution<GLfloat> distribution_{};
 

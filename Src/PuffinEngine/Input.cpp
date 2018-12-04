@@ -1,11 +1,9 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Input.hpp"
-
-#include "PuffinEngine/Exception.hpp"
 
 using namespace puffin;
 

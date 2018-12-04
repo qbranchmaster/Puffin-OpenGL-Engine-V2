@@ -1,15 +1,9 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Window.hpp"
-
-#include "PuffinEngine/Configuration.hpp"
-#include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/System.hpp"
-#include "PuffinEngine/Texture.hpp"
 
 using namespace puffin;
 
@@ -26,12 +20,13 @@ Window::Window() {
     auto monitors = glfwGetMonitors(&count);
     auto target_monitor = monitors[Configuration::instance().
         getTargetMonitorIndex()];
-    auto wnd_size = Configuration::instance().getFrameResolution();
-    handle_ = glfwCreateWindow(wnd_size.first, wnd_size.second,
-        caption_.c_str(), Configuration::instance().isFullscreenEnabled() ?
-        target_monitor : nullptr, nullptr);
+    auto wnd_width = Configuration::instance().getFrameWidth();
+    auto wnd_height = Configuration::instance().getFrameHeight();
+    handle_ = glfwCreateWindow(wnd_width, wnd_height, caption_.c_str(),
+        Configuration::instance().isFullscreenEnabled() ? target_monitor :
+        nullptr, nullptr);
     if (!handle_) {
-        throw Exception("Window::createWindow()", "Creating window error.");
+        throw Exception("Window::Window()", "Creating window error.");
     }
 
     glfwMakeContextCurrent(handle_);
@@ -44,17 +39,8 @@ Window::~Window() {
 }
 
 void Window::setCaption(std::string caption) {
-    if (!handle_) {
-        logError("Window::setCaption()", "Window not created yet.");
-        return;
-    }
-
     caption_ = caption;
     glfwSetWindowTitle(handle_, caption_.c_str());
-}
-
-std::string Window::getCaption() const {
-    return caption_;
 }
 
 void Window::setPosition(GLint x, GLint y) {
@@ -70,7 +56,7 @@ std::pair<GLint, GLint> Window::getPosition() const {
 void Window::setWindowIcon(std::string path) const {
     Texture icon;
     if (!icon.loadImageRaw(path)) {
-        logError("Window::setWindowIcon()", "Could not set window icon.");
+        logError("Window::setWindowIcon()", "Invalid value.");
         return;
     }
 

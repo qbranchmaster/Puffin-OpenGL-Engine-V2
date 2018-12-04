@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_SYSTEM_HPP
 #define PUFFIN_SYSTEM_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -13,10 +16,12 @@
 #include <utility>
 #include <vector>
 
+#include "PuffinEngine/Exception.hpp"
+#include "PuffinEngine/Logger.hpp"
+
 namespace puffin {
     class System {
         friend class Core;
-        friend class MasterRenderer;
 
     public:
         static System& instance() {

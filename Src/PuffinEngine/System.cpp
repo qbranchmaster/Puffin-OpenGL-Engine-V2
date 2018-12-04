@@ -1,12 +1,9 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/System.hpp"
-
-#include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
 
 using namespace puffin;
 
@@ -35,7 +32,7 @@ std::string System::getMonitorName(GLushort index) const {
     GLint count = 0;
     GLFWmonitor** monitors = glfwGetMonitors(&count);
     if (index >= count) {
-        logError("System::getMonitorName()", "Monitor index out of range.");
+        logError("System::getMonitorName()", "Invalid value.");
         return std::string("");
     }
 
@@ -47,7 +44,7 @@ std::pair<GLuint, GLuint> System::getMonitorSize(GLushort index) const {
     GLint count = 0;
     GLFWmonitor** monitors = glfwGetMonitors(&count);
     if (index >= count) {
-        logError("System::getMonitorSize()", "Monitor index out of range.");
+        logError("System::getMonitorSize()", "Invalid value.");
         return std::make_pair(0, 0);
     }
 
