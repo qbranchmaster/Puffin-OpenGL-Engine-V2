@@ -31,7 +31,7 @@ namespace puffin {
         void stop();
         void assignRenderingFunction(std::function<void()> function);
 
-        void assingPostprocessRenderer(PostprocessRendererPtr renderer) {
+        void assignPostprocessRenderer(PostprocessRendererPtr renderer) {
             if (!renderer) {
                 // logerror
                 return;

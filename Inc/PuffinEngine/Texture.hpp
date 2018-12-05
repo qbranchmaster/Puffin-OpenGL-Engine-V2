@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_TEXTURE_HPP
@@ -85,8 +85,6 @@ namespace puffin {
             case TextureType::TextureCube:
                 glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
                 break;
-            default:
-                break;
             }
 
             StateMachine::instance().bound_texture_[
@@ -110,23 +108,37 @@ namespace puffin {
             }
         }
 
-        GLushort getChannelsCount() const;
-        std::string getPath() const;
-        std::pair<GLuint, GLuint> getSize() const;
-        TextureType getType() const;
-        GLubyte* getRawData() const;
+        GLushort getChannelsCount() const {
+            return channels_;
+        }
+
+        std::string getPath() const {
+            return path_;
+        }
+
+        std::pair<GLuint, GLuint> getSize() const {
+            return std::make_pair(width_, height_);
+        }
+
+        TextureType getType() const {
+            return type_;
+        }
+
+        GLubyte* getRawData() const {
+            return img_handle_.accessPixels();
+        }
 
         void freeImage();
         void swapRedBlue();
         void flipVertical();
         void flipHorizontal();
-        void generateMipmap();
 
         GLFWimage toGlfwImage() const;
 
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
         void setTextureBorderColor(const glm::vec4 &color);
+        void setTexture2DData(void *data);
 
         GLuint getHandle() const {
             return handle_;
@@ -134,8 +146,9 @@ namespace puffin {
 
     private:
         GLboolean loadImage(std::string path);
+        GLboolean isBound();
         void fetchChannelsCount();
-        void setTexture2DData(void *data);
+        void generateMipmap();
 
         GLuint handle_{0};
         fipImage img_handle_;

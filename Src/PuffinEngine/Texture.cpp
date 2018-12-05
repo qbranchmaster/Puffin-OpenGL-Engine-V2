@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Texture.hpp"
@@ -27,97 +27,19 @@ Texture::~Texture() {
 }
 
 void Texture::freeImage() {
-    if (img_handle_.accessPixels()) {
-        img_handle_.clear();
-    }
-}
-
-std::pair<GLuint, GLuint> Texture::getSize() const {
-    return std::make_pair(width_, height_);
-}
-
-TextureType Texture::getType() const {
-    return type_;
-}
-
-std::string Texture::getPath() const {
-    return path_;
-}
-
-GLubyte* Texture::getRawData() const {
-    return img_handle_.accessPixels();
-}
-
-GLushort Texture::getChannelsCount() const {
-    return channels_;
-}
-
-void Texture::fetchChannelsCount() {
-    channels_ = img_handle_.getBitsPerPixel() / 8;
-    if (channels_ == 0) { // 4 / 8 = 0.5, so int type = 0
-        // Image is not empty, but has less bits per pixel than 8, so in fact,
-        // it has only one channel.
-        channels_ = 1;
-    }
-}
-GLboolean Texture::loadImageRaw(std::string path) {
-    if (!loadImage(path)) {
-        return false;
-    }
-
-    type_ = TextureType::RawImage;
-    return true;
-}
-
-GLboolean Texture::loadImage(std::string path) {
-    if (path.empty()) {
-        logError("Texture::loadImage()", "Empty image path.");
-        return false;
-    }
-
-    if (!img_handle_.load(path.c_str())) {
-        logError("Texture::loadImage()", "Error loading image from file [" +
-            path + "].");
-        return false;
-    }
-
-    path_ = path;
-    width_ = img_handle_.getWidth();
-    height_ = img_handle_.getHeight();
-    fetchChannelsCount();
-
-    logInfo("Texture::loadImage()", "Image [" + path_ + "] loaded.");
-    return true;
-}
-
-void Texture::generateMipmap() {
-    if (has_mipmap_) {
-        return;
-    }
-
-    if (type_ != TextureType::Texture2D) {
-        logError("Texture::generateMipmap()", "Invalid texture type.");
-        return;
-    }
-
-    bind();
-    glGenerateMipmap(GL_TEXTURE_2D);
-    has_mipmap_ = true;
+    img_handle_.clear();
 }
 
 void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
     switch (type) {
     case TextureType::Texture2D:
+    case TextureType::TextureCube:
         switch (filter) {
         case TextureFilter::NEAREST:
         case TextureFilter::BILINEAR:
         case TextureFilter::BILINEAR_WITH_MIPMAPS:
         case TextureFilter::TRILINEAR:
             default_texture_filter_[type] = filter;
-            break;
-        default:
-            logError("Texture::setDefaultTextureFilter()",
-                "Invalid texture type.");
             break;
         }
         break;
@@ -133,6 +55,7 @@ void Texture::setTextureSlot(GLushort slot_index) {
 
 void Texture::unbindAllTextures(TextureType type) {
     if (type == TextureType::None || type == TextureType::RawImage) {
+        logError("Texture::unbindAllTextures()", "Invalid texture type.");
         return;
     }
 
@@ -148,8 +71,141 @@ void Texture::unbindAllTextures(TextureType type) {
     StateMachine::instance().bound_texture_[static_cast<GLushort>(type)] = 0;
 }
 
-void Texture::setTextureWrap(TextureWrap wrap_mode) {
+GLboolean Texture::loadImage(std::string path) {
+    if (path.empty()) {
+        logError("Texture::loadImage()", "Invalid input.");
+        return false;
+    }
+
+    if (!img_handle_.load(path.c_str())) {
+        logError("Texture::loadImage()", "Loading image [" + path + "] error.");
+        return false;
+    }
+
+    path_ = path;
+    width_ = img_handle_.getWidth();
+    height_ = img_handle_.getHeight();
+    fetchChannelsCount();
+
+    logInfo("Texture::loadImage()", "Image [" + path_ + "] loaded.");
+    return true;
+}
+
+GLboolean Texture::isBound() {
+    if (StateMachine::instance().bound_texture_[static_cast<GLushort>(type_)]
+        == handle_) {
+        return true;
+    }
+
+    return false;
+}
+
+GLboolean Texture::loadImageRaw(std::string path) {
+    if (!loadImage(path)) {
+        return false;
+    }
+
+    type_ = TextureType::RawImage;
+
+    return true;
+}
+
+GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
+    if (!loadImage(path)) {
+        return false;
+    }
+
+    type_ = TextureType::Texture2D;
+
     bind();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB,
+        GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+    setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
+    setTextureWrap(TextureWrap::REPEAT);
+    unbind();
+
+    if (auto_free) {
+        freeImage();
+    }
+
+    logInfo("Texture::loadTexture2D()", "Texture 2D [" + path + "] loaded.");
+    return true;
+}
+
+GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
+    type_ = TextureType::TextureCube;
+    bind();
+
+    for (GLushort i = 0; i < 6; i++) {
+        if (!loadImage(paths[i])) {
+            return false;
+        }
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_,
+            height_, 0, GL_BGR, GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+        freeImage();
+
+        logInfo("Texture::loadTextureCube()", "Texture [" + paths[i] +
+            "] loaded.");
+    }
+
+    setTextureFilter(default_texture_filter_[TextureType::TextureCube]);
+    setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
+    unbind();
+
+    return true;
+}
+
+void Texture::createTextureBuffer(GLuint width, GLuint height) {
+    type_ = TextureType::Texture2D;
+    width_ = width;
+    height_ = height;
+
+    bind();
+    setTexture2DData(nullptr);
+    setTextureFilter(TextureFilter::BILINEAR);
+    unbind();
+}
+
+void Texture::fetchChannelsCount() {
+    channels_ = img_handle_.getBitsPerPixel() / 8;
+    if (channels_ == 0) { // 4 / 8 = 0.5, so int type = 0
+        // Image is not empty, but has less bits per pixel than 8, so in fact,
+        // it has only one channel.
+        channels_ = 1;
+    }
+}
+
+void Texture::generateMipmap() {
+    if (has_mipmap_) {
+        return;
+    }
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+    has_mipmap_ = true;
+}
+
+void Texture::setTextureBorderColor(const glm::vec4 & color) {
+    if (!isBound()) {
+        logError("Texture::setTextureBorderColor()", "Texture is not bound.");
+        return;
+    }
+
+    GLfloat border_color[] = {
+        glm::clamp(color.r, 0.0f, 1.0f),
+        glm::clamp(color.g, 0.0f, 1.0f),
+        glm::clamp(color.b, 0.0f, 1.0f),
+        glm::clamp(color.a, 0.0f, 1.0f)
+    };
+
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
+}
+
+void Texture::setTextureWrap(TextureWrap wrap_mode) {
+    if (!isBound()) {
+        logError("Texture::setTextureWrap()", "Texture is not bound.");
+        return;
+    }
 
     switch (type_) {
     case TextureType::Texture2D:
@@ -194,21 +250,11 @@ void Texture::setTextureWrap(TextureWrap wrap_mode) {
     }
 }
 
-void Texture::setTextureBorderColor(const glm::vec4 & color) {
-    bind();
-
-    GLfloat border_color[] = {
-        glm::clamp(color.r, 0.0f, 1.0f),
-        glm::clamp(color.g, 0.0f, 1.0f),
-        glm::clamp(color.b, 0.0f, 1.0f),
-        glm::clamp(color.a, 0.0f, 1.0f)
-    };
-
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
-}
-
 void Texture::setTextureFilter(TextureFilter filter) {
-    bind();
+    if (!isBound()) {
+        logError("Texture::setTextureFilter()", "Texture is not bound.");
+        return;
+    }
 
     switch (type_) {
     case TextureType::Texture2D:
@@ -255,75 +301,6 @@ void Texture::setTextureFilter(TextureFilter filter) {
     }
 }
 
-GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
-    if (!loadImage(path)) {
-        return false;
-    }
-
-    type_ = TextureType::Texture2D;
-    bind();
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB,
-        GL_UNSIGNED_BYTE, img_handle_.accessPixels());
-
-    setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
-
-    if (auto_free) {
-        freeImage();
-    }
-
-    logInfo("Texture::loadTexture2D()", "Texture 2D [" + path + "] loaded.");
-    return true;
-}
-
-void Texture::setTexture2DData(void *data) {
-    if (type_ != TextureType::Texture2D) {
-        logError("Texture::setTexture2DData()", "Invalid texture type.");
-        return;
-    }
-
-    bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
-        GL_UNSIGNED_BYTE, data);
-}
-
-GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
-    type_ = TextureType::TextureCube;
-    bind();
-
-    for (GLushort i = 0; i < 6; i++) {
-        if (!loadImage(paths[i])) {
-            return false;
-        }
-
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_,
-            height_, 0, GL_BGR, GL_UNSIGNED_BYTE, img_handle_.accessPixels());
-        freeImage();
-
-        logInfo("Texture::loadTextureCube()", "Texture [" + paths[i] +
-            "] loaded.");
-    }
-
-    setTextureFilter(default_texture_filter_[TextureType::TextureCube]);
-    setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
-
-    return true;
-}
-
-void Texture::createTextureBuffer(GLuint width, GLuint height) {
-    type_ = TextureType::Texture2D;
-
-    bind();
-
-    width_ = width;
-    height_ = height;
-
-    setTexture2DData(nullptr);
-    setTextureFilter(TextureFilter::BILINEAR);
-
-    unbind();
-}
-
 GLFWimage Texture::toGlfwImage() const {
     if (!img_handle_.accessPixels()) {
         logError("Texture::toGlfwImage()",
@@ -338,6 +315,21 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
+void Texture::setTexture2DData(void *data) {
+    if (type_ != TextureType::Texture2D) {
+        logError("Texture::setTexture2DData()", "Invalid texture type.");
+        return;
+    }
+
+    if (!isBound()) {
+        logError("Texture::setTexture2DData()", "Texture is not bound.");
+        return;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
+        GL_UNSIGNED_BYTE, data);
+}
+
 void Texture::swapRedBlue() {
     if (!img_handle_.accessPixels()) {
         logError("Texture::swapRedBlue()",
@@ -345,7 +337,8 @@ void Texture::swapRedBlue() {
         return;
     }
 
-    if (channels_ < 3) {
+    if (channels_ < 3 || !(type_ == TextureType::Texture2D ||
+        type_ == TextureType::RawImage)) {
         logError("Texture::swapRedBlue()",
             "Cannot perform this operation on this image.");
         return;
@@ -370,6 +363,12 @@ void Texture::flipVertical() {
         return;
     }
 
+    if (!(type_ == TextureType::Texture2D || type_ == TextureType::RawImage)) {
+        logError("Texture::flipVertical()",
+            "Cannot perform this operation on this image.");
+        return;
+    }
+
     img_handle_.flipVertical();
 
     if (type_ == TextureType::Texture2D) {
@@ -381,6 +380,12 @@ void Texture::flipHorizontal() {
     if (!img_handle_.accessPixels()) {
         logError("Texture::flipHorizontal()",
             "Cannot perform this operation on empty image.");
+        return;
+    }
+
+    if (!(type_ == TextureType::Texture2D || type_ == TextureType::RawImage)) {
+        logError("Texture::flipHorizontal()",
+            "Cannot perform this operation on this image.");
         return;
     }
 

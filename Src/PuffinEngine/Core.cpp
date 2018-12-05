@@ -25,13 +25,12 @@ void Core::initialize() {
     input_.reset(new Input(window_));
 
     render_settings_.reset(new RenderSettings());
-
     master_renderer_.reset(new MasterRenderer(window_, camera_,
         render_settings_));
-
     default_postprocess_renderer_.reset(new DefaultPostprocessRenderer());
 
-    master_renderer_->assingPostprocessRenderer(std::static_pointer_cast<PostprocessRenderer>(default_postprocess_renderer_));
+    master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
+        <PostprocessRenderer>(default_postprocess_renderer_));
 }
 
 void Core::start() const {
