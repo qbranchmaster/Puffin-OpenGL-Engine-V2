@@ -51,6 +51,13 @@ void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
     unbind();
 }
 
+void FrameBuffer::setClearColor(const glm::vec3 & color) {
+    clear_color_ = glm::vec3(
+        glm::clamp(color.r, 0.0f, 1.0f),
+        glm::clamp(color.g, 0.0f, 1.0f),
+        glm::clamp(color.b, 0.0f, 1.0f));
+}
+
 void FrameBuffer::addTextureBuffer(GLuint width, GLuint height) {
     if (!rgb_buffer_) {
         rgb_buffer_.reset(new Texture());

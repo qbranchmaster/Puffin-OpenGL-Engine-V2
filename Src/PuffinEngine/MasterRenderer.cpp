@@ -44,32 +44,6 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
     skybox_renderer_.reset(new SkyboxRenderer(render_settings_, camera_));
 
     createFrameBuffer();
-    loadShaders();
-
-    screen_mesh_.reset(new Mesh());
-    std::vector<GLfloat> positions = {
-        -1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f
-    };
-
-    std::vector<GLfloat> texture_coords = {
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f
-    };
-
-    screen_mesh_->setMeshData(positions, 0, 3);
-    screen_mesh_->setMeshData(texture_coords, 1, 2);
-
-    auto entity = screen_mesh_->addEntity();
-    entity->setVerticesCount(6);
 }
 
 void MasterRenderer::start() {
@@ -77,12 +51,14 @@ void MasterRenderer::start() {
     while (rendering_enabled_) {
         Time::instance().startDeltaMeasure();
 
+        clearDefaultFrameBuffer();
+
         if (rendering_function_) {
             rendering_function_();
         }
 
         if (postprocess_renderer_) {
-            postprocess_renderer_->render();
+            postprocess_renderer_->render(default_frame_buffer_);
         }
 
         target_window_->swapBuffers();
@@ -118,17 +94,10 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         return;
     }
 
+    // TODO: ---
     default_frame_buffer_->bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     skybox_renderer_->render(scene->getSkybox());
-
-    default_frame_buffer_->unbind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    default_shader_program_->activate();
-    setShadersUniforms();
-    glBindTexture(GL_TEXTURE_2D, default_frame_buffer_->getRgbBufferTexture()->getHandle());
-    screen_mesh_->bind();
-    screen_mesh_->draw(0);
+    // ---
 }
 
 void MasterRenderer::createFrameBuffer() {
@@ -145,22 +114,4 @@ void MasterRenderer::createFrameBuffer() {
     }
 
     default_frame_buffer_->unbind();
-}
-
-void MasterRenderer::setShadersUniforms() {
-    if (1) {
-        default_shader_program_->setUniform("color.effect",
-            static_cast<GLint>(render_settings_->postprocess()->getEffect()));
-        default_shader_program_->setUniform("color.kernel_size",
-            render_settings_->postprocess()->getKernelSize());
-        default_shader_program_->setUniform("color.tint_color",
-            render_settings_->postprocess()->getTintColor());
-        default_shader_program_->setUniform("color.screen_texture", 0);
-    }
-}
-
-void MasterRenderer::loadShaders() {
-    default_shader_program_.reset(new ShaderProgram());
-    default_shader_program_->loadShaders("Shaders/Master.vert",
-        "Shaders/Master.frag");
 }

@@ -52,7 +52,10 @@ Skybox::Skybox() : Mesh() {
         1.0f, -1.0f,  1.0f
     };
 
+    bind();
     setMeshData(data, 0, 3);
+    unbind();
+
     auto entity = addEntity();
     entity->setVerticesCount(36);
 }

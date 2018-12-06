@@ -39,11 +39,8 @@ private:
     puffin::TimerPtr fps_update_timer_;
 
     // ---
-    puffin::MeshPtr my_mesh_;
     puffin::ScenePtr scene_;
     puffin::SkyboxPtr skybox_;
-    puffin::ShaderProgramPtr basic_shader_;
-    puffin::TexturePtr basic_texture_;
     puffin::TexturePtr skybox_texture_;
     // ---
 };

@@ -8,6 +8,8 @@
 
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+
 #include <memory>
 
 #include "PuffinEngine/Logger.hpp"
@@ -60,6 +62,12 @@ namespace puffin {
         void addTextureBuffer(GLuint width, GLuint height);
         void addRenderBuffer(GLuint width, GLuint height);
 
+        void setClearColor(const glm::vec3 &color);
+
+        glm::vec3 getClearColor() const {
+            return clear_color_;
+        }
+
     private:
         GLboolean isBound() const;
 
@@ -67,6 +75,8 @@ namespace puffin {
 
         TexturePtr rgb_buffer_;
         RenderBufferPtr depth_buffer_;
+
+        glm::vec3 clear_color_{0.2f, 0.2f, 0.2f};
     };
 
     using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

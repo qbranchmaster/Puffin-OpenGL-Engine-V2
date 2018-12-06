@@ -1,11 +1,14 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_MESH_HPP
 #define PUFFIN_MESH_HPP
 
+#ifdef WIN32 // Prevents APIENTRY redefinition
+#include <Windows.h>
+#endif // WIN32
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
@@ -32,20 +35,38 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_mesh_handle_ == handle_) {
+            if (StateMachine::instance().bound_mesh_ == handle_) {
                 return;
             }
 
             glBindVertexArray(handle_);
-            StateMachine::instance().bound_mesh_handle_ = handle_;
+            StateMachine::instance().bound_mesh_ = handle_;
         }
 
         void unbind() const {
-            if (StateMachine::instance().bound_mesh_handle_ == handle_) {
+            if (StateMachine::instance().bound_mesh_ == handle_) {
                 glBindVertexArray(0);
-                StateMachine::instance().bound_mesh_handle_ = 0;
+                StateMachine::instance().bound_mesh_ = 0;
             }
         }
+
+        void setScale(const glm::vec3 &scale);
+
+        glm::vec3 getScale() const {
+            return scale_;
+        }
+
+        void translate(const glm::vec3 &translation);
+        void setPosition(const glm::vec3 &position);
+        void zeroTranslation();
+
+        glm::vec3 getPosition() const {
+            return position_;
+        }
+
+        void rotate(GLfloat angle, const glm::vec3 &axis);
+        void setRotationAngle(GLfloat angle, const glm::vec3 &axis);
+        void zeroRotation();
 
         glm::mat4 getRotationMatrix() const {
             return rotation_matrix_;
@@ -69,47 +90,8 @@ namespace puffin {
             return model_matrix_;
         }
 
-        void setScale(const glm::vec3 &scale) {
-            scale_ = scale;
-            scale_matrix_ = glm::scale(glm::mat4(1.0f), scale_);
-            model_matrix_changed_ = true;
-        }
-
-        void translate(const glm::vec3 &translation) {
-            translation_matrix_ = glm::translate(translation_matrix_,
-                translation);
-            position_ += translation;
-            model_matrix_changed_ = true;
-        }
-
-        void setPosition(const glm::vec3 &position) {
-            translation_matrix_ = glm::mat4(1.0f);
-            position_ = glm::vec3(0.0f, 0.0f, 0.0f);
-            translate(position);
-        }
-
-        void zeroTranslation() {
-            translation_matrix_ = glm::mat4(1.0f);
-            model_matrix_changed_ = true;
-        }
-
-        glm::vec3 getPosition() const {
-            return position_;
-        }
-
-        void rotate(GLfloat angle, const glm::vec3 &axis) {
-            rotation_matrix_ = glm::rotate(rotation_matrix_, angle, axis);
-            model_matrix_changed_ = true;
-        }
-
-        void setRotationAngle(GLfloat angle, const glm::vec3 &axis) {
-            rotation_matrix_ = glm::mat4(1.0f);
-            rotate(angle, axis);
-        }
-
-        void zeroRotation() {
-            rotation_matrix_ = glm::mat4(1.0f);
-            model_matrix_changed_ = true;
+        GLuint getHandle() const {
+            return handle_;
         }
 
         void setMeshData(std::vector<GLfloat> data, GLuint index,
@@ -117,7 +99,10 @@ namespace puffin {
             GLboolean is_indices = false);
         MeshEntityPtr addEntity();
         MeshEntityPtr getEntity(GLuint index) const;
-        GLuint getEntitiesCount() const;
+
+        GLuint getEntitiesCount() const {
+            return entities_.size();
+        }
 
         // TODO: Move it somewhere else.
         void draw(GLuint index) {
@@ -128,8 +113,11 @@ namespace puffin {
             auto entity = entities_[index];
             glDrawArrays(GL_TRIANGLES, 0, entity->getVerticesCount());
         }
+        // ---
 
     private:
+        GLboolean isBound() const;
+
         GLuint handle_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;

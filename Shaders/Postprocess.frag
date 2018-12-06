@@ -3,9 +3,9 @@
 struct Color
 {
     sampler2D screen_texture;
-    vec3 tint_color; 
+    vec3 tint_color;
     int effect;
-    float kernel_size;   
+    float kernel_size;
 };
 
 in VS_OUT

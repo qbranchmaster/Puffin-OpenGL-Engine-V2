@@ -43,18 +43,24 @@ namespace puffin {
         void drawScene(ScenePtr scene);
 
     private:
-        void loadShaders();
         void createFrameBuffer();
-        void setShadersUniforms();
+        void clearDefaultFrameBuffer() {
+            default_frame_buffer_->bind();
+            auto color = default_frame_buffer_->getClearColor();
+            glClearColor(color.r, color.g, color.b, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            default_frame_buffer_->unbind();
+        }
+
 
         GLboolean rendering_enabled_{false};
         std::function<void()> rendering_function_{nullptr};
 
         CameraPtr camera_;
         FrameBufferPtr default_frame_buffer_;
-        MeshPtr screen_mesh_;
+
         RenderSettingsPtr render_settings_;
-        ShaderProgramPtr default_shader_program_;
+
         SkyboxRendererPtr skybox_renderer_;
         WindowPtr target_window_;
 

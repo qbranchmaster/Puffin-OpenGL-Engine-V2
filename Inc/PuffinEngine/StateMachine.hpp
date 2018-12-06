@@ -29,8 +29,8 @@ namespace puffin {
         StateMachine(const StateMachine &) = delete;
         void operator=(const StateMachine &) = delete;
 
-        GLuint bound_mesh_handle_{0};
-        GLuint bound_shader_program_handle_{0};
+        GLuint bound_mesh_{0};
+        GLuint bound_shader_program_{0};
         GLuint bound_frame_buffer_{0};
         GLuint bound_render_buffer_{0};
 

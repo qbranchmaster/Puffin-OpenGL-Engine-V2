@@ -37,13 +37,13 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_shader_program_handle_ ==
+            if (StateMachine::instance().bound_shader_program_ ==
                 handle_) {
                 return;
             }
 
             glUseProgram(handle_);
-            StateMachine::instance().bound_shader_program_handle_ = handle_;
+            StateMachine::instance().bound_shader_program_ = handle_;
         }
 
         void loadShaders(std::string vs_path, std::string fs_path);
