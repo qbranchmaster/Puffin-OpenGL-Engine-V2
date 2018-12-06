@@ -39,6 +39,8 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
             "x" + std::to_string(System::instance().getMonitorSize(i).second));
     }
 
+    // TODO: add --- to separate
+
     skybox_renderer_.reset(new SkyboxRenderer(render_settings_, camera_));
 
     createFrameBuffer();
@@ -135,11 +137,14 @@ void MasterRenderer::createFrameBuffer() {
     auto h = Configuration::instance().getFrameHeight();
     default_frame_buffer_->addTextureBuffer(w, h);
     default_frame_buffer_->addTextureBuffer(w, h);
+    default_frame_buffer_->bind();
 
     if (!default_frame_buffer_->isComplete()) {
         throw Exception("MasterRenderer::createFrameBuffer()",
             "Error creating default frame buffer.");
     }
+
+    default_frame_buffer_->unbind();
 }
 
 void MasterRenderer::setShadersUniforms() {

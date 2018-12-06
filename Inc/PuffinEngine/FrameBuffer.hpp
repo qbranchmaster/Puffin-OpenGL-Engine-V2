@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_FRAME_BUFFER_HPP
@@ -43,8 +43,9 @@ namespace puffin {
             }
         }
 
-        void addTextureBuffer(GLuint width, GLuint height);
-        void addRenderBuffer(GLuint width, GLuint height);
+        GLuint getHandle() const {
+            return handle_;
+        }
 
         GLboolean isComplete() const;
 
@@ -52,7 +53,16 @@ namespace puffin {
             return rgb_buffer_;
         }
 
+        RenderBufferPtr getDepthRenderBuffer() const {
+            return depth_buffer_;
+        }
+
+        void addTextureBuffer(GLuint width, GLuint height);
+        void addRenderBuffer(GLuint width, GLuint height);
+
     private:
+        GLboolean isBound() const;
+
         GLuint handle_{0};
 
         TexturePtr rgb_buffer_;

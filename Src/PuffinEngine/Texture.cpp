@@ -91,7 +91,7 @@ GLboolean Texture::loadImage(std::string path) {
     return true;
 }
 
-GLboolean Texture::isBound() {
+GLboolean Texture::isBound() const {
     if (StateMachine::instance().bound_texture_[static_cast<GLushort>(type_)]
         == handle_) {
         return true;

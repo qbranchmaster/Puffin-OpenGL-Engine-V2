@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/FrameBuffer.hpp"
@@ -17,17 +17,25 @@ FrameBuffer::~FrameBuffer() {
     }
 }
 
-void FrameBuffer::addTextureBuffer(GLuint width, GLuint height) {
-    if (!rgb_buffer_) {
-        rgb_buffer_.reset(new Texture());
+GLboolean FrameBuffer::isComplete() const {
+    if (!isBound()) {
+        logError("FrameBuffer::isComplete()", "Frame buffer is not bound.");
+        return false;
     }
 
-    rgb_buffer_->createTextureBuffer(width, height);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return false;
+    }
 
-    bind();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        rgb_buffer_->getHandle(), 0);
-    unbind();
+    return true;
+}
+
+GLboolean FrameBuffer::isBound() const {
+    if (StateMachine::instance().bound_frame_buffer_ == handle_) {
+        return true;
+    }
+
+    return false;
 }
 
 void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
@@ -43,12 +51,15 @@ void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
     unbind();
 }
 
-GLboolean FrameBuffer::isComplete() const {
-    bind();
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        return false;
+void FrameBuffer::addTextureBuffer(GLuint width, GLuint height) {
+    if (!rgb_buffer_) {
+        rgb_buffer_.reset(new Texture());
     }
 
+    rgb_buffer_->createTextureBuffer(width, height);
+
+    bind();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+        rgb_buffer_->getHandle(), 0);
     unbind();
-    return true;
 }

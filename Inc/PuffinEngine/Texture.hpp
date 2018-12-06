@@ -146,7 +146,7 @@ namespace puffin {
 
     private:
         GLboolean loadImage(std::string path);
-        GLboolean isBound();
+        GLboolean isBound() const;
         void fetchChannelsCount();
         void generateMipmap();
 
