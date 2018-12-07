@@ -59,7 +59,7 @@ Skybox::Skybox() : Mesh() {
 
 void Skybox::setTexture(TexturePtr texture) {
     if (!texture) {
-        logError("Skybox::setTexture()", "Null texture.");
+        logError("Skybox::setTexture()", "Null input.");
         return;
     }
 

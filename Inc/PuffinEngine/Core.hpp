@@ -6,13 +6,11 @@
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
-#include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
+#include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/System.hpp"
-#include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class Core {
@@ -47,6 +45,7 @@ namespace puffin {
     private:
         CameraPtr camera_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
+        DefaultSkyboxRendererPtr default_skybox_renderer_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;
         RenderSettingsPtr render_settings_;

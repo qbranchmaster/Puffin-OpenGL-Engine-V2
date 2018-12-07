@@ -12,6 +12,7 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
@@ -40,6 +41,10 @@ namespace puffin {
             postprocess_renderer_ = renderer;
         }
 
+        void assignSkyboxRenderer(SkyboxRendererPtr renderer) {
+            skybox_renderer_ = renderer;
+        }
+
         void drawScene(ScenePtr scene);
 
     private:
@@ -61,9 +66,10 @@ namespace puffin {
 
         RenderSettingsPtr render_settings_;
 
-        SkyboxRendererPtr skybox_renderer_;
+
         WindowPtr target_window_;
 
+        SkyboxRendererPtr skybox_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
     };
 

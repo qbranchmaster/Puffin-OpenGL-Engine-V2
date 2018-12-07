@@ -2,7 +2,6 @@
 
 struct Color {
     samplerCube cube_texture;
-    vec3 filter_color;
 };
 
 in VS_OUT {
@@ -17,5 +16,5 @@ void main() {
     vec4 cube_texel = texture(color.cube_texture, fs_in.texture_coordinates);
     vec3 result_color = cube_texel.rgb;
 
-    frag_color = vec4(result_color * color.filter_color, 1.0f);
+    frag_color = vec4(result_color, 1.0f);
 }

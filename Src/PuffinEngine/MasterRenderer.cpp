@@ -41,7 +41,6 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
 
     // TODO: add --- to separate
 
-    skybox_renderer_.reset(new SkyboxRenderer(render_settings_, camera_));
 
     createFrameBuffer();
 }
@@ -81,8 +80,7 @@ void MasterRenderer::stop() {
 
 void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
     if (!function) {
-        logError("MasterRenderer::assignRenderingFunction()",
-            "Null rendering function.");
+        logError("MasterRenderer::assignRenderingFunction()", "Null input.");
         return;
     }
 
@@ -95,8 +93,9 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 
     // TODO: ---
-    default_frame_buffer_->bind();
-    skybox_renderer_->render(scene->getSkybox());
+    if (skybox_renderer_) {
+        skybox_renderer_->render(default_frame_buffer_, scene->getSkybox());
+    }
     // ---
 }
 

@@ -25,7 +25,7 @@ namespace puffin {
     public:
         Timer(const TimeoutCallback &timeout) {
             if (!timeout) {
-                logError("Timer::Timer()", "Null timer function.");
+                logError("Timer::Timer()", "Null input.");
                 return;
             }
 

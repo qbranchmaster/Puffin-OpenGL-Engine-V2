@@ -66,7 +66,7 @@ void DefaultPostprocessRenderer::createScreenMesh() {
 
 void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
     if (!mesh) {
-        logError("DefaultPostprocessRenderer::drawMesh()", "Null mesh.");
+        logError("DefaultPostprocessRenderer::drawMesh()", "Null input.");
         return;
     }
 
@@ -77,7 +77,7 @@ void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
 
 void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     if (!frame_buffer) {
-        logError("DefaultPostprocessRenderer::render()", "Null frame buffer.");
+        logError("DefaultPostprocessRenderer::render()", "Null input.");
         return;
     }
 

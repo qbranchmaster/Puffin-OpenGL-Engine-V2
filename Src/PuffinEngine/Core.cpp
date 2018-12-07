@@ -27,11 +27,16 @@ void Core::initialize() {
     render_settings_.reset(new RenderSettings());
     master_renderer_.reset(new MasterRenderer(window_, camera_,
         render_settings_));
+
     default_postprocess_renderer_.reset(new DefaultPostprocessRenderer(
         render_settings_));
+    default_skybox_renderer_.reset(new DefaultSkyboxRenderer(render_settings_,
+        camera_));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));
+    master_renderer_->assignSkyboxRenderer(std::static_pointer_cast
+        <SkyboxRenderer>(default_skybox_renderer_));
 }
 
 void Core::start() const {
