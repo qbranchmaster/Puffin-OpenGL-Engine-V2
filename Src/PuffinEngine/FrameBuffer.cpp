@@ -51,8 +51,8 @@ void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
     unbind();
 }
 
-void FrameBuffer::setClearColor(const glm::vec3 & color) {
-    clear_color_ = glm::vec3(
+void FrameBuffer::setBackgroundColor(const glm::vec3 & color) {
+    background_color_ = glm::vec3(
         glm::clamp(color.r, 0.0f, 1.0f),
         glm::clamp(color.g, 0.0f, 1.0f),
         glm::clamp(color.b, 0.0f, 1.0f));

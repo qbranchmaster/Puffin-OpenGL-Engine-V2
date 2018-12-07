@@ -46,7 +46,7 @@ namespace puffin {
         void createFrameBuffer();
         void clearDefaultFrameBuffer() {
             default_frame_buffer_->bind();
-            auto color = default_frame_buffer_->getClearColor();
+            auto color = default_frame_buffer_->getBackgroundColor();
             glClearColor(color.r, color.g, color.b, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             default_frame_buffer_->unbind();

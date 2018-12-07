@@ -95,8 +95,8 @@ namespace puffin {
         }
 
         void setMeshData(std::vector<GLfloat> data, GLuint index,
-            GLuint vertex_size, GLboolean dynamic_draw = false,
-            GLboolean is_indices = false);
+            GLuint vertex_size, GLboolean dynamic_draw = false);
+        void setMeshIndices(std::vector<GLuint> data);
         MeshEntityPtr addEntity();
         MeshEntityPtr getEntity(GLuint index) const;
 
@@ -104,21 +104,11 @@ namespace puffin {
             return entities_.size();
         }
 
-        // TODO: Move it somewhere else.
-        void draw(GLuint index) {
-            if (index >= entities_.size()) {
-                return;
-            }
-
-            auto entity = entities_[index];
-            glDrawArrays(GL_TRIANGLES, 0, entity->getVerticesCount());
-        }
-        // ---
-
-    private:
+    protected:
         GLboolean isBound() const;
 
         GLuint handle_{0};
+        GLuint indices_buffer_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
 

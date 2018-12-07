@@ -1,12 +1,10 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #ifndef PUFFIN_SKYBOX_HPP
 #define PUFFIN_SKYBOX_HPP
-
-#include <memory>
 
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Texture.hpp"
@@ -22,13 +20,7 @@ namespace puffin {
             return texture_;
         }
 
-        //void translate(const glm::vec3 &translation) = delete;
-
-        // TODO: Add function delete.
-
     private:
-        GLfloat rotation_angle_{0.0f};
-
         TexturePtr texture_;
     };
 

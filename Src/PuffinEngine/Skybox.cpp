@@ -1,6 +1,6 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/Skybox.hpp"
@@ -55,12 +55,14 @@ Skybox::Skybox() : Mesh() {
     bind();
     setMeshData(data, 0, 3);
     unbind();
-
-    auto entity = addEntity();
-    entity->setVerticesCount(36);
 }
 
 void Skybox::setTexture(TexturePtr texture) {
+    if (!texture) {
+        logError("Skybox::setTexture()", "Null texture.");
+        return;
+    }
+
     if (texture->getType() != TextureType::TextureCube) {
         logError("Skybox::setTexture()", "Invalid texture type.");
         return;

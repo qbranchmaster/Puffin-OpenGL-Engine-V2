@@ -27,6 +27,8 @@ namespace puffin {
         }
 
     private:
+        void drawSkybox(SkyboxPtr skybox);
+
         void loadShaders();
         void setShadersUniforms(SkyboxPtr skybox);
 

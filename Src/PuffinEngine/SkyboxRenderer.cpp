@@ -48,8 +48,17 @@ void SkyboxRenderer::render(SkyboxPtr skybox) {
     }
 
     // Draw.
+    drawSkybox(skybox);
+}
+
+void SkyboxRenderer::drawSkybox(SkyboxPtr skybox) {
+    if (!skybox) {
+        return;
+    }
+
     skybox->bind();
-    skybox->draw(0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    skybox->unbind();
 }
 
 void SkyboxRenderer::loadShaders() {

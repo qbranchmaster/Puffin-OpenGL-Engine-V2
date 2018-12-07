@@ -1,15 +1,14 @@
 #version 330 core
 
-struct Color
-{
+struct Color {
     sampler2D screen_texture;
-    vec3 tint_color;
+
     int effect;
+    vec3 tint_color;
     float kernel_size;
 };
 
-in VS_OUT
-{
+in VS_OUT {
     vec2 tex_coord;
 } fs_in;
 
@@ -17,45 +16,41 @@ out vec4 frag_color;
 
 uniform Color color;
 
-vec3 noEffect()
-{
+vec3 noEffect() {
     return vec3(texture(color.screen_texture, fs_in.tex_coord));
 }
 
-vec3 negative()
-{
+vec3 negative() {
     return vec3(1.0f - texture(color.screen_texture, fs_in.tex_coord));
 }
 
-vec3 grayScale()
-{
+vec3 grayScale() {
     vec3 texel_color = noEffect();
     float average = (texel_color.r + texel_color.g + texel_color.b) / 3.0f;
     return vec3(average, average, average);
 }
 
-vec3 tintColor()
-{
+vec3 tintColor() {
     vec3 texel_color = noEffect();
     return texel_color * color.tint_color;
 }
 
-vec3 calcPostprocess(vec2 offsets[9], float kernel[9])
-{
+vec3 calcPostprocess(vec2 offsets[9], float kernel[9]) {
     vec3 sample_tex[9];
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) {
         sample_tex[i] = vec3(texture(color.screen_texture, fs_in.tex_coord.st +
             offsets[i]));
+    }
 
-    vec3 output_2 = vec3(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < 9; i++)
-        output_2 += sample_tex[i] * kernel[i];
+    vec3 result = vec3(0.0f, 0.0f, 0.0f);
+    for (int i = 0; i < 9; i++) {
+        result += sample_tex[i] * kernel[i];
+    }
 
-    return output_2;
+    return result;
 }
 
-vec3 sharpen(vec2 offsets[9])
-{
+vec3 sharpen(vec2 offsets[9]) {
     float kernel[9] = float[](
         -1.0f, -1.0f, -1.0f,
         -1.0f,  9.0f, -1.0f,
@@ -64,8 +59,7 @@ vec3 sharpen(vec2 offsets[9])
     return calcPostprocess(offsets, kernel);
 }
 
-vec3 blur(vec2 offsets[9])
-{
+vec3 blur(vec2 offsets[9]) {
     float kernel[9] = float[](
         1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f,
         2.0f / 16.0f, 4.0f / 16.0f, 2.0f / 16.0f,
@@ -75,8 +69,7 @@ vec3 blur(vec2 offsets[9])
     return calcPostprocess(offsets, kernel);
 }
 
-vec3 edge(vec2 offsets[9])
-{
+vec3 edge(vec2 offsets[9]) {
     float kernel[9] = float[](
         1.0f,  1.0f, 1.0f,
         1.0f, -8.0f, 1.0f,
@@ -85,8 +78,7 @@ vec3 edge(vec2 offsets[9])
     return calcPostprocess(offsets, kernel);
 }
 
-void main()
-{
+void main() {
     float offset = 1.0f / color.kernel_size;
     vec2 offsets[9] = vec2[](
         vec2(-offset, offset),
@@ -101,8 +93,7 @@ void main()
 
     vec3 result_color = vec3(0.0f, 0.0f, 0.0f);
 
-    switch (color.effect)
-    {
+    switch (color.effect) {
     case 0: // None
         result_color = noEffect();
         break;

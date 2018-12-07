@@ -18,9 +18,7 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
     render_settings_ = render_settings;
 
     loadShaders();
-    // TODO: ---
     createScreenMesh();
-    // ---
 }
 
 void DefaultPostprocessRenderer::loadShaders() {
@@ -30,63 +28,72 @@ void DefaultPostprocessRenderer::loadShaders() {
 }
 
 void DefaultPostprocessRenderer::setShadersUniforms() {
-    // TODO: ---
-    if (1) {
-        default_shader_program_->setUniform("color.effect",
-            static_cast<GLint>(render_settings_->postprocess()->getEffect()));
-        default_shader_program_->setUniform("color.kernel_size",
-            render_settings_->postprocess()->getKernelSize());
-        default_shader_program_->setUniform("color.tint_color",
-            render_settings_->postprocess()->getTintColor());
-        default_shader_program_->setUniform("color.screen_texture", 0);
-    }
-    // ---
+    default_shader_program_->setUniform("color.effect",
+        static_cast<GLint>(render_settings_->postprocess()->getEffect()));
+    default_shader_program_->setUniform("color.kernel_size",
+        render_settings_->postprocess()->getKernelSize());
+    default_shader_program_->setUniform("color.tint_color",
+        render_settings_->postprocess()->getTintColor());
+    default_shader_program_->setUniform("color.screen_texture", 0);
 }
-// TODO: ---
+
 void DefaultPostprocessRenderer::createScreenMesh() {
     screen_mesh_.reset(new Mesh());
     std::vector<GLfloat> positions = {
         -1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f
+        1.0f, -1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
     };
 
     std::vector<GLfloat> texture_coords = {
         0.0f, 1.0f,
         0.0f, 0.0f,
+        1.0f, 0.0f,
         1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f
+    };
+
+    std::vector<GLuint> indices = {
+        0, 1, 3, 3, 1, 2
     };
 
     screen_mesh_->bind();
     screen_mesh_->setMeshData(positions, 0, 3);
     screen_mesh_->setMeshData(texture_coords, 1, 2);
+    screen_mesh_->setMeshIndices(indices);
     screen_mesh_->unbind();
-
-    auto entity = screen_mesh_->addEntity();
-    entity->setVerticesCount(6);
 }
-// ---
+
+void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
+    if (!mesh) {
+        logError("DefaultPostprocessRenderer::drawMesh()", "Null mesh.");
+        return;
+    }
+
+    mesh->bind();
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    mesh->unbind();
+}
 
 void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
-    // TODO: ----
+    if (!frame_buffer) {
+        logError("DefaultPostprocessRenderer::render()", "Null frame buffer.");
+        return;
+    }
+
     frame_buffer->unbind();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    setClearColor(glm::vec3(0.0f, 0.0f, 0.0f));
+    clearBuffer(true);
+
     default_shader_program_->activate();
     setShadersUniforms();
 
-    auto i = frame_buffer->getRgbBufferTexture()->getHandle();
-    glBindTexture(GL_TEXTURE_2D, i);
+    Texture::setTextureSlot(0);
+    frame_buffer->getRgbBufferTexture()->bind();
+
     render_settings_->depthTest()->enable(false);
     render_settings_->depthTest()->enableDepthMask(false);
-    screen_mesh_->bind();
-    screen_mesh_->draw(0);
-    // ---
+
+    drawMesh(screen_mesh_);
 }

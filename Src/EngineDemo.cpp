@@ -34,7 +34,8 @@ EngineDemo::EngineDemo() : Core() {
     Texture::setDefaultTextureFilter(TextureType::Texture2D,
         TextureFilter::TRILINEAR);
 
-    renderSettings()->postprocess()->setEffect(PostprocessEffect::GRAYSCALE);
+    renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
+    renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
 
     // ---
     scene_.reset(new Scene());

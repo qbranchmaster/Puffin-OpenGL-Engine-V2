@@ -85,7 +85,7 @@ GLboolean Mesh::isBound() const {
 }
 
 void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
-    GLuint vertex_size, GLboolean dynamic_draw, GLboolean is_indices) {
+    GLuint vertex_size, GLboolean dynamic_draw) {
     if (!isBound()) {
         logError("Mesh::setMeshData()", "Mesh is not bound.");
         return;
@@ -95,12 +95,25 @@ void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
         glGenBuffers(1, &data_buffers_[index]);
     }
 
-    glBindBuffer(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER,
-        data_buffers_[index]);
-    glBufferData(is_indices == 1 ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER,
-        data.size() * sizeof(GLfloat), data.data(), dynamic_draw ?
-        GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, data_buffers_[index]);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(),
+        dynamic_draw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 
     glVertexAttribPointer(index, vertex_size, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(index);
+}
+
+void Mesh::setMeshIndices(std::vector<GLuint> data) {
+    if (!isBound()) {
+        logError("Mesh::setMeshIndices()", "Mesh is not bound.");
+        return;
+    }
+
+    if (indices_buffer_ == 0) {
+        glGenBuffers(1, &indices_buffer_);
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buffer_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(GLuint),
+        data.data(), GL_STATIC_DRAW);
 }
