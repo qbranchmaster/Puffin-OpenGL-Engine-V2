@@ -15,7 +15,7 @@
 
 namespace puffin {
     void setClearColor(const glm::vec3 &color);
-    void clearBuffer(GLboolean depth_clear = true);
+    void clearFrameBuffer(GLboolean depth_clear = true);
 } // namespace puffin
 
 #endif // PUFFIN_GL_UTILS_HPP

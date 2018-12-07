@@ -1,15 +1,9 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "PuffinEngine/MasterRenderer.hpp"
-
-#include "PuffinEngine/Configuration.hpp"
-#include "PuffinEngine/Exception.hpp"
-#include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/System.hpp"
-#include "PuffinEngine/Time.hpp"
 
 using namespace puffin;
 
@@ -39,10 +33,29 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
             "x" + std::to_string(System::instance().getMonitorSize(i).second));
     }
 
-    // TODO: add --- to separate
+    createDefaultFrameBuffer();
+}
 
+void MasterRenderer::createDefaultFrameBuffer() {
+    default_frame_buffer_.reset(new FrameBuffer());
 
-    createFrameBuffer();
+    auto w = Configuration::instance().getFrameWidth();
+    auto h = Configuration::instance().getFrameHeight();
+    default_frame_buffer_->addTextureBuffer(w, h);
+    default_frame_buffer_->addTextureBuffer(w, h);
+
+    default_frame_buffer_->bind();
+
+    if (!default_frame_buffer_->isComplete()) {
+        throw Exception("MasterRenderer::createDefaultFrameBuffer()",
+            "Error creating default frame buffer.");
+    }
+
+    default_frame_buffer_->unbind();
+}
+
+void MasterRenderer::stop() {
+    rendering_enabled_ = false;
 }
 
 void MasterRenderer::start() {
@@ -74,10 +87,6 @@ void MasterRenderer::start() {
     }
 }
 
-void MasterRenderer::stop() {
-    rendering_enabled_ = false;
-}
-
 void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
     if (!function) {
         logError("MasterRenderer::assignRenderingFunction()", "Null input.");
@@ -87,30 +96,40 @@ void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
     rendering_function_ = function;
 }
 
-void MasterRenderer::drawScene(ScenePtr scene) {
-    if (!scene) {
+void MasterRenderer::assignPostprocessRenderer(
+    PostprocessRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignPostprocessRenderer()", "Null input.");
         return;
     }
 
-    // TODO: ---
+    postprocess_renderer_ = renderer;
+}
+
+void MasterRenderer::assignSkyboxRenderer(SkyboxRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignSkyboxRenderer()", "Null input.");
+        return;
+    }
+
+    skybox_renderer_ = renderer;
+}
+
+void MasterRenderer::drawScene(ScenePtr scene) {
+    if (!scene) {
+        logError("MasterRenderer::drawScene()", "Null input.");
+    }
+
     if (skybox_renderer_) {
         skybox_renderer_->render(default_frame_buffer_, scene->getSkybox());
     }
-    // ---
 }
 
-void MasterRenderer::createFrameBuffer() {
-    default_frame_buffer_.reset(new FrameBuffer());
-    auto w = Configuration::instance().getFrameWidth();
-    auto h = Configuration::instance().getFrameHeight();
-    default_frame_buffer_->addTextureBuffer(w, h);
-    default_frame_buffer_->addTextureBuffer(w, h);
+void MasterRenderer::clearDefaultFrameBuffer() {
     default_frame_buffer_->bind();
 
-    if (!default_frame_buffer_->isComplete()) {
-        throw Exception("MasterRenderer::createFrameBuffer()",
-            "Error creating default frame buffer.");
-    }
+    setClearColor(default_frame_buffer_->getBackgroundColor());
+    clearFrameBuffer(true);
 
     default_frame_buffer_->unbind();
 }

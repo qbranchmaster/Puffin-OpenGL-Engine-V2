@@ -1,11 +1,9 @@
 /*
 * Puffin OpenGL Engine ver. 2.0 Demo
-* Created by: Sebastian 'qbranchmaster' Tabaka
+* Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
 #include "EngineDemo.hpp"
-
-#include "PuffinEngine/PostprocessRenderer.hpp"
 
 using namespace puffin;
 
@@ -37,27 +35,7 @@ EngineDemo::EngineDemo() : Core() {
     renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
 
-    // ---
-    scene_.reset(new Scene());
-
-    skybox_.reset(new Skybox());
-
-    skybox_texture_.reset(new Texture());
-    skybox_texture_->loadTextureCube({
-        "DemoData/Skybox/right.jpg",
-        "DemoData/Skybox/left.jpg",
-        "DemoData/Skybox/up.jpg",
-        "DemoData/Skybox/down.jpg",
-        "DemoData/Skybox/back.jpg",
-        "DemoData/Skybox/front.jpg"});
-
-    skybox_->setTexture(skybox_texture_);
-    //skybox_->translate(glm::vec3(3, 3, 3));
-
-    //skyboxRenderer()->setFilterColor(glm::vec3(1.0f, 1.0f, 1.0f));
-
-    scene_->setSkybox(skybox_);
-    // ----
+    createScene();
 }
 
 EngineDemo::~EngineDemo() {
@@ -74,6 +52,24 @@ void EngineDemo::stopTimers() {
     fps_update_timer_->stop();
 }
 
+void EngineDemo::createScene() {
+    scene_.reset(new Scene());
+    skybox_.reset(new Skybox());
+
+    skybox_texture_.reset(new Texture());
+    skybox_texture_->loadTextureCube({
+        "DemoData/Skybox/right.jpg",
+        "DemoData/Skybox/left.jpg",
+        "DemoData/Skybox/up.jpg",
+        "DemoData/Skybox/down.jpg",
+        "DemoData/Skybox/back.jpg",
+        "DemoData/Skybox/front.jpg"});
+
+    skybox_->setTexture(skybox_texture_);
+
+    scene_->setSkybox(skybox_);
+}
+
 void EngineDemo::pollKeyboard() {
     if (input()->keyPressed(Key::ESCAPE, false)) {
         stop();
@@ -87,25 +83,7 @@ void EngineDemo::pollMouse() {
 }
 
 void EngineDemo::render() {
-    // ---
-    /*glViewport(0, 0, Configuration::instance().getFrameWidth(),
-        Configuration::instance().getFrameHeight());*/
-    /*glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-
-    /*glActiveTexture(GL_TEXTURE0);
-
     masterRenderer()->drawScene(scene_);
-
-    basic_shader_->activate();
-    basic_shader_->setUniform("matrices.view_matrix", camera()->getViewMatrix());
-    basic_shader_->setUniform("matrices.projection_matrix", camera()->getProjectionMatrix());
-
-    basic_texture_->bind();
-    my_mesh_->bind();
-    my_mesh_->draw(0);*/
-    masterRenderer()->drawScene(scene_);
-    // ---
 
     pollKeyboard();
     pollMouse();

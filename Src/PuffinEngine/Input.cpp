@@ -48,7 +48,7 @@ GLboolean Input::mouseKeyPressed(MouseButton button) {
     return false;
 }
 
-void Input::setCursorPosition(GLfloat x, GLfloat y) const {
+void Input::setCursorPosition(GLfloat x, GLfloat y) {
     glfwSetCursorPos(target_window_->handle_, x, y);
 }
 

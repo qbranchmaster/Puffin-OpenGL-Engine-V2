@@ -84,7 +84,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     frame_buffer->unbind();
 
     setClearColor(glm::vec3(0.0f, 0.0f, 0.0f));
-    clearBuffer(true);
+    clearFrameBuffer(true);
 
     default_shader_program_->activate();
     setShadersUniforms();
