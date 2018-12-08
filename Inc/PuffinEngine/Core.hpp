@@ -6,6 +6,7 @@
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
+#include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/Input.hpp"
@@ -44,6 +45,7 @@ namespace puffin {
 
     private:
         CameraPtr camera_;
+		DefaultMeshRendererPtr default_mesh_renderer_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
         DefaultSkyboxRendererPtr default_skybox_renderer_;
         InputPtr input_;

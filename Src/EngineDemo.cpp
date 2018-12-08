@@ -67,7 +67,23 @@ void EngineDemo::createScene() {
 
     skybox_->setTexture(skybox_texture_);
 
+    test_mesh_.reset(new Mesh());
+
+    std::vector<GLfloat> data = {
+        -0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
+    };
+
+    test_mesh_->bind();
+    test_mesh_->setMeshData(data, 0, 3);
+    test_mesh_->unbind();
+
+    auto entity = test_mesh_->addEntity();
+    entity->setVerticesCount(3);
+
     scene_->setSkybox(skybox_);
+    scene_->addMesh(test_mesh_);
 }
 
 void EngineDemo::pollKeyboard() {

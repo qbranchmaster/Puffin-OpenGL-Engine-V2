@@ -115,13 +115,34 @@ void MasterRenderer::assignSkyboxRenderer(SkyboxRendererPtr renderer) {
     skybox_renderer_ = renderer;
 }
 
+void MasterRenderer::assignMeshRenderer(MeshRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignMeshRenderer()", "Null input.");
+        return;
+    }
+
+    mesh_renderer_ = renderer;
+}
+
 void MasterRenderer::drawScene(ScenePtr scene) {
     if (!scene) {
         logError("MasterRenderer::drawScene()", "Null input.");
     }
 
     if (skybox_renderer_) {
-        skybox_renderer_->render(default_frame_buffer_, scene->getSkybox());
+        auto skybox = scene->getSkybox();
+        if (skybox) {
+            skybox_renderer_->render(default_frame_buffer_, skybox);
+        }
+    }
+
+    if (mesh_renderer_) {
+        for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
+            auto mesh = scene->getMesh(i);
+            if (mesh) {
+                mesh_renderer_->render(default_frame_buffer_, mesh);
+            }
+        }
     }
 }
 

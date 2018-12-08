@@ -32,11 +32,15 @@ void Core::initialize() {
         render_settings_));
     default_skybox_renderer_.reset(new DefaultSkyboxRenderer(render_settings_,
         camera_));
+	default_mesh_renderer_.reset(new DefaultMeshRenderer(render_settings_,
+		camera_));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));
     master_renderer_->assignSkyboxRenderer(std::static_pointer_cast
         <SkyboxRenderer>(default_skybox_renderer_));
+	master_renderer_->assignMeshRenderer(std::static_pointer_cast
+		<MeshRenderer>(default_mesh_renderer_));
 }
 
 void Core::start() {
