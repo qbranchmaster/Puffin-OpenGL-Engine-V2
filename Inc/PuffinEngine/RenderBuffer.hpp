@@ -44,7 +44,7 @@ namespace puffin {
             StateMachine::instance().bound_render_buffer_ = handle_;
         }
 
-        void unbind() {
+        void unbind() const {
             if (StateMachine::instance().bound_render_buffer_ == handle_) {
                 glBindRenderbuffer(GL_RENDERBUFFER, 0);
                 StateMachine::instance().bound_render_buffer_ = 0;

@@ -39,10 +39,10 @@ void Core::initialize() {
         <SkyboxRenderer>(default_skybox_renderer_));
 }
 
-void Core::start() const {
+void Core::start() {
     master_renderer_->start();
 }
 
-void Core::stop() const {
+void Core::stop() {
     master_renderer_->stop();
 }

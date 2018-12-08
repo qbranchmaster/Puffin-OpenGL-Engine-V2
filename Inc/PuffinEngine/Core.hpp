@@ -39,8 +39,8 @@ namespace puffin {
         }
 
         void initialize();
-        void start() const;
-        void stop() const;
+        void start();
+        void stop();
 
     private:
         CameraPtr camera_;

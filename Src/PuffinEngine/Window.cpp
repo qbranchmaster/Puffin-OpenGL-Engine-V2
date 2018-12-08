@@ -53,7 +53,7 @@ std::pair<GLint, GLint> Window::getPosition() const {
     return std::make_pair(x, y);
 }
 
-void Window::setWindowIcon(std::string path) const {
+void Window::setWindowIcon(std::string path) {
     Texture icon;
     if (!icon.loadImageRaw(path)) {
         logError("Window::setWindowIcon()", "Invalid value.");

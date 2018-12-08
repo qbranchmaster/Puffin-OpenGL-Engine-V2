@@ -36,7 +36,7 @@ namespace puffin {
             return caption_;
         }
 
-        void setWindowIcon(std::string path) const;
+        void setWindowIcon(std::string path);
 
         void setPosition(GLint x, GLint y);
         std::pair<GLint, GLint> getPosition() const;

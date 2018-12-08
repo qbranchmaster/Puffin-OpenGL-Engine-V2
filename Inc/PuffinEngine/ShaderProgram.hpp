@@ -30,7 +30,7 @@ namespace puffin {
         ShaderProgram();
         ~ShaderProgram();
 
-        void activate() {
+        void activate() const {
             if (!handle_) {
                 logError("ShaderProgram::activate()",
                     "Cannot activate null shader program.");
