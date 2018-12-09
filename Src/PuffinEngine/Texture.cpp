@@ -118,10 +118,11 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     type_ = TextureType::Texture2D;
 
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
         GL_UNSIGNED_BYTE, img_handle_.accessPixels());
     setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
     setTextureWrap(TextureWrap::REPEAT);
+    flipVertical();
     unbind();
 
     if (auto_free) {
@@ -177,12 +178,7 @@ void Texture::fetchChannelsCount() {
 }
 
 void Texture::generateMipmap() {
-    if (has_mipmap_) {
-        return;
-    }
-
     glGenerateMipmap(GL_TEXTURE_2D);
-    has_mipmap_ = true;
 }
 
 void Texture::setTextureBorderColor(const glm::vec4 & color) {
@@ -328,6 +324,9 @@ void Texture::setTexture2DData(void *data) {
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
         GL_UNSIGNED_BYTE, data);
+
+    // After setting new texture data there is a need to regenerate mipmaps.
+    generateMipmap();
 }
 
 void Texture::swapRedBlue() {

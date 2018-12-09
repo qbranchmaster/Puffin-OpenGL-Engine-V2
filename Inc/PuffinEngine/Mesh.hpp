@@ -116,6 +116,8 @@ namespace puffin {
 
     protected:
         GLboolean isBound() const;
+        std::string processTexturePath(std::string model_file_path,
+            const aiString &texture_path);
 
         GLuint handle_{0};
         GLuint indices_buffer_{0};

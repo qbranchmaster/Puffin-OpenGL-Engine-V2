@@ -170,7 +170,57 @@ void Mesh::loadFromFile(std::string path) {
         entity->setVerticesCount(mesh->mNumVertices);
         indices_count += entity->getIndicesCount();
 
-        // TODO: Material loading here.
+        if (scene->HasMaterials()) {
+            aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+            MaterialPtr mesh_material(new Material());
+
+            aiString texture_path;
+            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
+                == AI_SUCCESS) {
+                TexturePtr diffuse_tex(new Texture());
+                diffuse_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setDiffuseTexture(diffuse_tex);
+            }
+
+            if (material->GetTexture(aiTextureType_HEIGHT, 0, &texture_path) ==
+                AI_SUCCESS) {
+                TexturePtr normalmap_tex(new Texture());
+                normalmap_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setNormalMapTexture(normalmap_tex);
+            }
+
+            aiColor3D kd;
+            if (material->Get(AI_MATKEY_COLOR_DIFFUSE, kd) == AI_SUCCESS) {
+                mesh_material->setKd(glm::vec3(kd.r, kd.g, kd.b));
+            }
+
+            aiColor3D ka;
+            if (material->Get(AI_MATKEY_COLOR_AMBIENT, ka) == AI_SUCCESS) {
+                mesh_material->setKa(glm::vec3(ka.r, ka.g, ka.b));
+            }
+
+            aiColor3D ks;
+            if (material->Get(AI_MATKEY_COLOR_SPECULAR, ks) == AI_SUCCESS) {
+                mesh_material->setKs(glm::vec3(ks.r, ks.g, ks.b));
+            }
+
+            // Shininess needs to be divided by 4, because Assimp
+            // multiplies it by 4.
+            GLfloat shininess = 0;
+            if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
+                mesh_material->setShininess(static_cast<int>(shininess) / 4);
+            }
+
+            GLfloat reflectivity = 0;
+            if (material->Get(AI_MATKEY_REFLECTIVITY, reflectivity) ==
+                AI_SUCCESS) {
+                mesh_material->setReflectivity(reflectivity);
+            }
+
+            entity->setMaterial(mesh_material);
+        }
 
         entities_.push_back(entity);
     }
@@ -185,6 +235,19 @@ void Mesh::loadFromFile(std::string path) {
     unbind();
 
     has_indices_ = true;
+}
+
+std::string Mesh::processTexturePath(std::string model_file_path,
+    const aiString &texture_path) {
+    std::size_t slash_pos = model_file_path.find_last_of("/\\");
+    std::string path = model_file_path.substr(0, slash_pos);
+    std::string name = texture_path.C_Str();
+    if (name[0] == '/') {
+        name.erase(0, 1);
+    }
+
+    std::string file_path = path + "/" + name;
+    return file_path;
 }
 
 GLboolean Mesh::isBound() const {

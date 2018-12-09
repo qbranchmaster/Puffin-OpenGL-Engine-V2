@@ -35,10 +35,16 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
     render_settings_->depthTest()->enableDepthMask(true);
     render_settings_->faceCull()->enable(true);
 
-    Texture::setTextureSlot(0);
-    Texture::unbindAllTextures(TextureType::Texture2D);
+    for (GLuint i = 0; i < mesh->getEntitiesCount(); i++) {
+        auto entity = mesh->getEntity(i);
 
-    drawMesh(mesh, 0);
+        Texture::setTextureSlot(0);
+        entity->getMaterial()->getDiffuseTexture()->bind();
+
+        drawMesh(mesh, i);
+
+        entity->getMaterial()->getDiffuseTexture()->unbind();
+    }
 }
 
 void DefaultMeshRenderer::loadShaders() {
@@ -59,6 +65,8 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix",
         mesh->getModelMatrix());
+
+    default_shader_program_->setUniform("object_material.diffuse_texture", 0);
 }
 
 void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
@@ -68,10 +76,11 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
     }
 
     mesh->bind();
+
     auto entity = mesh->getEntity(entity_index);
     if (entity) {
-        //glDrawArrays(GL_TRIANGLES, 0, entity->getVerticesCount() * 2);
-        glDrawElements(GL_TRIANGLES, entity->getIndicesCount(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, entity->getIndicesCount(),
+            GL_UNSIGNED_INT, nullptr);
     }
 
     mesh->unbind();

@@ -153,7 +153,6 @@ namespace puffin {
         GLuint handle_{0};
         fipImage img_handle_;
         TextureType type_{TextureType::None};
-        GLboolean has_mipmap_{false};
 
         std::string path_;
         GLuint width_{0};

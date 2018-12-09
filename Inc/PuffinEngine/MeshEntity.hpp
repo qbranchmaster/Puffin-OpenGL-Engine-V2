@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "PuffinEngine/Material.hpp"
+
 namespace puffin {
     class MeshEntity {
     public:
@@ -40,10 +42,25 @@ namespace puffin {
             return vertices_count_;
         }
 
+        void setMaterial(MaterialPtr material) {
+            if (!material) {
+                logError("MeshEntity::setMaterial()", "Null input.");
+                return;
+            }
+
+            material_ = material;
+        }
+
+        MaterialPtr getMaterial() const {
+            return material_;
+        }
+
     private:
         GLuint starting_index_{0};
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
+
+        MaterialPtr material_;
     };
 
     using MeshEntityPtr = std::shared_ptr<MeshEntity>;

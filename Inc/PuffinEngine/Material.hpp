@@ -23,8 +23,7 @@ namespace puffin {
     public:
         void setDiffuseTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setDiffuseTexture()",
-                    "Not initialized object.");
+                logError("Material::setDiffuseTexture()", "Null input.");
                 return;
             }
 
@@ -33,6 +32,19 @@ namespace puffin {
 
         TexturePtr getDiffuseTexture() const {
             return diffuse_texture_;
+        }
+
+        void setNormalMapTexture(TexturePtr texture) {
+            if (!texture) {
+                logError("Material::setNormalMapTexture()", "Null input.");
+                return;
+            }
+
+            normalmap_texture_ = texture;
+        }
+
+        TexturePtr getNormalMapTexture() const {
+            return normalmap_texture_;
         }
 
         void setKa(const glm::vec3 &ka) {
@@ -97,7 +109,8 @@ namespace puffin {
         glm::vec3 kd_{0.0f, 0.0f, 0.0f};
         glm::vec3 ks_{0.0f, 0.0f, 0.0f};
 
-        TexturePtr diffuse_texture_{nullptr};
+        TexturePtr diffuse_texture_;
+        TexturePtr normalmap_texture_;
     };
 
     using MaterialPtr = std::shared_ptr<Material>;
