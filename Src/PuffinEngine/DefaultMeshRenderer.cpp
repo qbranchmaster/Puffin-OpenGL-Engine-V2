@@ -68,7 +68,11 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
     }
 
     mesh->bind();
-    glDrawArrays(GL_TRIANGLES, 0,
-        mesh->getEntity(entity_index)->getVerticesCount());
+    auto entity = mesh->getEntity(entity_index);
+    if (entity) {
+        //glDrawArrays(GL_TRIANGLES, 0, entity->getVerticesCount() * 2);
+        glDrawElements(GL_TRIANGLES, entity->getIndicesCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
     mesh->unbind();
 }

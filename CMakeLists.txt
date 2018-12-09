@@ -40,6 +40,7 @@ set(GLFW_INC_PATH "" CACHE PATH "GLFW include path")
 set(GLM_INC_PATH "" CACHE PATH "GLM include path")
 set(FREE_IMAGE_INC_PATH "" CACHE PATH "FreeImage include path")
 set(FREE_IMAGE_WRAP_INC_PATH "" CACHE PATH "FreeImage Wrapper include path")
+set(ASSIMP_INC_PATH "" CACHE PATH "Assimp include path")
 
 set(LIBS_BINARY_PATH "" CACHE PATH "Libs binaries path")
 
@@ -54,6 +55,7 @@ if (MSVC)
                         ${GLM_INC_PATH}
                         ${FREE_IMAGE_INC_PATH}
                         ${FREE_IMAGE_WRAP_INC_PATH}
+                        ${ASSIMP_INC_PATH}
                         )
 
     link_directories(${LIBS_BINARY_PATH})
@@ -68,7 +70,8 @@ if (UNIX)
 endif (UNIX)
 if (MSVC)
     target_link_libraries(PuffinEngineV2 OpenGL32.lib FreeImaged.lib
-	                      FreeImagePlusd.lib glew32d.lib glfw3.lib)
+                          FreeImagePlusd.lib glew32d.lib glfw3.lib 
+                          assimp-vc140-mt.lib)
 endif (MSVC)
 
 set_target_properties(PuffinEngineV2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY

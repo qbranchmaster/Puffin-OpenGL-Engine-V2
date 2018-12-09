@@ -15,6 +15,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -100,8 +104,14 @@ namespace puffin {
         MeshEntityPtr addEntity();
         MeshEntityPtr getEntity(GLuint index) const;
 
+        void loadFromFile(std::string path);
+
         GLuint getEntitiesCount() const {
             return entities_.size();
+        }
+
+        GLboolean hasIndices() const {
+            return has_indices_;
         }
 
     protected:
@@ -119,6 +129,8 @@ namespace puffin {
         glm::mat4 translation_matrix_{1.0f};
         glm::vec3 position_{0.0f, 0.0f, 0.0f};
         glm::vec3 scale_{1.0f, 1.0f, 1.0f};
+
+        GLboolean has_indices_{false};
     };
 
     using MeshPtr = std::shared_ptr<Mesh>;

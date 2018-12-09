@@ -68,19 +68,8 @@ void EngineDemo::createScene() {
     skybox_->setTexture(skybox_texture_);
 
     test_mesh_.reset(new Mesh());
-
-    std::vector<GLfloat> data = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    test_mesh_->bind();
-    test_mesh_->setMeshData(data, 0, 3);
-    test_mesh_->unbind();
-
-    auto entity = test_mesh_->addEntity();
-    entity->setVerticesCount(3);
+    test_mesh_->loadFromFile("DemoData/Models/Farmhouse/farmhouse_obj.obj");
+    test_mesh_->setScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);

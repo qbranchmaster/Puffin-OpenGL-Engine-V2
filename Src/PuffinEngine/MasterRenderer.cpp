@@ -42,7 +42,7 @@ void MasterRenderer::createDefaultFrameBuffer() {
     auto w = Configuration::instance().getFrameWidth();
     auto h = Configuration::instance().getFrameHeight();
     default_frame_buffer_->addTextureBuffer(w, h);
-    default_frame_buffer_->addTextureBuffer(w, h);
+    default_frame_buffer_->addRenderBuffer(w, h);
 
     default_frame_buffer_->bind();
 
@@ -148,6 +148,9 @@ void MasterRenderer::drawScene(ScenePtr scene) {
 
 void MasterRenderer::clearDefaultFrameBuffer() {
     default_frame_buffer_->bind();
+
+    // Before clearing frame buffer enable depth mask to clear it also.
+    render_settings_->depthTest()->enableDepthMask(true);
 
     setClearColor(default_frame_buffer_->getBackgroundColor());
     clearFrameBuffer(true);
