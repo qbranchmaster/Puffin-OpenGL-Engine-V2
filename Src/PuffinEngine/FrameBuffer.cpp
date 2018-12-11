@@ -17,6 +17,21 @@ FrameBuffer::~FrameBuffer() {
     }
 }
 
+void FrameBuffer::copyFrameBuffer(FrameBufferPtr target) {
+    if (!target) {
+        logError("FrameBuffer::copyFrameBuffer()", "Null input.");
+    }
+
+    bind(FrameBufferBindType::ONLY_READ);
+    target->bind(FrameBufferBindType::ONLY_WRITE);
+
+    auto size = rgb_buffer_->getSize();
+    glBlitFramebuffer(0, 0, size.first, size.second, 0, 0, size.first,
+        size.second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+    unbind();
+}
+
 GLboolean FrameBuffer::isComplete() const {
     if (!isBound()) {
         logError("FrameBuffer::isComplete()", "Frame buffer is not bound.");
@@ -38,14 +53,15 @@ GLboolean FrameBuffer::isBound() const {
     return false;
 }
 
-void FrameBuffer::addRenderBuffer(GLuint width, GLuint height) {
+void FrameBuffer::addRenderBuffer(GLuint width, GLuint height,
+    GLboolean multisample) {
     if (!depth_buffer_) {
         depth_buffer_.reset(new RenderBuffer());
     }
 
-    depth_buffer_->create(width, height);
+    depth_buffer_->create(width, height, multisample);
 
-    bind();
+    bind(FrameBufferBindType::NORMAL);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
         GL_RENDERBUFFER, depth_buffer_->getHandle());
     unbind();
@@ -58,15 +74,17 @@ void FrameBuffer::setBackgroundColor(const glm::vec3 & color) {
         glm::clamp(color.b, 0.0f, 1.0f));
 }
 
-void FrameBuffer::addTextureBuffer(GLuint width, GLuint height) {
+void FrameBuffer::addTextureBuffer(GLuint width, GLuint height,
+    GLboolean multisample) {
     if (!rgb_buffer_) {
         rgb_buffer_.reset(new Texture());
     }
 
-    rgb_buffer_->createTextureBuffer(width, height);
+    rgb_buffer_->createTextureBuffer(width, height, multisample);
 
-    bind();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+    bind(FrameBufferBindType::NORMAL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
         rgb_buffer_->getHandle(), 0);
     unbind();
 }

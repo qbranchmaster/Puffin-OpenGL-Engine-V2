@@ -22,6 +22,7 @@
 #include <string>
 #include <utility>
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/StateMachine.hpp"
 
@@ -30,6 +31,7 @@ namespace puffin {
         None,
         RawImage,
         Texture2D,
+        Texture2DMultisample,
         TextureCube,
     };
 
@@ -60,7 +62,8 @@ namespace puffin {
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
-        void createTextureBuffer(GLuint width, GLuint height);
+        void createTextureBuffer(GLuint width, GLuint height,
+            GLboolean multisample);
 
         void bind() const {
             if (!handle_) {
@@ -82,6 +85,9 @@ namespace puffin {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);
                 break;
+            case TextureType::Texture2DMultisample:
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, handle_);
+                break;
             case TextureType::TextureCube:
                 glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
                 break;
@@ -97,6 +103,9 @@ namespace puffin {
                 switch (type_) {
                 case TextureType::Texture2D:
                     glBindTexture(GL_TEXTURE_2D, 0);
+                    break;
+                case TextureType::Texture2DMultisample:
+                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
                     break;
                 case TextureType::TextureCube:
                     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

@@ -10,6 +10,7 @@ using namespace puffin;
 // Initialize default texture filter.
 std::map<TextureType, TextureFilter> Texture::default_texture_filter_ = {
     {TextureType::Texture2D, TextureFilter::BILINEAR},
+    {TextureType::Texture2DMultisample, TextureFilter::BILINEAR},
     {TextureType::TextureCube, TextureFilter::BILINEAR}
 };
 
@@ -33,6 +34,7 @@ void Texture::freeImage() {
 void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
     switch (type) {
     case TextureType::Texture2D:
+    case TextureType::Texture2DMultisample:
     case TextureType::TextureCube:
         switch (filter) {
         case TextureFilter::NEAREST:
@@ -62,6 +64,9 @@ void Texture::unbindAllTextures(TextureType type) {
     switch (type) {
     case TextureType::Texture2D:
         glBindTexture(GL_TEXTURE_2D, 0);
+        break;
+    case TextureType::Texture2DMultisample:
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         break;
     case TextureType::TextureCube:
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -157,8 +162,10 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
     return true;
 }
 
-void Texture::createTextureBuffer(GLuint width, GLuint height) {
-    type_ = TextureType::Texture2D;
+void Texture::createTextureBuffer(GLuint width, GLuint height,
+    GLboolean multisample) {
+    type_ = multisample ? TextureType::Texture2DMultisample :
+        TextureType::Texture2D;
     width_ = width;
     height_ = height;
 
@@ -178,6 +185,10 @@ void Texture::fetchChannelsCount() {
 }
 
 void Texture::generateMipmap() {
+    if (type_ != TextureType::Texture2D) {
+        return;
+    }
+
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
@@ -312,7 +323,8 @@ GLFWimage Texture::toGlfwImage() const {
 }
 
 void Texture::setTexture2DData(void *data) {
-    if (type_ != TextureType::Texture2D) {
+    if (!(type_ == TextureType::Texture2D ||
+        type_ == TextureType::Texture2DMultisample)) {
         logError("Texture::setTexture2DData()", "Invalid texture type.");
         return;
     }
@@ -322,8 +334,15 @@ void Texture::setTexture2DData(void *data) {
         return;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
-        GL_UNSIGNED_BYTE, data);
+    if (type_ == TextureType::Texture2D) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
+            GL_UNSIGNED_BYTE, data);
+    }
+    else if (type_ == TextureType::Texture2DMultisample) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+            Configuration::instance().getMsaaSamples(), GL_RGB, width_,
+            height_, GL_TRUE);
+    }
 
     // After setting new texture data there is a need to regenerate mipmaps.
     generateMipmap();

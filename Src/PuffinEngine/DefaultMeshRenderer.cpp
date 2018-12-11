@@ -26,7 +26,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
         return;
     }
 
-    frame_buffer->bind();
+    frame_buffer->bind(FrameBufferBindType::NORMAL);
 
     default_shader_program_->activate();
     setShadersUniforms(mesh);

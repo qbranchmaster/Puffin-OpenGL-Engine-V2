@@ -21,32 +21,67 @@
 #include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
+    enum class FrameBufferBindType {
+        NORMAL,
+        ONLY_READ,
+        ONLY_WRITE,
+    };
+
+    class FrameBuffer;
+    using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
+
     class FrameBuffer {
     public:
         FrameBuffer();
         ~FrameBuffer();
 
-        void bind() const {
+        void bind(FrameBufferBindType bind_type) const {
             if (!handle_) {
                 logError("FrameBuffer::bind()",
                     "Cannot bind null frame buffer.");
                 return;
             }
 
-            if (StateMachine::instance().bound_frame_buffer_ == handle_) {
+            GLuint target = 0;
+            GLuint *handle_ptr = nullptr;
+            switch (bind_type) {
+            case FrameBufferBindType::NORMAL:
+                handle_ptr = &StateMachine::instance().bound_frame_buffer_;
+                target = GL_FRAMEBUFFER;
+                break;
+            case FrameBufferBindType::ONLY_READ:
+                handle_ptr = &StateMachine::instance().bound_frame_buffer_read_;
+                target = GL_READ_FRAMEBUFFER;
+                break;
+            case FrameBufferBindType::ONLY_WRITE:
+                handle_ptr = &StateMachine::instance().bound_frame_buffer_write_;
+                target = GL_DRAW_FRAMEBUFFER;
+                break;
+            }
+
+            if (*handle_ptr == handle_) {
                 return;
             }
 
-            glBindFramebuffer(GL_FRAMEBUFFER, handle_);
-            StateMachine::instance().bound_frame_buffer_ = handle_;
+            glBindFramebuffer(target, handle_);
+            *handle_ptr = handle_;
+
+            if (bind_type == FrameBufferBindType::NORMAL) {
+                StateMachine::instance().bound_frame_buffer_read_ = handle_;
+                StateMachine::instance().bound_frame_buffer_write_ = handle_;
+            }
         }
 
         void unbind() const {
             if (StateMachine::instance().bound_frame_buffer_ == handle_) {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 StateMachine::instance().bound_frame_buffer_ = 0;
+                StateMachine::instance().bound_frame_buffer_read_ = 0;
+                StateMachine::instance().bound_frame_buffer_write_ = 0;
             }
         }
+
+        void copyFrameBuffer(FrameBufferPtr target);
 
         GLuint getHandle() const {
             return handle_;
@@ -62,8 +97,10 @@ namespace puffin {
             return depth_buffer_;
         }
 
-        void addTextureBuffer(GLuint width, GLuint height);
-        void addRenderBuffer(GLuint width, GLuint height);
+        void addTextureBuffer(GLuint width, GLuint height,
+            GLboolean multisample);
+        void addRenderBuffer(GLuint width, GLuint height,
+            GLboolean multisample);
 
         void setBackgroundColor(const glm::vec3 &color);
 
@@ -81,8 +118,6 @@ namespace puffin {
 
         glm::vec3 background_color_{0.0f, 0.0f, 0.0f};
     };
-
-    using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
 } // namespace puffin
 
 #endif // PUFFIN_FRAME_BUFFER_HPP

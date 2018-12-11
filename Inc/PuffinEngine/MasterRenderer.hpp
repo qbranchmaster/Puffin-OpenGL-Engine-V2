@@ -54,6 +54,7 @@ namespace puffin {
 
         CameraPtr camera_;
         FrameBufferPtr default_frame_buffer_;
+        FrameBufferPtr default_frame_buffer_multisample_;
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
 

@@ -38,13 +38,17 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
 
 void MasterRenderer::createDefaultFrameBuffer() {
     default_frame_buffer_.reset(new FrameBuffer());
+    default_frame_buffer_multisample_.reset(new FrameBuffer());
 
     auto w = Configuration::instance().getFrameWidth();
     auto h = Configuration::instance().getFrameHeight();
-    default_frame_buffer_->addTextureBuffer(w, h);
-    default_frame_buffer_->addRenderBuffer(w, h);
 
-    default_frame_buffer_->bind();
+    default_frame_buffer_->addTextureBuffer(w, h, false);
+    default_frame_buffer_->addRenderBuffer(w, h, false);
+    default_frame_buffer_multisample_->addTextureBuffer(w, h, true);
+    default_frame_buffer_multisample_->addRenderBuffer(w, h, true);
+
+    default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 
     if (!default_frame_buffer_->isComplete()) {
         throw Exception("MasterRenderer::createDefaultFrameBuffer()",
@@ -70,6 +74,8 @@ void MasterRenderer::start() {
         }
 
         if (postprocess_renderer_) {
+            default_frame_buffer_multisample_->
+                copyFrameBuffer(default_frame_buffer_);
             postprocess_renderer_->render(default_frame_buffer_);
         }
 
@@ -132,7 +138,8 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     if (skybox_renderer_) {
         auto skybox = scene->getSkybox();
         if (skybox) {
-            skybox_renderer_->render(default_frame_buffer_, skybox);
+            skybox_renderer_->render(default_frame_buffer_multisample_,
+                skybox);
         }
     }
 
@@ -140,20 +147,25 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
             auto mesh = scene->getMesh(i);
             if (mesh) {
-                mesh_renderer_->render(default_frame_buffer_, mesh);
+                mesh_renderer_->render(default_frame_buffer_multisample_,
+                    mesh);
             }
         }
     }
 }
 
 void MasterRenderer::clearDefaultFrameBuffer() {
-    default_frame_buffer_->bind();
-
     // Before clearing frame buffer enable depth mask to clear it also.
     render_settings_->depthTest()->enableDepthMask(true);
+
+    default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 
     setClearColor(default_frame_buffer_->getBackgroundColor());
     clearFrameBuffer(true);
 
     default_frame_buffer_->unbind();
+
+    default_frame_buffer_multisample_->bind(FrameBufferBindType::NORMAL);
+    clearFrameBuffer(true);
+    default_frame_buffer_multisample_->unbind();
 }

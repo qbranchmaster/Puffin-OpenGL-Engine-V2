@@ -13,6 +13,7 @@
 
 #include <memory>
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/StateMachine.hpp"
 
@@ -51,14 +52,21 @@ namespace puffin {
             }
         }
 
-        void create(GLuint width, GLuint height) {
+        void create(GLuint width, GLuint height, GLboolean multisample) {
             bind();
 
             width_ = width;
             height_ = height;
 
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-                width_, height_);
+            if (multisample) {
+                glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+                    Configuration::instance().getMsaaSamples(),
+                    GL_DEPTH24_STENCIL8, width_, height_);
+            }
+            else {
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+                    width_, height_);
+            }
 
             unbind();
         }

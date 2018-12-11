@@ -33,7 +33,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer,
         return;
     }
 
-    frame_buffer->bind();
+    frame_buffer->bind(FrameBufferBindType::NORMAL);
 
     default_shader_program_->activate();
     setShadersUniforms(skybox);
