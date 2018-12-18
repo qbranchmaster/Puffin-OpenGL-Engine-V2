@@ -7,6 +7,7 @@
 #define PUFFIN_DEFAULT_SKYBOX_RENDERER_HPP
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"

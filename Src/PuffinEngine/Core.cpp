@@ -21,6 +21,10 @@ void Core::initialize() {
     window_.reset(new Window());
     System::instance().initGl();
 
+    AlphaBlend::instance().fetchState();
+    DepthTest::instance().fetchState();
+    FaceCull::instance().fetchState();
+
     camera_.reset(new Camera());
     input_.reset(new Input(window_));
 

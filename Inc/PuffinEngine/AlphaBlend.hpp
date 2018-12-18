@@ -11,8 +11,6 @@
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <memory>
-
 namespace puffin {
     enum class BlendFunction {
         ADDITIVE,
@@ -21,7 +19,12 @@ namespace puffin {
 
     class AlphaBlend {
     public:
-        AlphaBlend() {
+        static AlphaBlend& instance() {
+            static AlphaBlend singleton;
+            return singleton;
+        }
+
+        void fetchState() {
             glGetBooleanv(GL_BLEND, &enabled_);
 
             GLint value = 0;
@@ -77,11 +80,13 @@ namespace puffin {
         }
 
     private:
+        AlphaBlend() {}
+        AlphaBlend(const AlphaBlend &) = delete;
+        void operator=(const AlphaBlend &) = delete;
+
         GLboolean enabled_{false};
         BlendFunction blend_function_{BlendFunction::NORMAL};
     };
-
-    using AlphaBlendPtr = std::shared_ptr<AlphaBlend>;
 } // namespace puffin
 
 #endif // PUFFIN_ALPHA_BLEND_HPP

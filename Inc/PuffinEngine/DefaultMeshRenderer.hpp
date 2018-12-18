@@ -7,6 +7,8 @@
 #define PUFFIN_DEFAULT_MESH_RENDERER_HPP
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/DepthTest.hpp"
+#include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"

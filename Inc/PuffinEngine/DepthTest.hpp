@@ -11,12 +11,15 @@
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <memory>
-
 namespace puffin {
     class DepthTest {
     public:
-        DepthTest() {
+        static DepthTest& instance() {
+            static DepthTest singleton;
+            return singleton;
+        }
+
+        void fetchState() {
             glGetBooleanv(GL_DEPTH_TEST, &enabled_);
             glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask_enabled_);
         }
@@ -54,11 +57,13 @@ namespace puffin {
         }
 
     private:
+        DepthTest() {}
+        DepthTest(const DepthTest &) = delete;
+        void operator=(const DepthTest &) = delete;
+
         GLboolean enabled_{false};
         GLboolean depth_mask_enabled_{false};
     };
-
-    using DepthTestPtr = std::shared_ptr<DepthTest>;
 } // namespace puffin
 
 #endif // PUFFIN_DEPTH_TEST_HPP

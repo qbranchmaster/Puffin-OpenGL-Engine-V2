@@ -38,8 +38,8 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer,
     default_shader_program_->activate();
     setShadersUniforms(skybox);
 
-    render_settings_->depthTest()->enable(true);
-    render_settings_->depthTest()->enableDepthMask(false);
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(false);
 
     auto texture = skybox->getTexture();
     Texture::setTextureSlot(0);

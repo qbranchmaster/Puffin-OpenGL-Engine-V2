@@ -11,8 +11,6 @@
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <memory>
-
 namespace puffin {
     enum class CulledSide {
         BACK,
@@ -22,7 +20,12 @@ namespace puffin {
 
     class FaceCull {
     public:
-        FaceCull() {
+        static FaceCull& instance() {
+            static FaceCull singleton;
+            return singleton;
+        }
+
+        void fetchState() {
             glGetBooleanv(GL_CULL_FACE, &enabled_);
 
             GLint value = 0;
@@ -84,11 +87,13 @@ namespace puffin {
         }
 
     private:
+        FaceCull() {}
+        FaceCull(const FaceCull &) = delete;
+        void operator=(const FaceCull &) = delete;
+
         GLboolean enabled_{false};
         CulledSide culled_side_{CulledSide::BACK};
     };
-
-    using FaceCullPtr = std::shared_ptr<FaceCull>;
 } // namespace puffin
 
 #endif // PUFFIN_FACE_CULL_HPP

@@ -6,6 +6,7 @@
 #ifndef PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 #define PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 
+#include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"

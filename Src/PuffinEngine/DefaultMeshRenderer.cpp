@@ -31,9 +31,9 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
     default_shader_program_->activate();
     setShadersUniforms(mesh);
 
-    render_settings_->depthTest()->enable(true);
-    render_settings_->depthTest()->enableDepthMask(true);
-    render_settings_->faceCull()->enable(true);
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(true);
+    FaceCull::instance().enable(true);
 
     for (GLuint i = 0; i < mesh->getEntitiesCount(); i++) {
         auto entity = mesh->getEntity(i);

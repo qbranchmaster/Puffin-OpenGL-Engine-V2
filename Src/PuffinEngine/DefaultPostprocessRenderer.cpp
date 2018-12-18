@@ -92,8 +92,8 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     Texture::setTextureSlot(0);
     frame_buffer->getRgbBufferTexture()->bind();
 
-    render_settings_->depthTest()->enable(false);
-    render_settings_->depthTest()->enableDepthMask(false);
+    DepthTest::instance().enable(false);
+    DepthTest::instance().enableDepthMask(false);
 
     drawMesh(screen_mesh_);
 }

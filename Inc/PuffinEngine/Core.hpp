@@ -6,9 +6,12 @@
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
+#include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
+#include "PuffinEngine/DepthTest.hpp"
+#include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/System.hpp"

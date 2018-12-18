@@ -156,7 +156,7 @@ void MasterRenderer::drawScene(ScenePtr scene) {
 
 void MasterRenderer::clearDefaultFrameBuffer() {
     // Before clearing frame buffer enable depth mask to clear it also.
-    render_settings_->depthTest()->enableDepthMask(true);
+    DepthTest::instance().enableDepthMask(true);
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 

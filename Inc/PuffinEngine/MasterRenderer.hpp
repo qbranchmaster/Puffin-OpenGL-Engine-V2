@@ -16,6 +16,7 @@
 
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Mesh.hpp"
