@@ -39,11 +39,18 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
         auto entity = mesh->getEntity(i);
 
         Texture::setTextureSlot(0);
-        entity->getMaterial()->getDiffuseTexture()->bind();
+        auto material = entity->getMaterial();
+        if (material) {
+            auto diffuse_texture = material->getDiffuseTexture();
+            if (diffuse_texture) {
+                diffuse_texture->bind();
+            }
+            else {
+                // TODO: Unbind texture.
+            }
+        }
 
         drawMesh(mesh, i);
-
-        entity->getMaterial()->getDiffuseTexture()->unbind();
     }
 }
 

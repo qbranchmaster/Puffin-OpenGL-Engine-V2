@@ -84,7 +84,16 @@ void Mesh::loadFromFile(std::string path) {
 
     Assimp::Importer mesh_importer;
     const aiScene *scene = mesh_importer.ReadFile(path.c_str(),
-        aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
+        aiProcess_CalcTangentSpace |
+        aiProcess_GenSmoothNormals |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_ImproveCacheLocality |
+        aiProcess_Triangulate |
+        aiProcess_SplitLargeMeshes |
+        aiProcess_GenUVCoords |
+        aiProcess_SortByPType |
+        aiProcess_FindDegenerates |
+        aiProcess_FlipUVs);
 
     if (!scene) {
         logError("Mesh::loadFromFile()", "Importer message: " +
@@ -165,6 +174,7 @@ void Mesh::loadFromFile(std::string path) {
             }
         }
 
+        entity->setStartingVetex(vertices_count);
         vertices_count += mesh->mNumVertices;
         entity->setStartingIndex(indices_count);
         entity->setVerticesCount(mesh->mNumVertices);

@@ -26,6 +26,14 @@ namespace puffin {
             return starting_index_;
         }
 
+        void setStartingVetex(GLuint vetex_index) {
+            starting_vertex_ = vetex_index;
+        }
+
+        GLuint getStartingVertex() const {
+            return starting_vertex_;
+        }
+
         void setIndicesCount(GLuint count) {
             indices_count_ = count;
         }
@@ -57,6 +65,7 @@ namespace puffin {
 
     private:
         GLuint starting_index_{0};
+        GLuint starting_vertex_{0};
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
 

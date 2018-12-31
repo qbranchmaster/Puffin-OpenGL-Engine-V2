@@ -302,6 +302,9 @@ void Texture::setTextureFilter(TextureFilter filter) {
             break;
         }
         break;
+    case TextureType::Texture2DMultisample:
+        // TODO: FIll it.
+        break;
     default:
         logError("Texture::setTextureFilter()", "Invalid texture type.");
         break;
