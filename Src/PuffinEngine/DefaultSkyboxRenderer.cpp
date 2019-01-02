@@ -65,6 +65,14 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
         camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix",
         skybox->getModelMatrix());
+
+    auto lighting = render_settings_->lighting();
+    default_shader_program_->setUniform("lighting.enabled",
+        lighting->isEnabled());
+    default_shader_program_->setUniform("lighting.ambient_enabled",
+        lighting->isAmbientEnabled());
+    default_shader_program_->setUniform("lighting.ambient_color",
+        lighting->getAmbientColor());
 }
 
 void DefaultSkyboxRenderer::drawSkybox(SkyboxPtr skybox) {

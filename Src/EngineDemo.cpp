@@ -35,6 +35,10 @@ EngineDemo::EngineDemo() : Core() {
     renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
 
+    renderSettings()->lighting()->enable(true);
+    renderSettings()->lighting()->enableAmbientLight(true);
+    renderSettings()->lighting()->setAmbientColor(glm::vec3(0.8f, 0.8f, 0.8f));
+
     createScene();
 }
 

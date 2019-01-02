@@ -11,6 +11,8 @@
 #endif // WIN32
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+
 #include <memory>
 
 namespace puffin {
@@ -24,8 +26,31 @@ namespace puffin {
             return enabled_;
         }
 
+        void enableAmbientLight(GLboolean state) {
+            ambient_enabled_ = state;
+        }
+
+        GLboolean isAmbientEnabled() const {
+            return ambient_enabled_;
+        }
+
+        void setAmbientColor(const glm::vec3 &color) {
+            ambient_color_ = glm::vec3(
+                glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f),
+                glm::clamp(color.b, 0.0f, 1.0f)
+            );
+        }
+
+        glm::vec3 getAmbientColor() const {
+            return ambient_color_;
+        }
+
     private:
         GLboolean enabled_{false};
+
+        GLboolean ambient_enabled_{false};
+        glm::vec3 ambient_color_{1.0f, 1.0f, 1.0f};
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;
