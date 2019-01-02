@@ -12,6 +12,7 @@
 #include <GL/glew.h>
 
 #include <memory>
+#include <string>
 
 #include "PuffinEngine/Material.hpp"
 
@@ -63,11 +64,21 @@ namespace puffin {
             return material_;
         }
 
+        void setName(std::string name) {
+            name_ = name;
+        }
+
+        std::string getName() const {
+            return name_;
+        }
+
     private:
         GLuint starting_index_{0};
         GLuint starting_vertex_{0};
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
+
+        std::string name_;
 
         MaterialPtr material_;
     };

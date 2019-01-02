@@ -68,7 +68,7 @@ void EngineDemo::createScene() {
     skybox_->setTexture(skybox_texture_);
 
     test_mesh_.reset(new Mesh());
-    test_mesh_->loadFromFile("DemoData/pony-cartoon/Pony_cartoon.obj");
+    test_mesh_->loadFromFile("DemoData/Models/pony-cartoon/Pony_cartoon.obj");
     test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
     scene_->setSkybox(skybox_);

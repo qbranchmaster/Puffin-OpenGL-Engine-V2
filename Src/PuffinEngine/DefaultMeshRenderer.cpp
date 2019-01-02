@@ -46,7 +46,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
                 diffuse_texture->bind();
             }
             else {
-                // TODO: Unbind texture.
+                Texture::unbindAllTextures(TextureType::Texture2D);
             }
         }
 
@@ -87,7 +87,8 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
     auto entity = mesh->getEntity(entity_index);
     if (entity) {
         glDrawElements(GL_TRIANGLES, entity->getIndicesCount(),
-            GL_UNSIGNED_INT, nullptr);
+            GL_UNSIGNED_INT, reinterpret_cast<void*>((
+                entity->getStartingIndex() * sizeof(GLuint))));
     }
 
     mesh->unbind();

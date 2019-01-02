@@ -84,16 +84,7 @@ void Mesh::loadFromFile(std::string path) {
 
     Assimp::Importer mesh_importer;
     const aiScene *scene = mesh_importer.ReadFile(path.c_str(),
-        aiProcess_CalcTangentSpace |
-        aiProcess_GenSmoothNormals |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_ImproveCacheLocality |
-        aiProcess_Triangulate |
-        aiProcess_SplitLargeMeshes |
-        aiProcess_GenUVCoords |
-        aiProcess_SortByPType |
-        aiProcess_FindDegenerates |
-        aiProcess_FlipUVs);
+        aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
 
     if (!scene) {
         logError("Mesh::loadFromFile()", "Importer message: " +
@@ -120,6 +111,7 @@ void Mesh::loadFromFile(std::string path) {
         aiMesh *mesh = scene->mMeshes[m];
 
         MeshEntityPtr entity(new MeshEntity());
+        entity->setName(mesh->mName.C_Str());
 
         for (GLuint v = 0; v < mesh->mNumVertices; v++) {
             aiVector3D vp(0.0f, 0.0f, 0.0f);
