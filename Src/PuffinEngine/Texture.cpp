@@ -55,9 +55,9 @@ void Texture::setTextureSlot(GLushort slot_index) {
     }
 }
 
-void Texture::unbindAllTextures(TextureType type) {
+void Texture::unbindTextureType(TextureType type) {
     if (type == TextureType::None || type == TextureType::RawImage) {
-        logError("Texture::unbindAllTextures()", "Invalid texture type.");
+        logError("Texture::unbindTextureType()", "Invalid texture type.");
         return;
     }
 

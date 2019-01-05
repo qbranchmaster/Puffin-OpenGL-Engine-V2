@@ -15,9 +15,15 @@
 
 #include <memory>
 
+#include "PuffinEngine/DirectionalLight.hpp"
+
 namespace puffin {
     class Lighting {
     public:
+        Lighting() {
+            directional_light_.reset(new DirectionalLight());
+        }
+
         void enable(GLboolean state) {
             enabled_ = state;
         }
@@ -26,31 +32,28 @@ namespace puffin {
             return enabled_;
         }
 
-        void enableAmbientLight(GLboolean state) {
-            ambient_enabled_ = state;
-        }
-
-        GLboolean isAmbientEnabled() const {
-            return ambient_enabled_;
-        }
-
-        void setAmbientColor(const glm::vec3 &color) {
-            ambient_color_ = glm::vec3(
+        void setSkyboxLightingColor(const glm::vec3 &color) {
+            skybox_light_color_ = glm::vec3(
                 glm::clamp(color.r, 0.0f, 1.0f),
                 glm::clamp(color.g, 0.0f, 1.0f),
                 glm::clamp(color.b, 0.0f, 1.0f)
             );
         }
 
-        glm::vec3 getAmbientColor() const {
-            return ambient_color_;
+        glm::vec3 getSkyboxLightColor() const {
+            return skybox_light_color_;
+        }
+
+        DirectionalLightPtr directionalLight() const {
+            return directional_light_;
         }
 
     private:
         GLboolean enabled_{false};
 
-        GLboolean ambient_enabled_{false};
-        glm::vec3 ambient_color_{1.0f, 1.0f, 1.0f};
+        glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
+
+        DirectionalLightPtr directional_light_;
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;

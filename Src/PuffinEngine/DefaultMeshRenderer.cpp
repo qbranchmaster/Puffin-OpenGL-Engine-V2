@@ -37,19 +37,6 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
 
     for (GLuint i = 0; i < mesh->getEntitiesCount(); i++) {
         auto entity = mesh->getEntity(i);
-
-        Texture::setTextureSlot(0);
-        auto material = entity->getMaterial();
-        if (material) {
-            auto diffuse_texture = material->getDiffuseTexture();
-            if (diffuse_texture) {
-                diffuse_texture->bind();
-            }
-            else {
-                Texture::unbindAllTextures(TextureType::Texture2D);
-            }
-        }
-
         drawMesh(mesh, i);
     }
 }
@@ -72,8 +59,62 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix",
         mesh->getModelMatrix());
+    default_shader_program_->setUniform("matrices.normal_matrix",
+        mesh->getNormalMatrix());
 
-    default_shader_program_->setUniform("object_material.diffuse_texture", 0);
+    auto lighting = render_settings_->lighting();
+    default_shader_program_->setUniform("lighting.enabled",
+        lighting->isEnabled());
+
+    default_shader_program_->setUniform("lighting.directional_light.enabled",
+        lighting->directionalLight()->isEnabled());
+    default_shader_program_->setUniform("lighting.directional_light.direction",
+        lighting->directionalLight()->getDirection());
+    default_shader_program_->setUniform(
+        "lighting.directional_light.ambient_color",
+        lighting->directionalLight()->getAmbientColor());
+    default_shader_program_->setUniform(
+        "lighting.directional_light.diffuse_color",
+        lighting->directionalLight()->getDiffuseColor());
+    default_shader_program_->setUniform(
+        "lighting.directional_light.specular_color",
+        lighting->directionalLight()->getSpecularColor());
+}
+
+void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
+    if (!entity) {
+        logError("DefaultMeshRenderer::setMeshEntityShadersUniforms()",
+            "Null input.");
+        return;
+    }
+
+    auto material = entity->getMaterial();
+    if (!material) {
+        return;
+    }
+
+    default_shader_program_->setUniform("material.has_ambient_texture",
+        material->getAmbientTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.ambient_texture", 0);
+    default_shader_program_->setUniform("material.ka", material->getKa());
+
+    default_shader_program_->setUniform("material.has_diffuse_texture",
+        material->getDiffuseTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.diffuse_texture", 1);
+    default_shader_program_->setUniform("material.kd", material->getKd());
+
+    default_shader_program_->setUniform("material.has_specular_texture",
+        material->getSpecularTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.specular_texture", 2);
+    default_shader_program_->setUniform("material.ks", material->getKs());
+
+    default_shader_program_->setUniform("material.has_emissive_texture",
+        material->getEmissiveTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.emissive_texture", 3);
+    default_shader_program_->setUniform("material.ke", material->getKe());
+
+    default_shader_program_->setUniform("material.shininess",
+        material->getShininess());
 }
 
 void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
@@ -86,6 +127,47 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
 
     auto entity = mesh->getEntity(entity_index);
     if (entity) {
+        setMeshEntityShadersUniforms(entity);
+
+        auto material = entity->getMaterial();
+        if (material) {
+            Texture::setTextureSlot(0);
+            auto ambient_texture = material->getAmbientTexture();
+            if (ambient_texture) {
+                ambient_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+
+            Texture::setTextureSlot(1);
+            auto diffuse_texture = material->getDiffuseTexture();
+            if (diffuse_texture) {
+                diffuse_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+
+            Texture::setTextureSlot(2);
+            auto specular_texture = material->getSpecularTexture();
+            if (specular_texture) {
+                specular_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+
+            Texture::setTextureSlot(3);
+            auto emissive_texture = material->getEmissiveTexture();
+            if (emissive_texture) {
+                emissive_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+        }
+
         glDrawElements(GL_TRIANGLES, entity->getIndicesCount(),
             GL_UNSIGNED_INT, reinterpret_cast<void*>((
                 entity->getStartingIndex() * sizeof(GLuint))));

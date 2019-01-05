@@ -47,7 +47,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer,
         texture->bind();
     }
     else {
-        Texture::unbindAllTextures(TextureType::TextureCube);
+        Texture::unbindTextureType(TextureType::TextureCube);
     }
 
     drawSkybox(skybox);
@@ -66,13 +66,9 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
     default_shader_program_->setUniform("matrices.model_matrix",
         skybox->getModelMatrix());
 
-    auto lighting = render_settings_->lighting();
-    default_shader_program_->setUniform("lighting.enabled",
-        lighting->isEnabled());
-    default_shader_program_->setUniform("lighting.ambient_enabled",
-        lighting->isAmbientEnabled());
-    default_shader_program_->setUniform("lighting.ambient_color",
-        lighting->getAmbientColor());
+    default_shader_program_->setUniform("color.cube_texture", 0);
+    default_shader_program_->setUniform("color.light_color",
+        render_settings_->lighting()->getSkyboxLightColor());
 }
 
 void DefaultSkyboxRenderer::drawSkybox(SkyboxPtr skybox) {

@@ -88,10 +88,17 @@ namespace puffin {
             if (model_matrix_changed_) {
                 model_matrix_ = translation_matrix_ * rotation_matrix_ *
                     scale_matrix_;
+                normal_matrix_ = glm::transpose(glm::inverse(
+                    glm::mat3(model_matrix_)));
+
                 model_matrix_changed_ = false;
             }
 
             return model_matrix_;
+        }
+
+        glm::mat3 getNormalMatrix() const {
+            return normal_matrix_;
         }
 
         GLuint getHandle() const {
@@ -126,6 +133,7 @@ namespace puffin {
 
         GLboolean model_matrix_changed_{false};
         glm::mat4 model_matrix_{1.0f};
+        glm::mat3 normal_matrix_{1.0f};
         glm::mat4 rotation_matrix_{1.0f};
         glm::mat4 scale_matrix_{1.0f};
         glm::mat4 translation_matrix_{1.0f};

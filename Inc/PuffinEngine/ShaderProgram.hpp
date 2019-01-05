@@ -60,6 +60,18 @@ namespace puffin {
             glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
         }
 
+        void setUniform(std::string uniform_name, const glm::mat3 &value) {
+            activate();
+            auto location = getUniformLocation(uniform_name);
+            if (location == -1) {
+                logError("ShaderProgram::setUniform()", "Uniform [" +
+                    uniform_name + "] does not exist in this shader program.");
+                return;
+            }
+
+            glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+        }
+
         void setUniform(std::string uniform_name, const glm::vec3 &value) {
             activate();
             auto location = getUniformLocation(uniform_name);

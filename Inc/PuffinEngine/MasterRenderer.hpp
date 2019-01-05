@@ -42,7 +42,7 @@ namespace puffin {
         void assignRenderingFunction(std::function<void()> function);
         void assignPostprocessRenderer(PostprocessRendererPtr renderer);
         void assignSkyboxRenderer(SkyboxRendererPtr renderer);
-		void assignMeshRenderer(MeshRendererPtr renderer);
+        void assignMeshRenderer(MeshRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
 
@@ -59,7 +59,7 @@ namespace puffin {
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
 
-		MeshRendererPtr mesh_renderer_;
+        MeshRendererPtr mesh_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
         SkyboxRendererPtr skybox_renderer_;
     };

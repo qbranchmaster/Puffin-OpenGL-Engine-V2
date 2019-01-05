@@ -11,12 +11,12 @@
 #include "PuffinEngine/Renderer.hpp"
 
 namespace puffin {
-	class MeshRenderer : public Renderer {
-	public:
-		virtual void render(FrameBufferPtr frame_buffer, MeshPtr mesh) = 0;
-	};
+    class MeshRenderer : public Renderer {
+    public:
+        virtual void render(FrameBufferPtr frame_buffer, MeshPtr mesh) = 0;
+    };
 
-	using MeshRendererPtr = std::shared_ptr<MeshRenderer>;
+    using MeshRendererPtr = std::shared_ptr<MeshRenderer>;
 } // namespace puffin
 
 #endif // PUFFIN_MESH_RENDERER_HPP

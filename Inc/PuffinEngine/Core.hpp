@@ -48,7 +48,7 @@ namespace puffin {
 
     private:
         CameraPtr camera_;
-		DefaultMeshRendererPtr default_mesh_renderer_;
+        DefaultMeshRendererPtr default_mesh_renderer_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
         DefaultSkyboxRendererPtr default_skybox_renderer_;
         InputPtr input_;

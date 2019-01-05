@@ -26,7 +26,7 @@ EngineDemo::EngineDemo() : Core() {
 
     createTimers();
 
-    camera()->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
     camera()->setFov(0.85f);
 
     Texture::setDefaultTextureFilter(TextureType::Texture2D,
@@ -36,8 +36,18 @@ EngineDemo::EngineDemo() : Core() {
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
 
     renderSettings()->lighting()->enable(true);
-    renderSettings()->lighting()->enableAmbientLight(true);
-    renderSettings()->lighting()->setAmbientColor(glm::vec3(0.8f, 0.8f, 0.8f));
+    renderSettings()->lighting()->setSkyboxLightingColor(
+        glm::vec3(0.8f, 0.8f, 0.8f));
+
+    renderSettings()->lighting()->directionalLight()->enable(true);
+    renderSettings()->lighting()->directionalLight()->setDirection(
+        glm::vec3(0.5f, -0.5f, 0.5f));
+    renderSettings()->lighting()->directionalLight()->setAmbientColor(
+        glm::vec3(0.2f, 0.2f, 0.2f));
+    renderSettings()->lighting()->directionalLight()->setDiffuseColor(
+        glm::vec3(0.8f, 0.8f, 0.8f));
+    renderSettings()->lighting()->directionalLight()->setSpecularColor(
+        glm::vec3(1.0f, 1.0f, 1.0f));
 
     createScene();
 }
@@ -114,12 +124,15 @@ void EngineDemo::moveCamera() {
     if (input()->keyPressed(Key::A, true)) {
         camera()->move(CameraMoveDirection::LEFT);
     }
+
     if (input()->keyPressed(Key::D, true)) {
         camera()->move(CameraMoveDirection::RIGHT);
     }
+
     if (input()->keyPressed(Key::W, true)) {
         camera()->move(CameraMoveDirection::FORWARD);
     }
+
     if (input()->keyPressed(Key::S, true)) {
         camera()->move(CameraMoveDirection::BACKWARD);
     }

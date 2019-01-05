@@ -21,6 +21,19 @@
 namespace puffin {
     class Material {
     public:
+        void setAmbientTexture(TexturePtr texture) {
+            if (!texture) {
+                logError("Material::setAmbientTexture()", "Null input.");
+                return;
+            }
+
+            ambient_texture_ = texture;
+        }
+
+        TexturePtr getAmbientTexture() const {
+            return ambient_texture_;
+        }
+
         void setDiffuseTexture(TexturePtr texture) {
             if (!texture) {
                 logError("Material::setDiffuseTexture()", "Null input.");
@@ -32,6 +45,32 @@ namespace puffin {
 
         TexturePtr getDiffuseTexture() const {
             return diffuse_texture_;
+        }
+
+        void setSpecularTexture(TexturePtr texture) {
+            if (!texture) {
+                logError("Material::setSpecularTexture()", "Null input.");
+                return;
+            }
+
+            specular_texture_ = texture;
+        }
+
+        TexturePtr getSpecularTexture() const {
+            return specular_texture_;
+        }
+
+        void setEmissiveTexture(TexturePtr texture) {
+            if (!texture) {
+                logError("Material::setEmissiveTexture()", "Null input.");
+                return;
+            }
+
+            emissive_texture_ = texture;
+        }
+
+        TexturePtr getEmissiveTexture() const {
+            return emissive_texture_;;
         }
 
         void setNormalMapTexture(TexturePtr texture) {
@@ -80,6 +119,17 @@ namespace puffin {
             return ks_;
         }
 
+        void setKe(const glm::vec3 &ke) {
+            ke_ = glm::vec3(
+                glm::clamp(ke.r, 0.0f, 1.0f),
+                glm::clamp(ke.g, 0.0f, 1.0f),
+                glm::clamp(ke.b, 0.0f, 1.0f));
+        }
+
+        glm::vec3 getKe() const {
+            return ke_;
+        }
+
         void setReflectivity(GLfloat value) {
             if (value < 0.0f) {
                 logError("Material::setReflectivity()", "Invalid value.");
@@ -93,24 +143,28 @@ namespace puffin {
             return reflectivity_;
         }
 
-        void setShininess(GLuint value) {
+        void setShininess(GLint value) {
             shininess_ = value;
         }
 
-        GLuint getShininess() const {
+        GLint getShininess() const {
             return shininess_;
         }
 
     private:
         GLfloat reflectivity_{0.0f};
-        GLuint shininess_{0};
+        GLint shininess_{0};
 
         glm::vec3 ka_{0.0f, 0.0f, 0.0f};
         glm::vec3 kd_{0.0f, 0.0f, 0.0f};
         glm::vec3 ks_{0.0f, 0.0f, 0.0f};
+        glm::vec3 ke_{0.0f, 0.0f, 0.0f};
 
+        TexturePtr ambient_texture_;
         TexturePtr diffuse_texture_;
+        TexturePtr specular_texture_;
         TexturePtr normalmap_texture_;
+        TexturePtr emissive_texture_;
     };
 
     using MaterialPtr = std::shared_ptr<Material>;

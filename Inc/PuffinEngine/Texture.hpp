@@ -56,7 +56,7 @@ namespace puffin {
         static void setDefaultTextureFilter(TextureType type,
             TextureFilter filter);
         static void setTextureSlot(GLushort slot_index);
-        static void unbindAllTextures(TextureType type);
+        static void unbindTextureType(TextureType type);
 
         GLboolean loadImageRaw(std::string path);
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);

@@ -177,12 +177,36 @@ void Mesh::loadFromFile(std::string path) {
             MaterialPtr mesh_material(new Material());
 
             aiString texture_path;
+            if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path)
+                == AI_SUCCESS) {
+                TexturePtr ambient_tex(new Texture());
+                ambient_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setAmbientTexture(ambient_tex);
+            }
+
             if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
                 == AI_SUCCESS) {
                 TexturePtr diffuse_tex(new Texture());
                 diffuse_tex->loadTexture2D(processTexturePath(path,
                     texture_path), true);
                 mesh_material->setDiffuseTexture(diffuse_tex);
+            }
+
+            if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path)
+                == AI_SUCCESS) {
+                TexturePtr specular_tex(new Texture());
+                specular_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setSpecularTexture(specular_tex);
+            }
+
+            if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path)
+                == AI_SUCCESS) {
+                TexturePtr emissive_tex(new Texture());
+                emissive_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setEmissiveTexture(emissive_tex);
             }
 
             if (material->GetTexture(aiTextureType_HEIGHT, 0, &texture_path) ==
@@ -208,11 +232,14 @@ void Mesh::loadFromFile(std::string path) {
                 mesh_material->setKs(glm::vec3(ks.r, ks.g, ks.b));
             }
 
-            // Shininess needs to be divided by 4, because Assimp
-            // multiplies it by 4.
+            aiColor3D ke;
+            if (material->Get(AI_MATKEY_COLOR_EMISSIVE, ke) == AI_SUCCESS) {
+                mesh_material->setKe(glm::vec3(ke.r, ke.g, ke.b));
+            }
+
             GLfloat shininess = 0;
             if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
-                mesh_material->setShininess(static_cast<int>(shininess) / 4);
+                mesh_material->setShininess(static_cast<GLint>(shininess));
             }
 
             GLfloat reflectivity = 0;

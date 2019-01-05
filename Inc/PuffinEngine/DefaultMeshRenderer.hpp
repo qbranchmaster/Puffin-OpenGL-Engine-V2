@@ -15,24 +15,25 @@
 #include "PuffinEngine/ShaderProgram.hpp"
 
 namespace puffin {
-	class DefaultMeshRenderer : public MeshRenderer {
-	public:
-		DefaultMeshRenderer(RenderSettingsPtr render_settings,
-			CameraPtr camera);
+    class DefaultMeshRenderer : public MeshRenderer {
+    public:
+        DefaultMeshRenderer(RenderSettingsPtr render_settings,
+            CameraPtr camera);
 
-		void render(FrameBufferPtr frame_buffer, MeshPtr mesh);
+        void render(FrameBufferPtr frame_buffer, MeshPtr mesh);
 
-	private:
-		void loadShaders();
+    private:
+        void loadShaders();
         void setShadersUniforms(MeshPtr mesh);
+        void setMeshEntityShadersUniforms(MeshEntityPtr entity);
         void drawMesh(MeshPtr mesh, GLuint entity_index);
 
-		CameraPtr camera_;
-		RenderSettingsPtr render_settings_;
-		ShaderProgramPtr default_shader_program_;
-	};
+        CameraPtr camera_;
+        RenderSettingsPtr render_settings_;
+        ShaderProgramPtr default_shader_program_;
+    };
 
-	using DefaultMeshRendererPtr = std::shared_ptr<DefaultMeshRenderer>;
+    using DefaultMeshRendererPtr = std::shared_ptr<DefaultMeshRenderer>;
 } // namespace puffin
 
 #endif // PUFFIN_DEFAULT_MESH_RENDERER_HPP
