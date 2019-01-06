@@ -135,6 +135,10 @@ void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
     default_shader_program_->setUniform("material.emissive_texture", 3);
     default_shader_program_->setUniform("material.ke", material->getKe());
 
+    default_shader_program_->setUniform("material.has_normalmap_texture",
+        material->getNormalMapTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.normalmap_texture", 4);
+
     default_shader_program_->setUniform("material.shininess",
         material->getShininess());
     default_shader_program_->setUniform("material.transparency",
@@ -186,6 +190,15 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
             auto emissive_texture = material->getEmissiveTexture();
             if (emissive_texture) {
                 emissive_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+
+            Texture::setTextureSlot(4);
+            auto normalmap_texture = material->getNormalMapTexture();
+            if (normalmap_texture) {
+                normalmap_texture->bind();
             }
             else {
                 Texture::unbindTextureType(TextureType::Texture2D);

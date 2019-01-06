@@ -3,6 +3,8 @@
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 texture_coord;
 layout(location = 2) in vec3 normal_vector;
+layout(location = 3) in vec3 tangent;
+layout(location = 4) in vec3 bitangent;
 
 struct Matrices {
     mat4 view_matrix;
@@ -27,12 +29,16 @@ struct Lighting {
 out VS_OUT {
     vec3 position_WORLD;
     vec3 position_VIEW;
+    vec3 position_TANGENT;
+
+    vec3 view_position_TANGENT;
 
     vec2 texture_coord_MODEL;
 
     vec3 normal_vector_VIEW;
 
     vec3 directional_light_direction_VIEW;
+    vec3 directional_light_direction_TANGENT;
 } vs_out;
 
 uniform Matrices matrices;
@@ -50,6 +56,24 @@ void main() {
     vs_out.directional_light_direction_VIEW =
         normalize(vec3(matrices.view_matrix *
         vec4(lighting.directional_light.direction, 0.0f)));
+
+    // Calculation for tangent space
+    vec3 camera_pos_WORLD = (inverse(matrices.view_matrix) *
+        vec4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+
+    // TODO: No need to calculate b? Use this from layout 4
+    // TODO: Check if object use normalmap, do not calculate it always
+    vec3 t = normalize(matrices.normal_matrix * tangent);
+    vec3 n = normalize(matrices.normal_matrix * normal_vector);
+    t = normalize(t - dot(t, n) * n);
+    vec3 b = cross(n, t);
+
+    mat3 tbn_matrix = transpose(mat3(t, b, n));
+
+    vs_out.position_TANGENT = tbn_matrix * vs_out.position_WORLD;
+    vs_out.view_position_TANGENT = tbn_matrix * camera_pos_WORLD;
+    vs_out.directional_light_direction_TANGENT = normalize(tbn_matrix *
+        lighting.directional_light.direction);
 
     gl_Position = matrices.projection_matrix * matrices.view_matrix *
         matrices.model_matrix * vec4(position, 1.0f);

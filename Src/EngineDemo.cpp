@@ -37,13 +37,13 @@ EngineDemo::EngineDemo() : Core() {
 
     renderSettings()->lighting()->enable(true);
     renderSettings()->lighting()->setSkyboxLightingColor(
-        glm::vec3(0.8f, 0.8f, 0.8f));
+        glm::vec3(0.9f, 0.9f, 0.9f));
 
     renderSettings()->lighting()->directionalLight()->enable(true);
     renderSettings()->lighting()->directionalLight()->setDirection(
-        glm::vec3(0.5f, -0.2f, -0.5f));
+        glm::vec3(0.5f, -0.1f, -0.5f));
     renderSettings()->lighting()->directionalLight()->setAmbientColor(
-        glm::vec3(0.4f, 0.4f, 0.4f));
+        glm::vec3(0.6f, 0.6f, 0.6f));
     renderSettings()->lighting()->directionalLight()->setDiffuseColor(
         glm::vec3(0.8f, 0.8f, 0.8f));
     renderSettings()->lighting()->directionalLight()->setSpecularColor(

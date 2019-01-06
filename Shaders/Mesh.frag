@@ -17,13 +17,15 @@ struct Material {
     sampler2D emissive_texture;
     vec3 ke;
 
+    bool has_normalmap_texture;
+    sampler2D normalmap_texture;
+
     int shininess;
 
     vec3 transparency;
 
 
-    bool has_normalmap_texture;
-    sampler2D normalmap_texture;
+    
     float reflectivity;
 };
 
@@ -50,12 +52,16 @@ struct Matrices {
 in VS_OUT {
     vec3 position_WORLD;
     vec3 position_VIEW;
+    vec3 position_TANGENT;
+
+    vec3 view_position_TANGENT;
 
     vec2 texture_coord_MODEL;
 
     vec3 normal_vector_VIEW;
 
     vec3 directional_light_direction_VIEW;
+    vec3 directional_light_direction_TANGENT;
 } fs_in;
 
 out vec4 frag_color;
@@ -78,16 +84,37 @@ void calculateDirectionalLight(inout vec3 ambient, inout vec3 diffuse,
 
     // Get normal vector
     vec3 normal_vector = vec3(0.0f, 1.0f, 0.0f);
-    normal_vector = fs_in.normal_vector_VIEW;
+    if (material.has_normalmap_texture)
+    {
+        vec3 normal_vector_TANGENT = texture(material.normalmap_texture,
+            fs_in.texture_coord_MODEL).rgb;
+        normal_vector_TANGENT = normalize(normal_vector_TANGENT * 2.0f - 1.0f);
+        normal_vector = normal_vector_TANGENT;
+    }
+    else {
+        normal_vector = fs_in.normal_vector_VIEW;
+    }
 
     // Get view direction
     vec3 view_direction = vec3(0.0f, 1.0f, 0.0f);
-    vec3 view_direction_VIEW = normalize(-fs_in.position_VIEW);
-    view_direction = view_direction_VIEW;
+     if (material.has_normalmap_texture) {
+        vec3 view_direction_TANGENT = normalize(fs_in.view_position_TANGENT -
+            fs_in.position_TANGENT);
+        view_direction = view_direction_TANGENT;
+    }
+    else {
+        vec3 view_direction_VIEW = normalize(-fs_in.position_VIEW);
+        view_direction = view_direction_VIEW;
+    }
 
     // Get light direction
     vec3 light_direction = vec3(0.0f, 1.0f, 0.0f);
-    light_direction = fs_in.directional_light_direction_VIEW;
+    if (material.has_normalmap_texture) {
+        light_direction = fs_in.directional_light_direction_TANGENT;
+    }
+    else {
+        light_direction = fs_in.directional_light_direction_VIEW;
+    }
 
     // Diffuse
     float diffuse_power = max(dot(normal_vector, -light_direction), 0.0f);

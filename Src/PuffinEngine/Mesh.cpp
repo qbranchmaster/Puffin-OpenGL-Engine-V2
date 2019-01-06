@@ -209,7 +209,7 @@ void Mesh::loadFromFile(std::string path) {
                 mesh_material->setEmissiveTexture(emissive_tex);
             }
 
-            if (material->GetTexture(aiTextureType_HEIGHT, 0, &texture_path) ==
+            if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) ==
                 AI_SUCCESS) {
                 TexturePtr normalmap_tex(new Texture());
                 normalmap_tex->loadTexture2D(processTexturePath(path,
