@@ -6,6 +6,7 @@
 #ifndef PUFFIN_DEFAULT_MESH_RENDERER_HPP
 #define PUFFIN_DEFAULT_MESH_RENDERER_HPP
 
+#include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"

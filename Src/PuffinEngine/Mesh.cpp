@@ -248,6 +248,13 @@ void Mesh::loadFromFile(std::string path) {
                 mesh_material->setReflectivity(reflectivity);
             }
 
+            aiColor3D transparency;
+            if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) ==
+                AI_SUCCESS) {
+                mesh_material->setTransparency(glm::vec3(transparency.r,
+                    transparency.g, transparency.b));
+            }
+
             entity->setMaterial(mesh_material);
         }
 

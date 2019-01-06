@@ -19,6 +19,7 @@ struct Material {
 
     int shininess;
 
+    vec3 transparency;
 
 
     bool has_normalmap_texture;
@@ -176,5 +177,9 @@ void main() {
     vec3 result_color = vec3(0.0f, 0.0f, 0.0f);
     result_color = calculateLighting();
 
-    frag_color = vec4(result_color, 1.0f);
+    // Calculate transparency
+    float tr_value = length(material.transparency);
+    tr_value = clamp(tr_value, 0.0f, 1.0f);
+
+    frag_color = vec4(result_color, tr_value);
 }

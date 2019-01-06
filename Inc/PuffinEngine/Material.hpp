@@ -151,6 +151,29 @@ namespace puffin {
             return shininess_;
         }
 
+        void setTransparency(const glm::vec3 &transparency) {
+            transparency_ = glm::vec3(
+                glm::clamp(transparency.r, 0.0f, 1.0f),
+                glm::clamp(transparency.g, 0.0f, 1.0f),
+                glm::clamp(transparency.b, 0.0f, 1.0f));
+
+            if (transparency_.r < 1.0f || transparency_.g < 1.0f ||
+                transparency_.b < 1.0f) {
+                has_transparency_ = true;
+            }
+            else {
+                has_transparency_ = false;
+            }
+        }
+
+        glm::vec3 getTransparency() const {
+            return transparency_;
+        }
+
+        GLboolean hasTransparency() const {
+            return has_transparency_;
+        }
+
     private:
         GLfloat reflectivity_{0.0f};
         GLint shininess_{0};
@@ -159,6 +182,9 @@ namespace puffin {
         glm::vec3 kd_{0.0f, 0.0f, 0.0f};
         glm::vec3 ks_{0.0f, 0.0f, 0.0f};
         glm::vec3 ke_{0.0f, 0.0f, 0.0f};
+
+        GLboolean has_transparency_{false};
+        glm::vec3 transparency_{1.0f, 1.0f, 1.0f};
 
         TexturePtr ambient_texture_;
         TexturePtr diffuse_texture_;

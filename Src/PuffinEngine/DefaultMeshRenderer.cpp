@@ -35,10 +35,32 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
     DepthTest::instance().enableDepthMask(true);
     FaceCull::instance().enable(true);
 
+    // First pass - skip transparent entities
+    std::vector<GLuint> skipped_en;
+
     for (GLuint i = 0; i < mesh->getEntitiesCount(); i++) {
+        auto entity = mesh->getEntity(i);
+        auto material = entity->getMaterial();
+        if (material && material->hasTransparency()) {
+            skipped_en.push_back(i);
+            continue;
+        }
+
+        drawMesh(mesh, i);
+    }
+
+    // Second pass - draw transparent entities
+    // TODO: Sort them in order.
+
+    AlphaBlend::instance().enable(true);
+    AlphaBlend::instance().setBlendFunction(BlendFunction::NORMAL);
+
+    for (const auto &i : skipped_en) {
         auto entity = mesh->getEntity(i);
         drawMesh(mesh, i);
     }
+
+    AlphaBlend::instance().enable(false);
 }
 
 void DefaultMeshRenderer::loadShaders() {
@@ -115,6 +137,8 @@ void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
 
     default_shader_program_->setUniform("material.shininess",
         material->getShininess());
+    default_shader_program_->setUniform("material.transparency",
+        material->getTransparency());
 }
 
 void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
