@@ -20,12 +20,15 @@ struct Material {
     bool has_normalmap_texture;
     sampler2D normalmap_texture;
 
+    bool has_opacity_texture;
+    sampler2D opacity_texture;
+
     int shininess;
 
     vec3 transparency;
 
 
-    
+
     float reflectivity;
 };
 
@@ -137,6 +140,11 @@ vec3 calculateLighting() {
     if (material.has_ambient_texture) {
         ambient_color = texture(material.ambient_texture,
             fs_in.texture_coord_MODEL).rgb;
+        // Use opacity texture as 'dirt' texture
+        if (material.has_opacity_texture) {
+            ambient_color = ambient_color * texture(material.opacity_texture,
+                fs_in.texture_coord_MODEL).rgb;
+        }
     }
     else {
         ambient_color = material.ka;
@@ -145,6 +153,11 @@ vec3 calculateLighting() {
     if (material.has_diffuse_texture) {
         diffuse_color = texture(material.diffuse_texture,
             fs_in.texture_coord_MODEL).rgb;
+		// Use opacity texture as 'dirt' texture
+        if (material.has_opacity_texture) {
+            diffuse_color = diffuse_color * texture(material.opacity_texture,
+                fs_in.texture_coord_MODEL).rgb;
+        }
     }
     else {
         diffuse_color = material.kd;

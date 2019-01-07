@@ -86,6 +86,19 @@ namespace puffin {
             return normalmap_texture_;
         }
 
+        void setOpacityTexture(TexturePtr texture) {
+            if (!texture) {
+                logError("Material::setOpacityTexture()", "Null input.");
+                return;
+            }
+
+            opacity_texture_ = texture;
+        }
+
+        TexturePtr getOpacityTexture() const {
+            return opacity_texture_;
+        }
+
         void setKa(const glm::vec3 &ka) {
             ka_ = glm::vec3(
                 glm::clamp(ka.r, 0.0f, 1.0f),
@@ -191,6 +204,7 @@ namespace puffin {
         TexturePtr specular_texture_;
         TexturePtr normalmap_texture_;
         TexturePtr emissive_texture_;
+        TexturePtr opacity_texture_;
     };
 
     using MaterialPtr = std::shared_ptr<Material>;

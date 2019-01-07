@@ -139,6 +139,10 @@ void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
         material->getNormalMapTexture() != nullptr ? GL_TRUE : GL_FALSE);
     default_shader_program_->setUniform("material.normalmap_texture", 4);
 
+    default_shader_program_->setUniform("material.has_opacity_texture",
+        material->getOpacityTexture() != nullptr ? GL_TRUE : GL_FALSE);
+    default_shader_program_->setUniform("material.opacity_texture", 5);
+
     default_shader_program_->setUniform("material.shininess",
         material->getShininess());
     default_shader_program_->setUniform("material.transparency",
@@ -199,6 +203,15 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
             auto normalmap_texture = material->getNormalMapTexture();
             if (normalmap_texture) {
                 normalmap_texture->bind();
+            }
+            else {
+                Texture::unbindTextureType(TextureType::Texture2D);
+            }
+
+            Texture::setTextureSlot(5);
+            auto opacity_texture = material->getOpacityTexture();
+            if (opacity_texture) {
+                opacity_texture->bind();
             }
             else {
                 Texture::unbindTextureType(TextureType::Texture2D);

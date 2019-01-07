@@ -217,6 +217,14 @@ void Mesh::loadFromFile(std::string path) {
                 mesh_material->setNormalMapTexture(normalmap_tex);
             }
 
+            if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) ==
+                AI_SUCCESS) {
+                TexturePtr opacity_tex(new Texture());
+                opacity_tex->loadTexture2D(processTexturePath(path,
+                    texture_path), true);
+                mesh_material->setOpacityTexture(opacity_tex);
+            }
+
             aiColor3D kd;
             if (material->Get(AI_MATKEY_COLOR_DIFFUSE, kd) == AI_SUCCESS) {
                 mesh_material->setKd(glm::vec3(kd.r, kd.g, kd.b));
