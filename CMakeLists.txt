@@ -23,9 +23,12 @@ endif (MSVC)
 # Puffin Engine sources
 file(GLOB PUFFIN_ENGINE_INC "Inc/PuffinEngine/*.hpp")
 file(GLOB PUFFIN_ENGINE_SRC "Src/PuffinEngine/*.cpp")
+file(GLOB PUFFIN_SHADERS "Shaders/*.vert"
+                         "Shaders/*.frag")
 
-source_group("PuffinEngine\\Inc" FILES {$PUFFIN_ENGINE_INC})
-source_group("PuffinEngine\\Src" FILES {$PUFFIN_ENGINE_SRC})
+source_group("PuffinEngine\\Inc" FILES ${PUFFIN_ENGINE_INC})
+source_group("PuffinEngine\\Src" FILES ${PUFFIN_ENGINE_SRC})
+source_group("PuffinEngine\\Shaders" FILES ${PUFFIN_SHADERS})
 
 # Engine Demo sources
 file(GLOB DEMO_SRC "Src/*.cpp")
@@ -63,14 +66,14 @@ endif (MSVC)
 
 # Build configuration
 add_executable(PuffinEngineV2 ${PUFFIN_ENGINE_INC} ${PUFFIN_ENGINE_SRC}
-               ${DEMO_SRC} ${DEMO_H})
+               ${DEMO_SRC} ${DEMO_H} ${PUFFIN_SHADERS})
 
 if (UNIX)
     # TODO
 endif (UNIX)
 if (MSVC)
     target_link_libraries(PuffinEngineV2 OpenGL32.lib FreeImaged.lib
-                          FreeImagePlusd.lib glew32d.lib glfw3.lib 
+                          FreeImagePlusd.lib glew32d.lib glfw3.lib
                           assimp-vc140-mt.lib)
 endif (MSVC)
 
