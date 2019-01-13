@@ -40,6 +40,7 @@ EngineDemo::EngineDemo() : Core() {
         glm::vec3(0.9f, 0.9f, 0.9f));
 
     renderSettings()->lighting()->directionalLight()->enable(true);
+    renderSettings()->lighting()->enableBlinnPhong(true);
     renderSettings()->lighting()->directionalLight()->setDirection(
         glm::vec3(0.5f, -0.5f, -0.5f));
     renderSettings()->lighting()->directionalLight()->setAmbientColor(

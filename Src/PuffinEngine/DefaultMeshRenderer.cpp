@@ -101,6 +101,8 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
     default_shader_program_->setUniform(
         "lighting.directional_light.specular_color",
         lighting->directionalLight()->getSpecularColor());
+    default_shader_program_->setUniform("lighting.blinn_phong",
+        lighting->isBlinnPhongEnabled());
 }
 
 void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {

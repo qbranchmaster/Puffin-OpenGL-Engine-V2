@@ -23,6 +23,7 @@ struct DirectionalLight {
 
 struct Lighting {
     bool enabled;
+    bool blinn_phong;
     DirectionalLight directional_light;
 };
 

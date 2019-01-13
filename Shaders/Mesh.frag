@@ -42,6 +42,7 @@ struct DirectionalLight {
 
 struct Lighting {
     bool enabled;
+    bool blinn_phong;
     DirectionalLight directional_light;
 };
 
@@ -124,10 +125,18 @@ void calculateDirectionalLight(inout vec3 ambient, inout vec3 diffuse,
     diffuse = lighting.directional_light.diffuse_color * diffuse_power;
 
     // Specular
-    vec3 reflected_ray = normalize(reflect(light_direction, normal_vector));
-    float specular_power = pow(max(dot(reflected_ray, view_direction), 0.0f),
-        material.shininess);
-    specular = lighting.directional_light.specular_color * specular_power;
+    if (lighting.blinn_phong) {
+        vec3 halfway = normalize(-light_direction + view_direction);
+        float specular_power = pow(max(dot(normal_vector, halfway), 0.0f),
+            material.shininess * 4);
+        specular = lighting.directional_light.specular_color * specular_power;
+    }
+    else {
+        vec3 reflected_ray = normalize(reflect(light_direction, normal_vector));
+        float specular_power = pow(max(dot(reflected_ray, view_direction), 0.0f),
+            material.shininess);
+        specular = lighting.directional_light.specular_color * specular_power;
+    }
 }
 
 vec3 calculateLighting() {

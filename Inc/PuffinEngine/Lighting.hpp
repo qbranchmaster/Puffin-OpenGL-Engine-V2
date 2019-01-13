@@ -32,6 +32,14 @@ namespace puffin {
             return enabled_;
         }
 
+        void enableBlinnPhong(GLboolean state) {
+            blinn_phong_enabled_ = state;
+        }
+
+        GLboolean isBlinnPhongEnabled() const {
+            return blinn_phong_enabled_;
+        }
+
         void setSkyboxLightingColor(const glm::vec3 &color) {
             skybox_light_color_ = glm::vec3(
                 glm::clamp(color.r, 0.0f, 1.0f),
@@ -50,6 +58,7 @@ namespace puffin {
 
     private:
         GLboolean enabled_{false};
+        GLboolean blinn_phong_enabled_{false};
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 
