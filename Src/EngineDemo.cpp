@@ -95,6 +95,12 @@ void EngineDemo::pollKeyboard() {
         stop();
     }
 
+    if (input()->keyPressed(Key::F1, false)) {
+        static GLboolean enabled = false;
+        enabled = !enabled;
+        masterRenderer()->configGuiEnabled(enabled);
+    }
+
     moveCamera();
 }
 

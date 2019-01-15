@@ -37,6 +37,20 @@ file(GLOB DEMO_H "Inc/*.hpp")
 source_group("Demo\\Src" FILES ${DEMO_SRC})
 source_group("Demo\\Include" FILES ${DEMO_H})
 
+# External additional libraries
+# IMGUI
+file(GLOB IMGUI_LIB "External/imgui/*.h"
+                    "External/imgui/*.cpp"
+                    "External/imgui/examples/imgui_impl_glfw.h"
+                    "External/imgui/examples/imgui_impl_glfw.cpp"
+                    "External/imgui/examples/imgui_impl_opengl3.h"
+                    "External/imgui/examples/imgui_impl_opengl3.cpp")
+
+set(IMGUI_INC_PATH "External/imgui")
+add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
+
+source_group("External\\IMGUI" FILES ${IMGUI_LIB})
+
 # Includes and libraries
 set(GLEW_INC_PATH "" CACHE PATH "GLEW include path")
 set(GLFW_INC_PATH "" CACHE PATH "GLFW include path")
@@ -53,6 +67,7 @@ endif (UNIX)
 if (MSVC)
     include_directories(include
                         "${CMAKE_SOURCE_DIR}/Inc"
+                        ${IMGUI_INC_PATH}
                         ${GLEW_INC_PATH}
                         ${GLFW_INC_PATH}
                         ${GLM_INC_PATH}
@@ -66,7 +81,7 @@ endif (MSVC)
 
 # Build configuration
 add_executable(PuffinEngineV2 ${PUFFIN_ENGINE_INC} ${PUFFIN_ENGINE_SRC}
-               ${DEMO_SRC} ${DEMO_H} ${PUFFIN_SHADERS})
+               ${DEMO_SRC} ${DEMO_H} ${PUFFIN_SHADERS} ${IMGUI_LIB})
 
 if (UNIX)
     # TODO

@@ -15,6 +15,7 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/ConfigGuiRenderer.hpp"
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/GlUtils.hpp"
@@ -46,11 +47,14 @@ namespace puffin {
 
         void drawScene(ScenePtr scene);
 
+        void configGuiEnabled(GLboolean state);
+
     private:
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
 
         GLboolean rendering_enabled_{false};
+        GLboolean config_gui_enabled_{true};
         std::function<void()> rendering_function_{nullptr};
 
         CameraPtr camera_;
@@ -59,6 +63,7 @@ namespace puffin {
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
 
+        ConfigGuiRendererPtr config_gui_renderer_;
         MeshRendererPtr mesh_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
         SkyboxRendererPtr skybox_renderer_;

@@ -23,6 +23,7 @@
 
 namespace puffin {
     class Window {
+        friend class ConfigGuiRenderer;
         friend class Input;
         friend class MasterRenderer;
 

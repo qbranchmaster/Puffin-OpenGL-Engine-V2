@@ -18,6 +18,8 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
     target_window_ = window;
     render_settings_ = render_settings;
 
+    config_gui_renderer_.reset(new ConfigGuiRenderer(target_window_));
+
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " +
@@ -77,6 +79,10 @@ void MasterRenderer::start() {
             default_frame_buffer_multisample_->
                 copyFrameBuffer(default_frame_buffer_);
             postprocess_renderer_->render(default_frame_buffer_);
+        }
+
+        if (config_gui_enabled_) {
+            config_gui_renderer_->render();
         }
 
         target_window_->swapBuffers();
@@ -152,6 +158,10 @@ void MasterRenderer::drawScene(ScenePtr scene) {
             }
         }
     }
+}
+
+void MasterRenderer::configGuiEnabled(GLboolean state) {
+    config_gui_enabled_ = state;
 }
 
 void MasterRenderer::clearDefaultFrameBuffer() {
