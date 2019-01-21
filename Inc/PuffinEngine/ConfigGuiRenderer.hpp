@@ -18,16 +18,22 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
+#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class ConfigGuiRenderer {
     public:
-        ConfigGuiRenderer(WindowPtr window);
+        ConfigGuiRenderer(WindowPtr window, RenderSettingsPtr render_settings);
 
         void render();
 
     private:
+        void setupImGui();
+
+        void postprocessDialog();
+
+        RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
     };
 
