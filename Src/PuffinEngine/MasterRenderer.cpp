@@ -46,9 +46,9 @@ void MasterRenderer::createDefaultFrameBuffer() {
     auto w = Configuration::instance().getFrameWidth();
     auto h = Configuration::instance().getFrameHeight();
 
-    default_frame_buffer_->addTextureBuffer(w, h, false);
+    default_frame_buffer_->addTextureBuffer(w, h, false, true);
     default_frame_buffer_->addRenderBuffer(w, h, false);
-    default_frame_buffer_multisample_->addTextureBuffer(w, h, true);
+    default_frame_buffer_multisample_->addTextureBuffer(w, h, true, true);
     default_frame_buffer_multisample_->addRenderBuffer(w, h, true);
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);

@@ -98,7 +98,7 @@ namespace puffin {
         }
 
         void addTextureBuffer(GLuint width, GLuint height,
-            GLboolean multisample);
+            GLboolean multisample, GLboolean float_buffer);
         void addRenderBuffer(GLuint width, GLuint height,
             GLboolean multisample);
 

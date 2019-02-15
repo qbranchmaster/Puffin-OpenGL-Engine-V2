@@ -75,12 +75,12 @@ void FrameBuffer::setBackgroundColor(const glm::vec3 & color) {
 }
 
 void FrameBuffer::addTextureBuffer(GLuint width, GLuint height,
-    GLboolean multisample) {
+    GLboolean multisample, GLboolean float_buffer) {
     if (!rgb_buffer_) {
         rgb_buffer_.reset(new Texture());
     }
 
-    rgb_buffer_->createTextureBuffer(width, height, multisample);
+    rgb_buffer_->createTextureBuffer(width, height, multisample, float_buffer);
 
     bind(FrameBufferBindType::NORMAL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,

@@ -163,14 +163,14 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
 }
 
 void Texture::createTextureBuffer(GLuint width, GLuint height,
-    GLboolean multisample) {
+    GLboolean multisample, GLboolean float_buffer) {
     type_ = multisample ? TextureType::Texture2DMultisample :
         TextureType::Texture2D;
     width_ = width;
     height_ = height;
 
     bind();
-    setTexture2DData(nullptr);
+    setTexture2DData(nullptr, false, float_buffer);
     setTextureFilter(TextureFilter::BILINEAR);
     unbind();
 }
@@ -325,7 +325,8 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
-void Texture::setTexture2DData(void *data) {
+void Texture::setTexture2DData(void *data, GLboolean generate_mipmaps,
+    GLboolean float_type) {
     if (!(type_ == TextureType::Texture2D ||
         type_ == TextureType::Texture2DMultisample)) {
         logError("Texture::setTexture2DData()", "Invalid texture type.");
@@ -338,17 +339,19 @@ void Texture::setTexture2DData(void *data) {
     }
 
     if (type_ == TextureType::Texture2D) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
-            GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, float_type ? GL_RGB16F : GL_RGB,
+            width_, height_, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
     }
     else if (type_ == TextureType::Texture2DMultisample) {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-            Configuration::instance().getMsaaSamples(), GL_RGB, width_,
-            height_, GL_TRUE);
+            Configuration::instance().getMsaaSamples(),
+            float_type ? GL_RGB16F : GL_RGB, width_, height_, GL_TRUE);
     }
 
     // After setting new texture data there is a need to regenerate mipmaps.
-    generateMipmap();
+    if (generate_mipmaps) {
+        generateMipmap();
+    }
 }
 
 void Texture::swapRedBlue() {

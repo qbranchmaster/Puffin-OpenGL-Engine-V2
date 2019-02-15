@@ -27,24 +27,15 @@ namespace puffin {
         }
 
         void setAmbientColor(const glm::vec3 &color) {
-            ambient_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f));
+            ambient_color_ = color;
         }
 
         void setDiffuseColor(const glm::vec3 &color) {
-            diffuse_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f));
+            diffuse_color_ = color;
         }
 
         void setSpecularColor(const glm::vec3 &color) {
-            specular_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f));
+            specular_color_ = color;
         }
 
         glm::vec3 getAmbientColor() const {

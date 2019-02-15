@@ -8,6 +8,7 @@ struct Color {
     float kernel_size;
 
     float gamma;
+    float exposure;
 };
 
 in VS_OUT {
@@ -119,6 +120,11 @@ void main() {
         break;
     }
 
-    result_color.rgb = pow(result_color.rgb, vec3(1.0f / color.gamma));
-    frag_color = vec4(result_color, 1.0f);
+    // Tone mapping
+    vec3 mapped = vec3(1.0f) - exp(-result_color * color.exposure);
+
+    // Gamma correction
+    mapped = pow(mapped, vec3(1.0f / color.gamma));
+
+    frag_color = vec4(mapped, 1.0f);
 }

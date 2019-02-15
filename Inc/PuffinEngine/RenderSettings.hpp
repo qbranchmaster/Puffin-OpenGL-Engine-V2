@@ -44,8 +44,22 @@ namespace puffin {
             return gamma_;
         }
 
+        void setExposure(GLfloat exposure) {
+            if (exposure <= 0.0f) {
+                logError("RenderSettings::setExposure()", "Invalid value.");
+                return;
+            }
+
+            exposure_ = exposure;
+        }
+
+        GLfloat getExposure() const {
+            return exposure_;
+        }
+
     private:
         GLfloat gamma_{2.2f};
+        GLfloat exposure_{1.0f};
 
         FogPtr fog_;
         LightingPtr lighting_;

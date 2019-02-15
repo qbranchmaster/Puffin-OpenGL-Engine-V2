@@ -90,6 +90,10 @@ void ConfigGuiRenderer::postprocessDialog() {
 void ConfigGuiRenderer::lightingDialog() {
     ImGui::Begin("Lighting");
 
+    float exposure = render_settings_->getExposure();
+    ImGui::SliderFloat("Exposure", &exposure, 0.1f, 10.0f);
+    render_settings_->setExposure(exposure);
+
     ImGui::End();
 }
 
@@ -97,7 +101,7 @@ void ConfigGuiRenderer::gammaDialog() {
     ImGui::Begin("Gamma");
 
     float gamma = render_settings_->getGamma();
-    ImGui::SliderFloat("Gamma value", &gamma, 1.0f, 3.0f);
+    ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
     render_settings_->setGamma(gamma);
 
     ImGui::End();

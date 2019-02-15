@@ -37,6 +37,8 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
     default_shader_program_->setUniform("color.screen_texture", 0);
     default_shader_program_->setUniform("color.gamma",
         render_settings_->getGamma());
+    default_shader_program_->setUniform("color.exposure",
+        render_settings_->getExposure());
 }
 
 void DefaultPostprocessRenderer::createScreenMesh() {

@@ -63,7 +63,7 @@ namespace puffin {
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
         void createTextureBuffer(GLuint width, GLuint height,
-            GLboolean multisample);
+            GLboolean multisample, GLboolean float_buffer);
 
         void bind() const {
             if (!handle_) {
@@ -147,7 +147,8 @@ namespace puffin {
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
         void setTextureBorderColor(const glm::vec4 &color);
-        void setTexture2DData(void *data);
+        void setTexture2DData(void *data, GLboolean generate_mipmaps = true,
+            GLboolean float_type = false);
 
         GLuint getHandle() const {
             return handle_;
