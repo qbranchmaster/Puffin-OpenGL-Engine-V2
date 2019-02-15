@@ -53,6 +53,10 @@ struct Matrices {
     mat3 normal_matrix;
 };
 
+struct Other {
+    float gamma;
+};
+
 in VS_OUT {
     vec3 position_WORLD;
     vec3 position_VIEW;
@@ -72,6 +76,12 @@ out vec4 frag_color;
 
 uniform Material material;
 uniform Lighting lighting;
+uniform Other other;
+
+vec3 gammaCorrection(vec3 input_color) {
+    vec3 result = pow(input_color, vec3(other.gamma));
+    return result;
+}
 
 void calculateDirectionalLight(inout vec3 ambient, inout vec3 diffuse,
     inout vec3 specular) {
@@ -149,10 +159,13 @@ vec3 calculateLighting() {
     if (material.has_ambient_texture) {
         ambient_color = texture(material.ambient_texture,
             fs_in.texture_coord_MODEL).rgb;
+        ambient_color.rgb = gammaCorrection(ambient_color.rgb);
         // Use opacity texture as 'dirt' texture
         if (material.has_opacity_texture) {
-            ambient_color = ambient_color * texture(material.opacity_texture,
-                fs_in.texture_coord_MODEL).rgb;
+            vec4 dirt_color = texture(material.opacity_texture,
+                fs_in.texture_coord_MODEL);
+            dirt_color.rgb = gammaCorrection(dirt_color.rgb);
+            ambient_color = ambient_color * dirt_color.rgb;
         }
     }
     else {
@@ -162,10 +175,13 @@ vec3 calculateLighting() {
     if (material.has_diffuse_texture) {
         diffuse_color = texture(material.diffuse_texture,
             fs_in.texture_coord_MODEL).rgb;
+        diffuse_color.rgb = gammaCorrection(diffuse_color.rgb);
 		// Use opacity texture as 'dirt' texture
         if (material.has_opacity_texture) {
-            diffuse_color = diffuse_color * texture(material.opacity_texture,
-                fs_in.texture_coord_MODEL).rgb;
+            vec4 dirt_color = texture(material.opacity_texture,
+                fs_in.texture_coord_MODEL);
+            dirt_color.rgb = gammaCorrection(dirt_color.rgb);
+            diffuse_color = diffuse_color * dirt_color.rgb;
         }
     }
     else {
@@ -183,6 +199,7 @@ vec3 calculateLighting() {
     if (material.has_emissive_texture) {
         emissive_color = texture(material.emissive_texture,
             fs_in.texture_coord_MODEL).rgb;
+        emissive_color.rgb = gammaCorrection(emissive_color.rgb);
     }
     else {
         emissive_color = material.ke;

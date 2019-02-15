@@ -31,7 +31,22 @@ namespace puffin {
             return postprocess_;
         }
 
+        void setGamma(GLfloat gamma) {
+            if (gamma <= 0.0f) {
+                logError("RenderSettings::setGamma()", "Invalid value.");
+                return;
+            }
+
+            gamma_ = gamma;
+        }
+
+        GLfloat getGamma() const {
+            return gamma_;
+        }
+
     private:
+        GLfloat gamma_{2.2f};
+
         FogPtr fog_;
         LightingPtr lighting_;
         PostprocessPtr postprocess_;

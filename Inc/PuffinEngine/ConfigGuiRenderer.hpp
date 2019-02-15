@@ -33,6 +33,7 @@ namespace puffin {
 
         void postprocessDialog();
         void lightingDialog();
+        void gammaDialog();
 
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;

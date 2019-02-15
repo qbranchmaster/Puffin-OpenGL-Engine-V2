@@ -6,6 +6,8 @@ struct Color {
     int effect;
     vec3 tint_color;
     float kernel_size;
+
+    float gamma;
 };
 
 in VS_OUT {
@@ -117,5 +119,6 @@ void main() {
         break;
     }
 
+    result_color.rgb = pow(result_color.rgb, vec3(1.0f / color.gamma));
     frag_color = vec4(result_color, 1.0f);
 }

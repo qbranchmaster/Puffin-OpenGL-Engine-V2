@@ -34,6 +34,7 @@ void ConfigGuiRenderer::render() {
 
     lightingDialog();
     postprocessDialog();
+    gammaDialog();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -88,6 +89,16 @@ void ConfigGuiRenderer::postprocessDialog() {
 
 void ConfigGuiRenderer::lightingDialog() {
     ImGui::Begin("Lighting");
+
+    ImGui::End();
+}
+
+void ConfigGuiRenderer::gammaDialog() {
+    ImGui::Begin("Gamma");
+
+    float gamma = render_settings_->getGamma();
+    ImGui::SliderFloat("Gamma value", &gamma, 1.0f, 3.0f);
+    render_settings_->setGamma(gamma);
 
     ImGui::End();
 }

@@ -69,6 +69,8 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
     default_shader_program_->setUniform("color.cube_texture", 0);
     default_shader_program_->setUniform("color.light_color",
         render_settings_->lighting()->getSkyboxLightColor());
+    default_shader_program_->setUniform("color.gamma",
+        render_settings_->getGamma());
 }
 
 void DefaultSkyboxRenderer::drawSkybox(SkyboxPtr skybox) {
