@@ -32,6 +32,7 @@ namespace puffin {
         void setupImGui();
 
         void postprocessDialog();
+        void lightingDialog();
 
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;

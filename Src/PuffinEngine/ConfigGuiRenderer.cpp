@@ -32,6 +32,7 @@ void ConfigGuiRenderer::render() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    lightingDialog();
     postprocessDialog();
 
     ImGui::Render();
@@ -81,6 +82,12 @@ void ConfigGuiRenderer::postprocessDialog() {
     auto k_size = render_settings_->postprocess()->getKernelSize();
     ImGui::InputFloat("Kernel size", &k_size, 1.0f, 5.0f, "%.2f");
     render_settings_->postprocess()->setKernelSize(k_size);
+
+    ImGui::End();
+}
+
+void ConfigGuiRenderer::lightingDialog() {
+    ImGui::Begin("Lighting");
 
     ImGui::End();
 }
