@@ -14,11 +14,13 @@
 #include <glm/glm.hpp>
 
 #include <memory>
+#include <vector>
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/RenderBuffer.hpp"
 #include "PuffinEngine/StateMachine.hpp"
-#include "PuffinEngine/Texture.hpp"
+#include "PuffinEngine/TextureBuffer.hpp"
 
 namespace puffin {
     enum class FrameBufferBindType {
@@ -32,16 +34,18 @@ namespace puffin {
 
     class FrameBuffer {
     public:
-        FrameBuffer();
+        FrameBuffer(GLuint width, GLuint height);
         ~FrameBuffer();
 
-        void bind(FrameBufferBindType bind_type) const {
-            if (!handle_) {
-                logError("FrameBuffer::bind()",
-                    "Cannot bind null frame buffer.");
-                return;
-            }
+        GLuint getWidth() const {
+            return width_;
+        }
 
+        GLuint getHeight() const {
+            return height_;
+        }
+
+        void bind(FrameBufferBindType bind_type) {
             GLuint target = 0;
             GLuint *handle_ptr = nullptr;
             switch (bind_type) {
@@ -72,51 +76,58 @@ namespace puffin {
             }
         }
 
-        void unbind() const {
+        void unbind() {
             if (StateMachine::instance().bound_frame_buffer_ == handle_) {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 StateMachine::instance().bound_frame_buffer_ = 0;
                 StateMachine::instance().bound_frame_buffer_read_ = 0;
                 StateMachine::instance().bound_frame_buffer_write_ = 0;
             }
+            else if (StateMachine::instance().bound_frame_buffer_read_ ==
+                handle_) {
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+                StateMachine::instance().bound_frame_buffer_read_ = 0;
+            }
+            else if (StateMachine::instance().bound_frame_buffer_write_ ==
+                handle_) {
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+                StateMachine::instance().bound_frame_buffer_write_ = 0;
+            }
         }
+
+        void setClearColor(const glm::vec3 &color);
+
+        glm::vec3 getClearColor() const {
+            return clear_color_;
+        }
+
+        GLboolean isComplete();
 
         void copyFrameBuffer(FrameBufferPtr target);
+        void addRenderBuffer(GLboolean multisample);
+        void addTextureBuffer(GLushort index, GLboolean multisample,
+            GLboolean float_buffer);
 
-        GLuint getHandle() const {
-            return handle_;
-        }
+        TextureBufferPtr getTextureBuffer(GLushort index) const {
+            if (index >= texture_buffers_.size()) {
+                logError("FrameBuffer::getTextureBuffer()",
+                    "Invalid value.");
+                return 0;
+            }
 
-        GLboolean isComplete() const;
-
-        TexturePtr getRgbBufferTexture() const {
-            return rgb_buffer_;
-        }
-
-        RenderBufferPtr getDepthRenderBuffer() const {
-            return depth_buffer_;
-        }
-
-        void addTextureBuffer(GLuint width, GLuint height,
-            GLboolean multisample, GLboolean float_buffer);
-        void addRenderBuffer(GLuint width, GLuint height,
-            GLboolean multisample);
-
-        void setBackgroundColor(const glm::vec3 &color);
-
-        glm::vec3 getBackgroundColor() const {
-            return background_color_;
+            return texture_buffers_[index];
         }
 
     private:
-        GLboolean isBound() const;
-
         GLuint handle_{0};
 
-        TexturePtr rgb_buffer_;
-        RenderBufferPtr depth_buffer_;
+        GLuint width_{0};
+        GLuint height_{0};
 
-        glm::vec3 background_color_{0.0f, 0.0f, 0.0f};
+        glm::vec3 clear_color_{0.0f, 0.0f, 0.0f};
+
+        RenderBufferPtr render_buffer_;
+        std::vector<TextureBufferPtr> texture_buffers_;
     };
 } // namespace puffin
 

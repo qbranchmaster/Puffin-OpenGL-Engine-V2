@@ -52,6 +52,7 @@ namespace puffin {
     private:
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
+        void checkGlErrors();
 
         GLboolean rendering_enabled_{false};
         GLboolean config_gui_enabled_{true};

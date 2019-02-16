@@ -14,49 +14,18 @@
 #include <memory>
 
 #include "PuffinEngine/Configuration.hpp"
-#include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class RenderBuffer {
     public:
-        RenderBuffer() {
+        RenderBuffer(GLuint width, GLuint height, GLboolean multisample) {
             glGenRenderbuffers(1, &handle_);
-        }
-
-        ~RenderBuffer() {
-            if (handle_) {
-                glDeleteRenderbuffers(1, &handle_);
-            }
-        }
-
-        void bind() const {
-            if (!handle_) {
-                logError("RenderBuffer::bind()",
-                    "Cannot bind null render buffer.");
-                return;
-            }
-
-            if (StateMachine::instance().bound_render_buffer_ == handle_) {
-                return;
-            }
-
-            glBindRenderbuffer(GL_RENDERBUFFER, handle_);
-            StateMachine::instance().bound_render_buffer_ = handle_;
-        }
-
-        void unbind() const {
-            if (StateMachine::instance().bound_render_buffer_ == handle_) {
-                glBindRenderbuffer(GL_RENDERBUFFER, 0);
-                StateMachine::instance().bound_render_buffer_ = 0;
-            }
-        }
-
-        void create(GLuint width, GLuint height, GLboolean multisample) {
-            bind();
 
             width_ = width;
             height_ = height;
+            multisample_ = multisample;
+
+            bind();
 
             if (multisample) {
                 glRenderbufferStorageMultisample(GL_RENDERBUFFER,
@@ -67,8 +36,14 @@ namespace puffin {
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
                     width_, height_);
             }
+        }
 
-            unbind();
+        ~RenderBuffer() {
+            glDeleteRenderbuffers(1, &handle_);
+        }
+
+        void bind() {
+            glBindRenderbuffer(GL_RENDERBUFFER, handle_);
         }
 
         GLuint getWidth() const {
@@ -83,11 +58,16 @@ namespace puffin {
             return handle_;
         }
 
+        GLboolean isMultisample() const {
+            return multisample_;
+        }
+
     private:
         GLuint handle_{0};
 
         GLuint width_{0};
         GLuint height_{0};
+        GLboolean multisample_{false};
     };
 
     using RenderBufferPtr = std::shared_ptr<RenderBuffer>;

@@ -7,7 +7,7 @@
 
 using namespace puffin;
 
-// Initialize default texture filter.
+// Initialize default texture filter
 std::map<TextureType, TextureFilter> Texture::default_texture_filter_ = {
     {TextureType::Texture2D, TextureFilter::BILINEAR},
     {TextureType::Texture2DMultisample, TextureFilter::BILINEAR},
@@ -22,9 +22,7 @@ Texture::Texture() {
 
 Texture::~Texture() {
     freeImage();
-    if (handle_) {
-        glDeleteTextures(1, &handle_);
-    }
+    glDeleteTextures(1, &handle_);
 }
 
 void Texture::freeImage() {
@@ -35,7 +33,6 @@ void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
     switch (type) {
     case TextureType::Texture2D:
     case TextureType::Texture2DMultisample:
-    case TextureType::TextureCube:
         switch (filter) {
         case TextureFilter::NEAREST:
         case TextureFilter::BILINEAR:
@@ -44,6 +41,21 @@ void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
             default_texture_filter_[type] = filter;
             break;
         }
+        break;
+    case TextureType::TextureCube:
+        switch (filter) {
+        case TextureFilter::NEAREST:
+        case TextureFilter::BILINEAR:
+            default_texture_filter_[type] = filter;
+            break;
+        default:
+            logError("Texture::setDefaultTextureFilter()",
+                "Invalid filter type.");
+            break;
+        }
+        break;
+    default:
+        logError("Texture::setDefaultTextureFilter()", "Invalid texture type.");
         break;
     }
 }
@@ -96,15 +108,6 @@ GLboolean Texture::loadImage(std::string path) {
     return true;
 }
 
-GLboolean Texture::isBound() const {
-    if (StateMachine::instance().bound_texture_[static_cast<GLushort>(type_)]
-        == handle_) {
-        return true;
-    }
-
-    return false;
-}
-
 GLboolean Texture::loadImageRaw(std::string path) {
     if (!loadImage(path)) {
         return false;
@@ -128,7 +131,6 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
     setTextureWrap(TextureWrap::REPEAT);
     flipVertical();
-    unbind();
 
     if (auto_free) {
         freeImage();
@@ -157,22 +159,8 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
 
     setTextureFilter(default_texture_filter_[TextureType::TextureCube]);
     setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
-    unbind();
 
     return true;
-}
-
-void Texture::createTextureBuffer(GLuint width, GLuint height,
-    GLboolean multisample, GLboolean float_buffer) {
-    type_ = multisample ? TextureType::Texture2DMultisample :
-        TextureType::Texture2D;
-    width_ = width;
-    height_ = height;
-
-    bind();
-    setTexture2DData(nullptr, false, float_buffer);
-    setTextureFilter(TextureFilter::BILINEAR);
-    unbind();
 }
 
 void Texture::fetchChannelsCount() {
@@ -192,11 +180,8 @@ void Texture::generateMipmap() {
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture::setTextureBorderColor(const glm::vec4 & color) {
-    if (!isBound()) {
-        logError("Texture::setTextureBorderColor()", "Texture is not bound.");
-        return;
-    }
+void Texture::setTextureBorderColor(const glm::vec4 &color) {
+    bind();
 
     GLfloat border_color[] = {
         glm::clamp(color.r, 0.0f, 1.0f),
@@ -209,10 +194,7 @@ void Texture::setTextureBorderColor(const glm::vec4 & color) {
 }
 
 void Texture::setTextureWrap(TextureWrap wrap_mode) {
-    if (!isBound()) {
-        logError("Texture::setTextureWrap()", "Texture is not bound.");
-        return;
-    }
+    bind();
 
     switch (type_) {
     case TextureType::Texture2D:
@@ -258,10 +240,7 @@ void Texture::setTextureWrap(TextureWrap wrap_mode) {
 }
 
 void Texture::setTextureFilter(TextureFilter filter) {
-    if (!isBound()) {
-        logError("Texture::setTextureFilter()", "Texture is not bound.");
-        return;
-    }
+    bind();
 
     switch (type_) {
     case TextureType::Texture2D:
@@ -325,27 +304,23 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
-void Texture::setTexture2DData(void *data, GLboolean generate_mipmaps,
-    GLboolean float_type) {
+void Texture::setTexture2DData(void *data, GLboolean generate_mipmaps) {
     if (!(type_ == TextureType::Texture2D ||
         type_ == TextureType::Texture2DMultisample)) {
         logError("Texture::setTexture2DData()", "Invalid texture type.");
         return;
     }
 
-    if (!isBound()) {
-        logError("Texture::setTexture2DData()", "Texture is not bound.");
-        return;
-    }
+    bind();
 
     if (type_ == TextureType::Texture2D) {
-        glTexImage2D(GL_TEXTURE_2D, 0, float_type ? GL_RGB16F : GL_RGB,
-            width_, height_, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0,
+            GL_BGR, GL_UNSIGNED_BYTE, data);
     }
     else if (type_ == TextureType::Texture2DMultisample) {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-            Configuration::instance().getMsaaSamples(),
-            float_type ? GL_RGB16F : GL_RGB, width_, height_, GL_TRUE);
+            Configuration::instance().getMsaaSamples(), GL_RGB, width_,
+            height_, GL_TRUE);
     }
 
     // After setting new texture data there is a need to regenerate mipmaps.

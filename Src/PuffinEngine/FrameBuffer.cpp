@@ -7,36 +7,53 @@
 
 using namespace puffin;
 
-FrameBuffer::FrameBuffer() {
+FrameBuffer::FrameBuffer(GLuint width, GLuint height) {
     glGenFramebuffers(1, &handle_);
+
+    width_ = width;
+    height_ = height;
 }
 
 FrameBuffer::~FrameBuffer() {
-    if (handle_) {
-        glDeleteFramebuffers(1, &handle_);
-    }
+    glDeleteFramebuffers(1, &handle_);
+}
+
+void FrameBuffer::setClearColor(const glm::vec3 & color) {
+    clear_color_ = glm::vec3(
+        glm::clamp(color.r, 0.0f, 1.0f),
+        glm::clamp(color.g, 0.0f, 1.0f),
+        glm::clamp(color.b, 0.0f, 1.0f));
 }
 
 void FrameBuffer::copyFrameBuffer(FrameBufferPtr target) {
     if (!target) {
         logError("FrameBuffer::copyFrameBuffer()", "Null input.");
+        return;
     }
 
     bind(FrameBufferBindType::ONLY_READ);
     target->bind(FrameBufferBindType::ONLY_WRITE);
 
-    auto size = rgb_buffer_->getSize();
-    glBlitFramebuffer(0, 0, size.first, size.second, 0, 0, size.first,
-        size.second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-    unbind();
+    target->unbind();
 }
 
-GLboolean FrameBuffer::isComplete() const {
-    if (!isBound()) {
-        logError("FrameBuffer::isComplete()", "Frame buffer is not bound.");
-        return false;
+void FrameBuffer::addRenderBuffer(GLboolean multisample) {
+    if (render_buffer_ != nullptr) {
+        return;
     }
+
+    render_buffer_.reset(new RenderBuffer(width_, height_, multisample));
+
+    bind(FrameBufferBindType::NORMAL);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+        GL_RENDERBUFFER, render_buffer_->getHandle());
+}
+
+GLboolean FrameBuffer::isComplete() {
+    bind(FrameBufferBindType::NORMAL);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         return false;
@@ -45,46 +62,20 @@ GLboolean FrameBuffer::isComplete() const {
     return true;
 }
 
-GLboolean FrameBuffer::isBound() const {
-    if (StateMachine::instance().bound_frame_buffer_ == handle_) {
-        return true;
+void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
+    GLboolean float_buffer) {
+    if (index < texture_buffers_.size() &&
+        texture_buffers_[index] != nullptr) {
+        return;
     }
 
-    return false;
-}
-
-void FrameBuffer::addRenderBuffer(GLuint width, GLuint height,
-    GLboolean multisample) {
-    if (!depth_buffer_) {
-        depth_buffer_.reset(new RenderBuffer());
-    }
-
-    depth_buffer_->create(width, height, multisample);
+    TextureBufferPtr buffer(new TextureBuffer(width_, height_, multisample,
+        float_buffer));
 
     bind(FrameBufferBindType::NORMAL);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, depth_buffer_->getHandle());
-    unbind();
-}
-
-void FrameBuffer::setBackgroundColor(const glm::vec3 & color) {
-    background_color_ = glm::vec3(
-        glm::clamp(color.r, 0.0f, 1.0f),
-        glm::clamp(color.g, 0.0f, 1.0f),
-        glm::clamp(color.b, 0.0f, 1.0f));
-}
-
-void FrameBuffer::addTextureBuffer(GLuint width, GLuint height,
-    GLboolean multisample, GLboolean float_buffer) {
-    if (!rgb_buffer_) {
-        rgb_buffer_.reset(new Texture());
-    }
-
-    rgb_buffer_->createTextureBuffer(width, height, multisample, float_buffer);
-
-    bind(FrameBufferBindType::NORMAL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
         multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
-        rgb_buffer_->getHandle(), 0);
-    unbind();
+        buffer->getHandle(), 0);
+
+    texture_buffers_.push_back(buffer);
 }

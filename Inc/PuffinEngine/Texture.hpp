@@ -62,9 +62,6 @@ namespace puffin {
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
-        void createTextureBuffer(GLuint width, GLuint height,
-            GLboolean multisample, GLboolean float_buffer);
-
         void bind() const {
             if (!handle_) {
                 logError("Texture::bind()", "Cannot bind null texture.");
@@ -147,8 +144,7 @@ namespace puffin {
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
         void setTextureBorderColor(const glm::vec4 &color);
-        void setTexture2DData(void *data, GLboolean generate_mipmaps = true,
-            GLboolean float_type = false);
+        void setTexture2DData(void *data, GLboolean generate_mipmaps = true);
 
         GLuint getHandle() const {
             return handle_;
@@ -156,7 +152,6 @@ namespace puffin {
 
     private:
         GLboolean loadImage(std::string path);
-        GLboolean isBound() const;
         void fetchChannelsCount();
         void generateMipmap();
 

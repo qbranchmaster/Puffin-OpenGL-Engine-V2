@@ -94,7 +94,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     setShadersUniforms();
 
     Texture::setTextureSlot(0);
-    frame_buffer->getRgbBufferTexture()->bind();
+    frame_buffer->getTextureBuffer(0)->bind();
 
     DepthTest::instance().enable(false);
     DepthTest::instance().enableDepthMask(false);

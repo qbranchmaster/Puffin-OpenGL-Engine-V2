@@ -14,7 +14,6 @@ namespace puffin {
     class StateMachine {
         friend class FrameBuffer;
         friend class Mesh;
-        friend class RenderBuffer;
         friend class ShaderProgram;
         friend class Texture;
 
@@ -34,7 +33,6 @@ namespace puffin {
         GLuint bound_frame_buffer_{0};
         GLuint bound_frame_buffer_write_{0};
         GLuint bound_frame_buffer_read_{0};
-        GLuint bound_render_buffer_{0};
 
         std::unordered_map<GLushort, GLuint> bound_texture_;
     };

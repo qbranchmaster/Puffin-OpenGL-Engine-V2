@@ -40,16 +40,17 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
 }
 
 void MasterRenderer::createDefaultFrameBuffer() {
-    default_frame_buffer_.reset(new FrameBuffer());
-    default_frame_buffer_multisample_.reset(new FrameBuffer());
-
     auto w = Configuration::instance().getFrameWidth();
     auto h = Configuration::instance().getFrameHeight();
 
-    default_frame_buffer_->addTextureBuffer(w, h, false, true);
-    default_frame_buffer_->addRenderBuffer(w, h, false);
-    default_frame_buffer_multisample_->addTextureBuffer(w, h, true, true);
-    default_frame_buffer_multisample_->addRenderBuffer(w, h, true);
+    default_frame_buffer_.reset(new FrameBuffer(w, h));
+    default_frame_buffer_multisample_.reset(new FrameBuffer(w, h));
+
+    default_frame_buffer_->addRenderBuffer(false);
+    default_frame_buffer_->addTextureBuffer(0, false, true);
+
+    default_frame_buffer_multisample_->addRenderBuffer(true);
+    default_frame_buffer_multisample_->addTextureBuffer(0, true, true);
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 
@@ -91,6 +92,8 @@ void MasterRenderer::start() {
 
         Time::instance().endDeltaMeasure();
         Time::instance().update();
+
+        checkGlErrors();
 
         camera_->updateSpeed(Time::instance().getDelta());
 
@@ -171,7 +174,7 @@ void MasterRenderer::clearDefaultFrameBuffer() {
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 
-    setClearColor(default_frame_buffer_->getBackgroundColor());
+    setClearColor(default_frame_buffer_->getClearColor());
     clearFrameBuffer(true);
 
     default_frame_buffer_->unbind();
@@ -179,4 +182,11 @@ void MasterRenderer::clearDefaultFrameBuffer() {
     default_frame_buffer_multisample_->bind(FrameBufferBindType::NORMAL);
     clearFrameBuffer(true);
     default_frame_buffer_multisample_->unbind();
+}
+
+void MasterRenderer::checkGlErrors() {
+    if (glGetError() != GL_NO_ERROR) {
+        throw Exception("MasterRenderer::checkGlErrors()",
+            "OpenGL error occured.");
+    }
 }
