@@ -79,3 +79,14 @@ void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
 
     texture_buffers_.push_back(buffer);
 }
+
+void FrameBuffer::setDrawBuffersCount(GLushort count) {
+    bind(FrameBufferBindType::NORMAL);
+
+    std::vector<GLuint> attachments;
+    for (int i = 0; i < count; i++) {
+        attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+    }
+
+    glDrawBuffers(count, attachments.data());
+}

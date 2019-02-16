@@ -118,6 +118,8 @@ namespace puffin {
             return texture_buffers_[index];
         }
 
+        void setDrawBuffersCount(GLushort count);
+
     private:
         GLuint handle_{0};
 

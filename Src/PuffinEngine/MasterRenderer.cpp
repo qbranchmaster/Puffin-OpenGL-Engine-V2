@@ -48,9 +48,13 @@ void MasterRenderer::createDefaultFrameBuffer() {
 
     default_frame_buffer_->addRenderBuffer(false);
     default_frame_buffer_->addTextureBuffer(0, false, true);
+    default_frame_buffer_->addTextureBuffer(1, false, true);
+    default_frame_buffer_->setDrawBuffersCount(2);
 
     default_frame_buffer_multisample_->addRenderBuffer(true);
     default_frame_buffer_multisample_->addTextureBuffer(0, true, true);
+    default_frame_buffer_multisample_->addTextureBuffer(1, true, true);
+    default_frame_buffer_multisample_->setDrawBuffersCount(2);
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 

@@ -1,4 +1,6 @@
 #version 330 core
+layout(location = 1) out vec4 frag_color;
+layout(location = 0) out vec4 bright_color;
 
 struct Material {
     bool has_ambient_texture;
@@ -71,8 +73,6 @@ in VS_OUT {
     vec3 directional_light_direction_VIEW;
     vec3 directional_light_direction_TANGENT;
 } fs_in;
-
-out vec4 frag_color;
 
 uniform Material material;
 uniform Lighting lighting;
@@ -248,4 +248,12 @@ void main() {
     tr_value = clamp(tr_value, 0.0f, 1.0f);
 
     frag_color = vec4(result_color, tr_value);
+
+    float brightness = dot(result_color.rgb, vec3(0.2f, 0.2f, 0.2f));
+    if (brightness < 1.0f) {
+        bright_color = vec4(brightness, brightness, brightness, 1.0f);
+    }
+    else {
+        bright_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    }
 }
