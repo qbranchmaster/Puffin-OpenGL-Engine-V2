@@ -49,20 +49,17 @@ void MasterRenderer::createDefaultFrameBuffer() {
     default_frame_buffer_->addRenderBuffer(false);
     default_frame_buffer_->addTextureBuffer(0, false, true);
     default_frame_buffer_->addTextureBuffer(1, false, true);
-    default_frame_buffer_->setDrawBuffersCount(2);
 
     default_frame_buffer_multisample_->addRenderBuffer(true);
     default_frame_buffer_multisample_->addTextureBuffer(0, true, true);
     default_frame_buffer_multisample_->addTextureBuffer(1, true, true);
-    default_frame_buffer_multisample_->setDrawBuffersCount(2);
-
-    default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
 
     if (!default_frame_buffer_->isComplete()) {
         throw Exception("MasterRenderer::createDefaultFrameBuffer()",
             "Error creating default frame buffer.");
     }
 
+    default_frame_buffer_multisample_->unbind();
     default_frame_buffer_->unbind();
 }
 
@@ -83,7 +80,9 @@ void MasterRenderer::start() {
 
         if (postprocess_renderer_) {
             default_frame_buffer_multisample_->
-                copyFrameBuffer(default_frame_buffer_);
+                copyFrameBuffer(default_frame_buffer_, 0);
+            default_frame_buffer_multisample_->
+                copyFrameBuffer(default_frame_buffer_, 1);
             postprocess_renderer_->render(default_frame_buffer_);
         }
 

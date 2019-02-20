@@ -34,6 +34,7 @@ EngineDemo::EngineDemo() : Core() {
 
     renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
+    renderSettings()->postprocess()->enableGlowBloom(true);
 
     renderSettings()->lighting()->enable(true);
     renderSettings()->lighting()->setSkyboxLightingColor(
@@ -48,7 +49,7 @@ EngineDemo::EngineDemo() : Core() {
     renderSettings()->lighting()->directionalLight()->setDiffuseColor(
         glm::vec3(0.8f, 0.8f, 0.8f));
     renderSettings()->lighting()->directionalLight()->setSpecularColor(
-        glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::vec3(5.5f, 5.5f, 5.5f));
 
     createScene();
 }

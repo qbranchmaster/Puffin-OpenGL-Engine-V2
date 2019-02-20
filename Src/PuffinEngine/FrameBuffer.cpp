@@ -25,14 +25,23 @@ void FrameBuffer::setClearColor(const glm::vec3 & color) {
         glm::clamp(color.b, 0.0f, 1.0f));
 }
 
-void FrameBuffer::copyFrameBuffer(FrameBufferPtr target) {
+void FrameBuffer::copyFrameBuffer(FrameBufferPtr target,
+    GLushort attachment_index) {
     if (!target) {
         logError("FrameBuffer::copyFrameBuffer()", "Null input.");
         return;
     }
 
+    if (attachment_index >= texture_buffers_.size()) {
+        logError("FrameBuffer::copyFrameBuffer()", "Invalid value.");
+        return;
+    }
+
     bind(FrameBufferBindType::ONLY_READ);
     target->bind(FrameBufferBindType::ONLY_WRITE);
+
+    glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
 
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_,
         GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -78,15 +87,11 @@ void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
         buffer->getHandle(), 0);
 
     texture_buffers_.push_back(buffer);
-}
-
-void FrameBuffer::setDrawBuffersCount(GLushort count) {
-    bind(FrameBufferBindType::NORMAL);
 
     std::vector<GLuint> attachments;
-    for (int i = 0; i < count; i++) {
+    for (GLushort i = 0; i < texture_buffers_.size(); i++) {
         attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
     }
 
-    glDrawBuffers(count, attachments.data());
+    glDrawBuffers(texture_buffers_.size(), attachments.data());
 }

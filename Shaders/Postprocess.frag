@@ -3,6 +3,9 @@
 struct Color {
     sampler2D screen_texture;
 
+    sampler2D glow_bloom_texture;
+    bool glow_bloom_enabled;
+
     int effect;
     vec3 tint_color;
     float kernel_size;
@@ -19,12 +22,21 @@ out vec4 frag_color;
 
 uniform Color color;
 
+vec3 sampleAccumTextures(vec2 tex_coords) {
+    vec3 result = texture(color.screen_texture, tex_coords).rgb;
+    if (color.glow_bloom_enabled) {
+        result = result + texture(color.glow_bloom_texture, tex_coords).rgb;
+    }
+
+    return result;
+}
+
 vec3 noEffect() {
-    return vec3(texture(color.screen_texture, fs_in.tex_coord));
+    return sampleAccumTextures(fs_in.tex_coord);
 }
 
 vec3 negative() {
-    return vec3(1.0f - texture(color.screen_texture, fs_in.tex_coord));
+    return vec3(1.0f - noEffect());
 }
 
 vec3 grayScale() {
@@ -41,8 +53,7 @@ vec3 tintColor() {
 vec3 calcPostprocess(vec2 offsets[9], float kernel[9]) {
     vec3 sample_tex[9];
     for (int i = 0; i < 9; i++) {
-        sample_tex[i] = vec3(texture(color.screen_texture, fs_in.tex_coord.st +
-            offsets[i]));
+        sample_tex[i] = sampleAccumTextures(fs_in.tex_coord.st + offsets[i]);
     }
 
     vec3 result = vec3(0.0f, 0.0f, 0.0f);

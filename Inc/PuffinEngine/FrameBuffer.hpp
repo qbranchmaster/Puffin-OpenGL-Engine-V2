@@ -103,7 +103,7 @@ namespace puffin {
 
         GLboolean isComplete();
 
-        void copyFrameBuffer(FrameBufferPtr target);
+        void copyFrameBuffer(FrameBufferPtr target, GLushort attachment_index);
         void addRenderBuffer(GLboolean multisample);
         void addTextureBuffer(GLushort index, GLboolean multisample,
             GLboolean float_buffer);
@@ -117,8 +117,6 @@ namespace puffin {
 
             return texture_buffers_[index];
         }
-
-        void setDrawBuffersCount(GLushort count);
 
     private:
         GLuint handle_{0};

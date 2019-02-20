@@ -36,7 +36,7 @@ namespace puffin {
             }
             else {
                 glTexImage2D(GL_TEXTURE_2D, 0, float_buffer ? GL_RGB16F :
-                    GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                    GL_RGB, width_, height_, 0, GL_RGB, GL_FLOAT,
                     nullptr);
             }
 

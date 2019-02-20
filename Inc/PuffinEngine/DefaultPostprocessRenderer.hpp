@@ -6,6 +6,7 @@
 #ifndef PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 #define PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 
+#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/Mesh.hpp"
@@ -25,11 +26,13 @@ namespace puffin {
         void setShadersUniforms();
         void createScreenMesh();
         void drawMesh(MeshPtr mesh);
+        void renderGlowBloom(FrameBufferPtr frame_buffer);
 
-        FrameBufferPtr target_frame_buffer_;
+        FrameBufferPtr bloom_frame_buffer_[2];
         MeshPtr screen_mesh_;
         RenderSettingsPtr render_settings_;
         ShaderProgramPtr default_shader_program_;
+        ShaderProgramPtr bloom_shader_program_;
     };
 
     using DefaultPostprocessRendererPtr =

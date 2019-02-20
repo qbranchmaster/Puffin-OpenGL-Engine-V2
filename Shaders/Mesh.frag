@@ -1,6 +1,6 @@
 #version 330 core
-layout(location = 1) out vec4 frag_color;
-layout(location = 0) out vec4 bright_color;
+layout(location = 0) out vec4 frag_color;
+layout(location = 1) out vec4 bright_color;
 
 struct Material {
     bool has_ambient_texture;
@@ -249,11 +249,11 @@ void main() {
 
     frag_color = vec4(result_color, tr_value);
 
-    float brightness = dot(result_color.rgb, vec3(0.2f, 0.2f, 0.2f));
-    if (brightness < 1.0f) {
-        bright_color = vec4(brightness, brightness, brightness, 1.0f);
+    float brightness = dot(frag_color.rgb, vec3(0.5f, 0.5f, 0.5f));
+    if (brightness > 1.0f) {
+        bright_color = frag_color;
     }
     else {
-        bright_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        bright_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     }
 }

@@ -62,9 +62,18 @@ namespace puffin {
             return kernel_size_;
         }
 
+        void enableGlowBloom(GLboolean state) {
+            glow_bloom_enabled_ = state;
+        }
+
+        GLboolean isGlowBloomEnabled() const {
+            return glow_bloom_enabled_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::NONE};
 
+        GLboolean glow_bloom_enabled_{false};
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
     };

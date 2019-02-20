@@ -19,12 +19,26 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
 
     loadShaders();
     createScreenMesh();
+
+    bloom_frame_buffer_[0].reset(new FrameBuffer(
+        Configuration::instance().getFrameWidth(),
+        Configuration::instance().getFrameHeight()));
+    bloom_frame_buffer_[0]->addTextureBuffer(0, false, true);
+
+    bloom_frame_buffer_[1].reset(new FrameBuffer(
+        Configuration::instance().getFrameWidth(),
+        Configuration::instance().getFrameHeight()));
+    bloom_frame_buffer_[1]->addTextureBuffer(0, false, true);
 }
 
 void DefaultPostprocessRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram());
     default_shader_program_->loadShaders("Shaders/Postprocess.vert",
         "Shaders/Postprocess.frag");
+
+    bloom_shader_program_.reset(new ShaderProgram());
+    bloom_shader_program_->loadShaders("Shaders/Postprocess.vert",
+        "Shaders/PostprocessGlowBloom.frag");
 }
 
 void DefaultPostprocessRenderer::setShadersUniforms() {
@@ -39,6 +53,12 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
         render_settings_->getGamma());
     default_shader_program_->setUniform("color.exposure",
         render_settings_->getExposure());
+    default_shader_program_->setUniform("color.glow_bloom_enabled",
+        render_settings_->postprocess()->isGlowBloomEnabled());
+
+    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+        default_shader_program_->setUniform("color.glow_bloom_texture", 1);
+    }
 }
 
 void DefaultPostprocessRenderer::createScreenMesh() {
@@ -79,10 +99,41 @@ void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
     mesh->unbind();
 }
 
+void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
+    GLboolean horizontal = true;
+    GLboolean first = true;
+    constexpr GLushort amount = 10;
+
+    bloom_shader_program_->activate();
+    Texture::setTextureSlot(0);
+
+    for (GLushort i = 0; i < amount; i++) {
+        bloom_frame_buffer_[horizontal ? 1 : 0]->bind(FrameBufferBindType::NORMAL);
+        bloom_shader_program_->setUniform("horizontal", horizontal);
+        if (first) {
+            frame_buffer->getTextureBuffer(1)->bind();
+            first = false;
+        }
+        else {
+            bloom_frame_buffer_[horizontal ? 0 : 1]->getTextureBuffer(0)->bind();
+        }
+
+        drawMesh(screen_mesh_);
+        horizontal = !horizontal;
+    }
+
+    bloom_frame_buffer_[0]->unbind();
+    bloom_frame_buffer_[1]->unbind();
+}
+
 void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     if (!frame_buffer) {
         logError("DefaultPostprocessRenderer::render()", "Null input.");
         return;
+    }
+
+    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+        renderGlowBloom(frame_buffer);
     }
 
     frame_buffer->unbind();
@@ -95,6 +146,10 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
 
     Texture::setTextureSlot(0);
     frame_buffer->getTextureBuffer(0)->bind();
+    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+        Texture::setTextureSlot(1);
+        bloom_frame_buffer_[0]->getTextureBuffer(0)->bind();
+    }
 
     DepthTest::instance().enable(false);
     DepthTest::instance().enableDepthMask(false);
