@@ -106,6 +106,8 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
 
     default_shader_program_->setUniform("other.gamma",
         render_settings_->getGamma());
+    default_shader_program_->setUniform("other.bloom_threshold_color",
+        render_settings_->postprocess()->getGlowBloomThresholdColor());
 }
 
 void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {

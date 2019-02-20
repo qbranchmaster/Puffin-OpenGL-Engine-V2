@@ -57,6 +57,7 @@ struct Matrices {
 
 struct Other {
     float gamma;
+    vec3 bloom_threshold_color;
 };
 
 in VS_OUT {
@@ -249,7 +250,7 @@ void main() {
 
     frag_color = vec4(result_color, tr_value);
 
-    float brightness = dot(frag_color.rgb, vec3(0.5f, 0.5f, 0.5f));
+    float brightness = dot(frag_color.rgb, other.bloom_threshold_color);
     if (brightness > 1.0f) {
         bright_color = frag_color;
     }

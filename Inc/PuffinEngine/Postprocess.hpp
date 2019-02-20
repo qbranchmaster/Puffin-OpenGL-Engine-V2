@@ -70,10 +70,23 @@ namespace puffin {
             return glow_bloom_enabled_;
         }
 
+        void setGlowBloomThresholdColor(const glm::vec3 &threshold) {
+            glow_bloom_thresh_ = glm::vec3(
+                glm::clamp(threshold.r, 0.0f, 1.0f),
+                glm::clamp(threshold.g, 0.0f, 1.0f),
+                glm::clamp(threshold.b, 0.0f, 1.0f)
+            );
+        }
+
+        glm::vec3 getGlowBloomThresholdColor() const {
+            return glow_bloom_thresh_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::NONE};
 
         GLboolean glow_bloom_enabled_{false};
+        glm::vec3 glow_bloom_thresh_{0.5f, 0.5f, 0.5f};
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
     };

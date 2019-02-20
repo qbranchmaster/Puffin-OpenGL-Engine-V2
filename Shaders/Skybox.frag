@@ -6,6 +6,7 @@ struct Color {
     samplerCube cube_texture;
     vec3 light_color;
     float gamma;
+    vec3 bloom_threshold_color;
 };
 
 in VS_OUT {
@@ -26,7 +27,7 @@ void main() {
     vec3 texel_color = cube_texel.rgb * color.light_color;
     frag_color = vec4(texel_color, 1.0f);
 
-    float brightness = dot(frag_color.rgb, vec3(0.5f, 0.5f, 0.5f));
+    float brightness = dot(frag_color.rgb, color.bloom_threshold_color);
     if (brightness > 1.0f) {
         bright_color = frag_color;
     }

@@ -94,6 +94,18 @@ void ConfigGuiRenderer::lightingDialog() {
     ImGui::SliderFloat("Exposure", &exposure, 0.1f, 10.0f);
     render_settings_->setExposure(exposure);
 
+    bool enable_bloom = render_settings_->postprocess()->isGlowBloomEnabled();
+    ImGui::Checkbox("Glow bloom", &enable_bloom);
+    render_settings_->postprocess()->enableGlowBloom(enable_bloom);
+
+    auto bloom_thresh = render_settings_->postprocess()->
+        getGlowBloomThresholdColor();
+    ImVec4 thresh_color = ImVec4(bloom_thresh.r, bloom_thresh.g,
+        bloom_thresh.b, 1.0f);
+    ImGui::ColorEdit3("Glow bloom threshold color", (float*)&thresh_color);
+    render_settings_->postprocess()->setGlowBloomThresholdColor(glm::vec3(
+        thresh_color.x, thresh_color.y, thresh_color.z));
+
     ImGui::End();
 }
 

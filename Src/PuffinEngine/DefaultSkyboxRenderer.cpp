@@ -71,6 +71,8 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
         render_settings_->lighting()->getSkyboxLightColor());
     default_shader_program_->setUniform("color.gamma",
         render_settings_->getGamma());
+    default_shader_program_->setUniform("color.bloom_threshold_color",
+        render_settings_->postprocess()->getGlowBloomThresholdColor());
 }
 
 void DefaultSkyboxRenderer::drawSkybox(SkyboxPtr skybox) {
