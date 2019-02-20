@@ -7,6 +7,10 @@
 
 using namespace puffin;
 
+GLuint FrameBuffer::bound_frame_buffer_ = 0;
+GLuint FrameBuffer::bound_frame_buffer_write_ = 0;
+GLuint FrameBuffer::bound_frame_buffer_read_ = 0;
+
 FrameBuffer::FrameBuffer(GLuint width, GLuint height) {
     glGenFramebuffers(1, &handle_);
 

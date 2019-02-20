@@ -30,9 +30,6 @@ namespace puffin {
 
         GLuint bound_mesh_{0};
         GLuint bound_shader_program_{0};
-        GLuint bound_frame_buffer_{0};
-        GLuint bound_frame_buffer_write_{0};
-        GLuint bound_frame_buffer_read_{0};
 
         std::unordered_map<GLushort, GLuint> bound_texture_;
     };

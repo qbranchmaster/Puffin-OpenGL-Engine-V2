@@ -121,9 +121,6 @@ void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
         drawMesh(screen_mesh_);
         horizontal = !horizontal;
     }
-
-    bloom_frame_buffer_[0]->unbind();
-    bloom_frame_buffer_[1]->unbind();
 }
 
 void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
@@ -136,7 +133,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
         renderGlowBloom(frame_buffer);
     }
 
-    frame_buffer->unbind();
+    FrameBuffer::unbindAll();
 
     setClearColor(glm::vec3(0.0f, 0.0f, 0.0f));
     clearFrameBuffer(true);

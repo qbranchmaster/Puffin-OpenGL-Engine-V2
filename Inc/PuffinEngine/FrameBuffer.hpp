@@ -19,7 +19,6 @@
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/RenderBuffer.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 #include "PuffinEngine/TextureBuffer.hpp"
 
 namespace puffin {
@@ -50,15 +49,15 @@ namespace puffin {
             GLuint *handle_ptr = nullptr;
             switch (bind_type) {
             case FrameBufferBindType::NORMAL:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_;
+                handle_ptr = &bound_frame_buffer_;
                 target = GL_FRAMEBUFFER;
                 break;
             case FrameBufferBindType::ONLY_READ:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_read_;
+                handle_ptr = &bound_frame_buffer_read_;
                 target = GL_READ_FRAMEBUFFER;
                 break;
             case FrameBufferBindType::ONLY_WRITE:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_write_;
+                handle_ptr = &bound_frame_buffer_write_;
                 target = GL_DRAW_FRAMEBUFFER;
                 break;
             }
@@ -71,28 +70,33 @@ namespace puffin {
             *handle_ptr = handle_;
 
             if (bind_type == FrameBufferBindType::NORMAL) {
-                StateMachine::instance().bound_frame_buffer_read_ = handle_;
-                StateMachine::instance().bound_frame_buffer_write_ = handle_;
+                bound_frame_buffer_read_ = handle_;
+                bound_frame_buffer_write_ = handle_;
             }
         }
 
         void unbind() {
-            if (StateMachine::instance().bound_frame_buffer_ == handle_) {
+            if (bound_frame_buffer_ == handle_) {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_ = 0;
-                StateMachine::instance().bound_frame_buffer_read_ = 0;
-                StateMachine::instance().bound_frame_buffer_write_ = 0;
+                bound_frame_buffer_ = 0;
+                bound_frame_buffer_read_ = 0;
+                bound_frame_buffer_write_ = 0;
             }
-            else if (StateMachine::instance().bound_frame_buffer_read_ ==
-                handle_) {
+            else if (bound_frame_buffer_read_ == handle_) {
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_read_ = 0;
+                bound_frame_buffer_read_ = 0;
             }
-            else if (StateMachine::instance().bound_frame_buffer_write_ ==
-                handle_) {
+            else if (bound_frame_buffer_write_ == handle_) {
                 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_write_ = 0;
+                bound_frame_buffer_write_ = 0;
             }
+        }
+
+        static void unbindAll() {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            bound_frame_buffer_ = 0;
+            bound_frame_buffer_read_ = 0;
+            bound_frame_buffer_write_ = 0;
         }
 
         void setClearColor(const glm::vec3 &color);
@@ -128,6 +132,10 @@ namespace puffin {
 
         RenderBufferPtr render_buffer_;
         std::vector<TextureBufferPtr> texture_buffers_;
+
+        static GLuint bound_frame_buffer_;
+        static GLuint bound_frame_buffer_write_;
+        static GLuint bound_frame_buffer_read_;
     };
 } // namespace puffin
 
