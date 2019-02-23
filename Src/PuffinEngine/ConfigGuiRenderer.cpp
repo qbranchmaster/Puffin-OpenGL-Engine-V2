@@ -34,7 +34,6 @@ void ConfigGuiRenderer::render() {
 
     lightingDialog();
     postprocessDialog();
-    gammaDialog();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -84,11 +83,9 @@ void ConfigGuiRenderer::postprocessDialog() {
     ImGui::InputFloat("Kernel size", &k_size, 1.0f, 5.0f, "%.2f");
     render_settings_->postprocess()->setKernelSize(k_size);
 
-    ImGui::End();
-}
-
-void ConfigGuiRenderer::lightingDialog() {
-    ImGui::Begin("Lighting");
+    float gamma = render_settings_->getGamma();
+    ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
+    render_settings_->setGamma(gamma);
 
     float exposure = render_settings_->getExposure();
     ImGui::SliderFloat("Exposure", &exposure, 0.1f, 10.0f);
@@ -109,12 +106,45 @@ void ConfigGuiRenderer::lightingDialog() {
     ImGui::End();
 }
 
-void ConfigGuiRenderer::gammaDialog() {
-    ImGui::Begin("Gamma");
+void ConfigGuiRenderer::lightingDialog() {
+    ImGui::Begin("Lighting");
 
-    float gamma = render_settings_->getGamma();
-    ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
-    render_settings_->setGamma(gamma);
+    bool enabled = render_settings_->lighting()->isEnabled();
+    ImGui::Checkbox("Enabled", &enabled);
+    render_settings_->lighting()->enable(enabled);
+
+    ImGui::Text("Directional light");
+    auto dir_light_direction = render_settings_->lighting()->
+        directionalLight()->getDirection();
+    float direction[3] = {dir_light_direction.x, dir_light_direction.y,
+        dir_light_direction.z};
+    ImGui::InputFloat3("Direction", direction, 2);
+    render_settings_->lighting()->directionalLight()->setDirection(
+        glm::vec3(direction[0], direction[1], direction[2]));
+
+    auto ambient_dir_color = render_settings_->lighting()->
+        directionalLight()->getAmbientColor();
+    ImVec4 amb_dir_color(ambient_dir_color.r, ambient_dir_color.g,
+        ambient_dir_color.b, 1.0f);
+    ImGui::ColorEdit3("Ambient color", (float*)&amb_dir_color);
+    render_settings_->lighting()->directionalLight()->setAmbientColor(
+        glm::vec3(amb_dir_color.x, amb_dir_color.y, amb_dir_color.z));
+
+    auto diffuse_dir_color = render_settings_->lighting()->
+        directionalLight()->getDiffuseColor();
+    ImVec4 diff_dir_color(diffuse_dir_color.r, diffuse_dir_color.g,
+        diffuse_dir_color.b, 1.0f);
+    ImGui::ColorEdit3("Diffuse color", (float*)&diff_dir_color);
+    render_settings_->lighting()->directionalLight()->setDiffuseColor(
+        glm::vec3(diff_dir_color.x, diff_dir_color.y, diff_dir_color.z));
+
+    auto specular_dir_color = render_settings_->lighting()->
+        directionalLight()->getSpecularColor();
+    ImVec4 spec_dir_color(specular_dir_color.r, specular_dir_color.g,
+        specular_dir_color.b, 1.0f);
+    ImGui::ColorEdit3("Specular color", (float*)&spec_dir_color);
+    render_settings_->lighting()->directionalLight()->setSpecularColor(
+        glm::vec3(spec_dir_color.x, spec_dir_color.y, spec_dir_color.z));
 
     ImGui::End();
 }
