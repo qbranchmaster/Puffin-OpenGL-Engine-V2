@@ -34,11 +34,15 @@ EngineDemo::EngineDemo() : Core() {
 
     renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
-    renderSettings()->postprocess()->enableGlowBloom(true);
+    renderSettings()->postprocess()->enableGlowBloom(false);
 
     renderSettings()->lighting()->enable(true);
     renderSettings()->lighting()->setSkyboxLightingColor(
         glm::vec3(0.9f, 0.9f, 0.9f));
+
+    renderSettings()->lighting()->enableShadowMapping(true);
+    renderSettings()->lighting()->setDirectionalLightShadowMapSize(1024);
+    renderSettings()->lighting()->setShadowDistance(20.0f);
 
     renderSettings()->lighting()->directionalLight()->enable(true);
     renderSettings()->lighting()->enableBlinnPhong(true);
@@ -52,6 +56,7 @@ EngineDemo::EngineDemo() : Core() {
         glm::vec3(5.5f, 5.5f, 5.5f));
 
     createScene();
+    createDefaultRenderers();
 }
 
 EngineDemo::~EngineDemo() {

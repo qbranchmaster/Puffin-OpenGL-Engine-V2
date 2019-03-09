@@ -9,6 +9,7 @@
 #include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
+#include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
@@ -43,6 +44,7 @@ namespace puffin {
         }
 
         void initialize();
+        void createDefaultRenderers();
         void start();
         void stop();
 
@@ -50,6 +52,7 @@ namespace puffin {
         CameraPtr camera_;
         DefaultMeshRendererPtr default_mesh_renderer_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
+        DefaultShadowMapRendererPtr default_shadow_map_renderer_;
         DefaultSkyboxRendererPtr default_skybox_renderer_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;

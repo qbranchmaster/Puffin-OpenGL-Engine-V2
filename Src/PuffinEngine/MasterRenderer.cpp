@@ -143,6 +143,15 @@ void MasterRenderer::assignMeshRenderer(MeshRendererPtr renderer) {
     mesh_renderer_ = renderer;
 }
 
+void MasterRenderer::assignShadowMapRenderer(ShadowMapRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignShadowMapRenderer()", "Null input.");
+        return;
+    }
+
+    shadow_map_renderer_ = renderer;
+}
+
 void MasterRenderer::drawScene(ScenePtr scene) {
     if (!scene) {
         logError("MasterRenderer::drawScene()", "Null input.");
@@ -153,6 +162,16 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         if (skybox) {
             skybox_renderer_->render(default_frame_buffer_multisample_,
                 skybox);
+        }
+    }
+
+    if (shadow_map_renderer_ && render_settings_->lighting()->
+        isShadowMappingEnabled()) {
+        for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
+            auto mesh = scene->getMesh(i);
+            if (mesh) {
+                shadow_map_renderer_->render(mesh);
+            }
         }
     }
 
@@ -176,14 +195,12 @@ void MasterRenderer::clearDefaultFrameBuffer() {
     DepthTest::instance().enableDepthMask(true);
 
     default_frame_buffer_->bind(FrameBufferBindType::NORMAL);
-
-    setClearColor(default_frame_buffer_->getClearColor());
-    clearFrameBuffer(true);
-
+    FrameBuffer::clear(FrameBufferClearType::DEPTH_AND_COLOR,
+        default_frame_buffer_->getClearColor());
     default_frame_buffer_->unbind();
 
     default_frame_buffer_multisample_->bind(FrameBufferBindType::NORMAL);
-    clearFrameBuffer(true);
+    FrameBuffer::clear(FrameBufferClearType::DEPTH_AND_COLOR);
     default_frame_buffer_multisample_->unbind();
 }
 

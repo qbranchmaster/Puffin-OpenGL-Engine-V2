@@ -118,7 +118,7 @@ void Camera::calculateViewMatrix() {
         -position_);*/
 
     view_matrix_static_ = glm::mat4(glm::mat3(view_matrix_));
-    //view_matrix_inverted_ = glm::inverse(view_matrix_);
+    view_matrix_inverted_ = glm::inverse(view_matrix_);
 }
 
 void Camera::calculateViewVectors() {

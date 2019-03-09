@@ -8,7 +8,6 @@
 
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
-#include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"

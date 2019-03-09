@@ -56,9 +56,48 @@ namespace puffin {
             return directional_light_;
         }
 
+        void enableShadowMapping(GLboolean state) {
+            shadow_mapping_enabled_ = state;
+        }
+
+        GLboolean isShadowMappingEnabled() const {
+            return shadow_mapping_enabled_;
+        }
+
+        void setDirectionalLightShadowMapSize(GLuint size) {
+            if (size == 0) {
+                logError("Lighting::setDirectionalLightShadowMapSize()",
+                    "Invalid value.");
+                return;
+            }
+
+            directional_light_shadow_map_size_ = size;
+        }
+
+        GLuint getDirectionalLightShadowMapSize() const {
+            return directional_light_shadow_map_size_;
+        }
+
+        void setShadowDistance(GLfloat distance) {
+            if (distance <= 0.0f) {
+                logError("Lighting::setShadowDistance()", "Invalid value.");
+                return;
+            }
+
+            shadow_distance_ = distance;
+        }
+
+        GLfloat getShadowDistance() const {
+            return shadow_distance_;
+        }
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};
+
+        GLboolean shadow_mapping_enabled_{true};
+        GLuint directional_light_shadow_map_size_{1024};
+        GLfloat shadow_distance_{10.0f};
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 

@@ -17,6 +17,6 @@ uniform Matrices matrices;
 void main() {
     vs_out.texture_coordinates = position;
 
-    gl_Position = matrices.projection_matrix * matrices.view_matrix * 
+    gl_Position = matrices.projection_matrix * matrices.view_matrix *
         matrices.model_matrix * vec4(position, 1.0f);
 }

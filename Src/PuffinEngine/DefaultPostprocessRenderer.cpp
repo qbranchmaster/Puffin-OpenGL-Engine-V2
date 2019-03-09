@@ -134,9 +134,10 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     }
 
     FrameBuffer::unbindAll();
-
-    setClearColor(glm::vec3(0.0f, 0.0f, 0.0f));
-    clearFrameBuffer(true);
+    FrameBuffer::setViewportSize(Configuration::instance().getFrameWidth(),
+        Configuration::instance().getFrameHeight());
+    FrameBuffer::clear(FrameBufferClearType::DEPTH_AND_COLOR,
+        glm::vec3(0.0f, 0.0f, 0.0f));
 
     default_shader_program_->activate();
     setShadersUniforms();

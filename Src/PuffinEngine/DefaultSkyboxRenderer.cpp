@@ -33,6 +33,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer,
         return;
     }
 
+    FrameBuffer::setViewportSize(frame_buffer);
     frame_buffer->bind(FrameBufferBindType::NORMAL);
 
     default_shader_program_->activate();

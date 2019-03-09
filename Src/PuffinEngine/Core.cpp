@@ -31,13 +31,17 @@ void Core::initialize() {
     render_settings_.reset(new RenderSettings());
     master_renderer_.reset(new MasterRenderer(window_, camera_,
         render_settings_));
+}
 
+void Core::createDefaultRenderers() {
     default_postprocess_renderer_.reset(new DefaultPostprocessRenderer(
         render_settings_));
     default_skybox_renderer_.reset(new DefaultSkyboxRenderer(render_settings_,
         camera_));
     default_mesh_renderer_.reset(new DefaultMeshRenderer(render_settings_,
         camera_));
+    default_shadow_map_renderer_.reset(new DefaultShadowMapRenderer(
+        render_settings_, camera_));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));
@@ -45,6 +49,8 @@ void Core::initialize() {
         <SkyboxRenderer>(default_skybox_renderer_));
     master_renderer_->assignMeshRenderer(std::static_pointer_cast
         <MeshRenderer>(default_mesh_renderer_));
+    master_renderer_->assignShadowMapRenderer(std::static_pointer_cast
+        <ShadowMapRenderer>(default_shadow_map_renderer_));
 }
 
 void Core::start() {

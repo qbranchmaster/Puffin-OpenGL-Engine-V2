@@ -26,6 +26,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
         return;
     }
 
+    FrameBuffer::setViewportSize(frame_buffer);
     frame_buffer->bind(FrameBufferBindType::NORMAL);
 
     default_shader_program_->activate();

@@ -99,3 +99,61 @@ void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
 
     glDrawBuffers(texture_buffers_.size(), attachments.data());
 }
+
+void FrameBuffer::addDepthTextureBuffer() {
+    if (depth_texture_buffer_) {
+        return;
+    }
+
+    depth_texture_buffer_.reset(new DepthTextureBuffer(width_, height_));
+
+    bind(FrameBufferBindType::NORMAL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+        depth_texture_buffer_->getHandle(), 0);
+}
+
+void FrameBuffer::disableDrawBuffer() {
+    bind(FrameBufferBindType::NORMAL);
+    glDrawBuffer(GL_NONE);
+}
+
+void FrameBuffer::disableReadBuffer() {
+    bind(FrameBufferBindType::NORMAL);
+    glReadBuffer(GL_NONE);
+}
+
+void FrameBuffer::clear(FrameBufferClearType clear_type,
+    const glm::vec3 &color) {
+    glClearColor(color.r, color.g, color.b, 1.0f);
+
+    switch (clear_type) {
+    case FrameBufferClearType::ONLY_COLOR:
+        glClear(GL_COLOR_BUFFER_BIT);
+        break;
+    case FrameBufferClearType::ONLY_DEPTH:
+        glClear(GL_DEPTH_BUFFER_BIT);
+        break;
+    case FrameBufferClearType::DEPTH_AND_COLOR:
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        break;
+    }
+}
+
+void FrameBuffer::setViewportSize(GLuint width, GLuint height) {
+    if (width == 0 || height == 0) {
+        logError("FrameBuffer::setViewportSize()", "Invalid value.");
+        return;
+    }
+
+    glViewport(0, 0, width, height);
+}
+
+void FrameBuffer::setViewportSize(FrameBufferPtr frame_buffer) {
+    if (!frame_buffer) {
+        logError("FrameBuffer::setViewportSize()", "Null input.");
+        return;
+    }
+
+    FrameBuffer::setViewportSize(frame_buffer->getWidth(),
+        frame_buffer->getHeight());
+}

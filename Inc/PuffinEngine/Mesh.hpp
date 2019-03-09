@@ -121,6 +121,14 @@ namespace puffin {
             return has_indices_;
         }
 
+        void enableShadowCasting(GLboolean enabled) {
+            shadow_cast_enabled_ = enabled;
+        }
+
+        GLboolean isShadowCastingEnabled() const {
+            return shadow_cast_enabled_;
+        }
+
     protected:
         GLboolean isBound() const;
         std::string processTexturePath(std::string model_file_path,
@@ -141,6 +149,8 @@ namespace puffin {
         glm::vec3 scale_{1.0f, 1.0f, 1.0f};
 
         GLboolean has_indices_{false};
+
+        GLboolean shadow_cast_enabled_{true};
     };
 
     using MeshPtr = std::shared_ptr<Mesh>;

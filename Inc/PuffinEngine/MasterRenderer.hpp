@@ -18,7 +18,6 @@
 #include "PuffinEngine/ConfigGuiRenderer.hpp"
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
-#include "PuffinEngine/GlUtils.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
@@ -26,6 +25,7 @@
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/ShadowMapRenderer.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Time.hpp"
@@ -44,6 +44,7 @@ namespace puffin {
         void assignPostprocessRenderer(PostprocessRendererPtr renderer);
         void assignSkyboxRenderer(SkyboxRendererPtr renderer);
         void assignMeshRenderer(MeshRendererPtr renderer);
+        void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
 
@@ -68,6 +69,7 @@ namespace puffin {
         MeshRendererPtr mesh_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
         SkyboxRendererPtr skybox_renderer_;
+        ShadowMapRendererPtr shadow_map_renderer_;
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;
