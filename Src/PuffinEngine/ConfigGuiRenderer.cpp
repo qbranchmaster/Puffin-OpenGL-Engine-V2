@@ -153,6 +153,10 @@ void ConfigGuiRenderer::lightingDialog() {
     render_settings_->lighting()->directionalLight()->setSpecularColor(
         glm::vec3(spec_dir_color.x, spec_dir_color.y, spec_dir_color.z));
 
+    auto emission_factor = render_settings_->lighting()->getEmissionFactor();
+    ImGui::SliderFloat("Emission factor", &emission_factor, 0.0f, 30.0f);
+    render_settings_->lighting()->setEmissionFactor(emission_factor);
+
     ImGui::End();
 }
 

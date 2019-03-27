@@ -45,6 +45,7 @@ struct Lighting {
     bool enabled;
     bool blinn_phong;
     DirectionalLight directional_light;
+    float emission_factor;
 };
 
 struct Matrices {
@@ -267,8 +268,7 @@ vec3 calculateLighting() {
         (diffuse + specular);
 
     // Add emissive factor
-    // TODO: emissive factor uniform
-    final_color = final_color + emissive_color * 10.0f;
+    final_color = final_color + emissive_color * lighting.emission_factor;
 
     return final_color;
 }

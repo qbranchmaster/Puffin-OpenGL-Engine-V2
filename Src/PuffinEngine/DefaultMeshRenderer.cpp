@@ -109,6 +109,8 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         lighting->directionalLight()->getSpecularColor());
     default_shader_program_->setUniform("lighting.blinn_phong",
         lighting->isBlinnPhongEnabled());
+    default_shader_program_->setUniform("lighting.emission_factor",
+        lighting->getEmissionFactor());
 
     default_shader_program_->setUniform("other.gamma",
         render_settings_->getGamma());

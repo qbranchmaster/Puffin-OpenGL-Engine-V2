@@ -26,6 +26,7 @@ struct Lighting {
     bool enabled;
     bool blinn_phong;
     DirectionalLight directional_light;
+    float emission_factor;
 };
 
 out VS_OUT {

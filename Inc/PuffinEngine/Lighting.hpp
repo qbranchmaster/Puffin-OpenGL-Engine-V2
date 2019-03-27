@@ -91,6 +91,19 @@ namespace puffin {
             return shadow_distance_;
         }
 
+        void setEmissionFactor(GLfloat factor) {
+            if (factor < 0.0f) {
+                logError("Lighting::setEmissionFactor()", "Invalid value.");
+                return;
+            }
+
+            emission_factor_ = factor;
+        }
+
+        GLfloat getEmissionFactor() const {
+            return emission_factor_;
+        }
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};
@@ -98,6 +111,7 @@ namespace puffin {
         GLboolean shadow_mapping_enabled_{true};
         GLuint directional_light_shadow_map_size_{1024};
         GLfloat shadow_distance_{10.0f};
+        GLfloat emission_factor_{10.0f};
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 
