@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class ShaderProgram {
@@ -37,13 +36,7 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_shader_program_ ==
-                handle_) {
-                return;
-            }
-
             glUseProgram(handle_);
-            StateMachine::instance().bound_shader_program_ = handle_;
         }
 
         void loadShaders(std::string vs_path, std::string fs_path);

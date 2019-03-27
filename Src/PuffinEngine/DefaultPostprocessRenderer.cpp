@@ -85,7 +85,6 @@ void DefaultPostprocessRenderer::createScreenMesh() {
     screen_mesh_->setMeshData(positions, 0, 3);
     screen_mesh_->setMeshData(texture_coords, 1, 2);
     screen_mesh_->setMeshIndices(indices);
-    screen_mesh_->unbind();
 }
 
 void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
@@ -96,7 +95,6 @@ void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
 
     mesh->bind();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-    mesh->unbind();
 }
 
 void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {

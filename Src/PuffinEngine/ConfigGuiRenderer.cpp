@@ -8,14 +8,16 @@
 using namespace puffin;
 
 ConfigGuiRenderer::ConfigGuiRenderer(WindowPtr window,
-    RenderSettingsPtr render_settings) {
-    if (!window || !render_settings) {
+    RenderSettingsPtr render_settings,
+    RenderersSharedDataPtr renderers_shared_data) {
+    if (!window || !render_settings || !renderers_shared_data) {
         throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
             "Not initialized object.");
     }
 
     render_settings_ = render_settings;
     target_window_ = window;
+    renderers_shared_data_ = renderers_shared_data;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -34,6 +36,11 @@ void ConfigGuiRenderer::render() {
 
     lightingDialog();
     postprocessDialog();
+    shadowMappingDialog();
+
+    if (debug_enabled_) {
+        debugDialog();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -145,6 +152,35 @@ void ConfigGuiRenderer::lightingDialog() {
     ImGui::ColorEdit3("Specular color", (float*)&spec_dir_color);
     render_settings_->lighting()->directionalLight()->setSpecularColor(
         glm::vec3(spec_dir_color.x, spec_dir_color.y, spec_dir_color.z));
+
+    ImGui::End();
+}
+
+void ConfigGuiRenderer::shadowMappingDialog() {
+    ImGui::Begin("Shadow mapping");
+
+    bool shadow_mapping_enabled = render_settings_->lighting()->
+        isShadowMappingEnabled();
+    ImGui::Checkbox("Enabled", &shadow_mapping_enabled);
+    render_settings_->lighting()->enableShadowMapping(shadow_mapping_enabled);
+
+    auto shadow_distance = render_settings_->lighting()->getShadowDistance();
+    ImGui::SliderFloat("Shadow distance", &shadow_distance, 5.0f, 100.0f);
+    render_settings_->lighting()->setShadowDistance(shadow_distance);
+
+    ImGui::End();
+}
+
+void ConfigGuiRenderer::debugDialog() {
+    ImGui::Begin("Debug");
+
+    ImGui::ShowMetricsWindow();
+
+    ImGui::Text("Directional light depth map:");
+    auto shadow_map_texture = renderers_shared_data_->shadow_map_texture;
+    ImTextureID texture_handle = (void*)(shadow_map_texture->getHandle());
+    ImGui::Image(texture_handle, ImVec2(shadow_map_texture->getWidth() / 4.0f,
+        shadow_map_texture->getHeight() / 4.0f));
 
     ImGui::End();
 }

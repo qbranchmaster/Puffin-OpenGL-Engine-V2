@@ -24,7 +24,8 @@ namespace puffin {
     class CameraFrustum {
     public:
         void setCameraVectors(const glm::vec3 &direction,
-            const glm::vec3 &right, const glm::vec3 &up);
+            const glm::vec3 &right, const glm::vec3 &up,
+            const glm::vec3 &position);
         void setCameraParameters(GLfloat near_distance, GLfloat far_distance,
             GLfloat aspect, GLfloat fov);
 
@@ -58,6 +59,7 @@ namespace puffin {
         glm::vec3 direction_vector_{0.0f, 0.0f, -1.0f};
         glm::vec3 right_vector_{1.0f, 0.0f, 0.0f};
         glm::vec3 up_vector_{0.0f, 1.0f, 0.0f};
+        glm::vec3 camera_position_{0.0f, 0.0f, 0.0f};
 
         glm::vec3 min_box_{0.0f, 0.0f, 0.0f};
         glm::vec3 max_box_{0.0f, 0.0f, 0.0f};

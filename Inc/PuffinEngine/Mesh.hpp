@@ -25,7 +25,6 @@
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MeshEntity.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class Mesh {
@@ -39,19 +38,7 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_mesh_ == handle_) {
-                return;
-            }
-
             glBindVertexArray(handle_);
-            StateMachine::instance().bound_mesh_ = handle_;
-        }
-
-        void unbind() const {
-            if (StateMachine::instance().bound_mesh_ == handle_) {
-                glBindVertexArray(0);
-                StateMachine::instance().bound_mesh_ = 0;
-            }
         }
 
         void setScale(const glm::vec3 &scale);
@@ -130,7 +117,6 @@ namespace puffin {
         }
 
     protected:
-        GLboolean isBound() const;
         std::string processTexturePath(std::string model_file_path,
             const aiString &texture_path);
 

@@ -54,7 +54,6 @@ Skybox::Skybox() : Mesh() {
 
     bind();
     setMeshData(data, 0, 3);
-    unbind();
 }
 
 void Skybox::setTexture(TexturePtr texture) {

@@ -36,6 +36,11 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
     DepthTest::instance().enableDepthMask(true);
     FaceCull::instance().enable(true);
 
+    if (render_settings_->lighting()->isShadowMappingEnabled()) {
+        Texture::setTextureSlot(6);
+        renderers_shared_data_->shadow_map_texture->bind();
+    }
+
     // First pass - skip transparent entities
     std::vector<GLuint> skipped_en;
 
@@ -109,6 +114,16 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         render_settings_->getGamma());
     default_shader_program_->setUniform("other.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());
+
+    // Shadow mapping
+    default_shader_program_->setUniform("shadow_mapping.enabled",
+        render_settings_->lighting()->isShadowMappingEnabled());
+    if (render_settings_->lighting()->isShadowMappingEnabled()) {
+        default_shader_program_->setUniform("shadow_mapping.shadow_map_texture",
+            6);
+        default_shader_program_->setUniform("matrices.dir_light_matrix",
+            renderers_shared_data_->dir_light_space_matrix);
+    }
 }
 
 void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
@@ -230,6 +245,4 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
             GL_UNSIGNED_INT, reinterpret_cast<void*>((
                 entity->getStartingIndex() * sizeof(GLuint))));
     }
-
-    mesh->unbind();
 }

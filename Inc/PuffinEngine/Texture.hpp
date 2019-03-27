@@ -24,7 +24,6 @@
 
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     enum class TextureType {
@@ -73,11 +72,6 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_texture_[
-                static_cast<GLushort>(type_)] == handle_) {
-                return;
-            }
-
             switch (type_) {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);
@@ -88,29 +82,6 @@ namespace puffin {
             case TextureType::TextureCube:
                 glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
                 break;
-            }
-
-            StateMachine::instance().bound_texture_[
-                static_cast<GLushort>(type_)] = handle_;
-        }
-
-        void unbind() const {
-            if (StateMachine::instance().bound_texture_[
-                static_cast<GLushort>(type_)] == handle_) {
-                switch (type_) {
-                case TextureType::Texture2D:
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    break;
-                case TextureType::Texture2DMultisample:
-                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-                    break;
-                case TextureType::TextureCube:
-                    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-                    break;
-                }
-
-                StateMachine::instance().bound_texture_[
-                    static_cast<GLushort>(type_)] = 0;
             }
         }
 

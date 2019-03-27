@@ -22,6 +22,7 @@
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
+#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
@@ -48,7 +49,8 @@ namespace puffin {
 
         void drawScene(ScenePtr scene);
 
-        void configGuiEnabled(GLboolean state);
+        void configGuiEnable(GLboolean state);
+        void configGuiEnableDebug(GLboolean state);
 
     private:
         void createDefaultFrameBuffer();
@@ -68,6 +70,7 @@ namespace puffin {
         ConfigGuiRendererPtr config_gui_renderer_;
         MeshRendererPtr mesh_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
+        RenderersSharedDataPtr renderers_shared_data_;
         SkyboxRendererPtr skybox_renderer_;
         ShadowMapRendererPtr shadow_map_renderer_;
     };

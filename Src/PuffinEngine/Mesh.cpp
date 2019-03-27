@@ -276,7 +276,6 @@ void Mesh::loadFromFile(std::string path) {
     setMeshData(v_tangents, 3, 3);
     setMeshData(v_bitangents, 4, 3);
     setMeshIndices(v_indices);
-    unbind();
 
     has_indices_ = true;
 }
@@ -294,20 +293,9 @@ std::string Mesh::processTexturePath(std::string model_file_path,
     return file_path;
 }
 
-GLboolean Mesh::isBound() const {
-    if (StateMachine::instance().bound_mesh_ == handle_) {
-        return true;
-    }
-
-    return false;
-}
-
 void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
     GLuint vertex_size, GLboolean dynamic_draw) {
-    if (!isBound()) {
-        logError("Mesh::setMeshData()", "Mesh is not bound.");
-        return;
-    }
+    bind();
 
     if (data_buffers_[index] == 0) {
         glGenBuffers(1, &data_buffers_[index]);
@@ -322,10 +310,7 @@ void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
 }
 
 void Mesh::setMeshIndices(std::vector<GLuint> data) {
-    if (!isBound()) {
-        logError("Mesh::setMeshIndices()", "Mesh is not bound.");
-        return;
-    }
+    bind();
 
     if (indices_buffer_ == 0) {
         glGenBuffers(1, &indices_buffer_);

@@ -11,6 +11,7 @@ struct Matrices {
     mat4 projection_matrix;
     mat4 model_matrix;
     mat3 normal_matrix;
+    mat4 dir_light_matrix;
 };
 
 struct DirectionalLight {
@@ -40,6 +41,8 @@ out VS_OUT {
 
     vec3 directional_light_direction_VIEW;
     vec3 directional_light_direction_TANGENT;
+
+    vec4 frag_pos_DIR_LIGHT;
 } vs_out;
 
 uniform Matrices matrices;
@@ -57,6 +60,9 @@ void main() {
     vs_out.directional_light_direction_VIEW =
         normalize(vec3(matrices.view_matrix *
         vec4(lighting.directional_light.direction, 0.0f)));
+
+    vs_out.frag_pos_DIR_LIGHT = matrices.dir_light_matrix *
+        vec4(vs_out.position_WORLD, 1.0f);
 
     // Calculation for tangent space
     vec3 camera_pos_WORLD = (inverse(matrices.view_matrix) *

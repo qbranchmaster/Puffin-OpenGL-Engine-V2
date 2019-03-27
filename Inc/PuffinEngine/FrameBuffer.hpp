@@ -135,6 +135,10 @@ namespace puffin {
             return texture_buffers_[index];
         }
 
+        DepthTextureBufferPtr getDepthTextureBuffer() const {
+            return depth_texture_buffer_;
+        }
+
         void disableDrawBuffer();
         void disableReadBuffer();
 

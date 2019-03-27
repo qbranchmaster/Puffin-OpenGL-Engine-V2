@@ -37,6 +37,9 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
     directional_light_shadow_map_frame_bufer_->addDepthTextureBuffer();
     directional_light_shadow_map_frame_bufer_->disableDrawBuffer();
     directional_light_shadow_map_frame_bufer_->disableReadBuffer();
+
+    renderers_shared_data_->shadow_map_texture =
+        directional_light_shadow_map_frame_bufer_->getDepthTextureBuffer();
 }
 
 glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix() {
@@ -44,9 +47,9 @@ glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix() {
         render_settings_->lighting()->getShadowDistance(),
         camera_->getAspect(), camera_->getFov());
     camera_frustum_->setCameraVectors(camera_->getDirectionVector(),
-        camera_->getRightVector(), camera_->getUpVector());
+        camera_->getRightVector(), camera_->getUpVector(),
+        camera_->getPosition());
     camera_frustum_->calculateFrustumPoints();
-    camera_frustum_->recalculateToFrame(camera_->getViewMatrixInverted());
     camera_frustum_->calculateBoundingBoxSize();
 
     glm::vec3 dir_light_pos = camera_frustum_->getCenter();
@@ -81,7 +84,8 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
         createDirectionalLightFrameBuffer();
     }
 
-    glm::mat4 light_space_matrix = calculateDirectionalLightSpaceMatrix();
+    renderers_shared_data_->dir_light_space_matrix =
+        calculateDirectionalLightSpaceMatrix();
 
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);
@@ -98,17 +102,21 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
 
     directional_light_shader_program_->activate();
     directional_light_shader_program_->setUniform(
-        "matrices.light_space_matrix", light_space_matrix);
+        "matrices.light_space_matrix", renderers_shared_data_->
+        dir_light_space_matrix);
     directional_light_shader_program_->setUniform("matrices.model_matrix",
         mesh->getModelMatrix());
 
     mesh->bind();
     for (GLushort i = 0; i < mesh->getEntitiesCount(); i++) {
         auto entity = mesh->getEntity(i);
+        auto material = entity->getMaterial();
+        if (material && material->hasTransparency()) {
+            continue;
+        }
+
         glDrawElements(GL_TRIANGLES, entity->getIndicesCount(),
             GL_UNSIGNED_INT, reinterpret_cast<void*>((
                 entity->getStartingIndex() * sizeof(GLuint))));
     }
-
-    mesh->unbind();
 }

@@ -84,8 +84,6 @@ void Texture::unbindTextureType(TextureType type) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         break;
     }
-
-    StateMachine::instance().bound_texture_[static_cast<GLushort>(type)] = 0;
 }
 
 GLboolean Texture::loadImage(std::string path) {

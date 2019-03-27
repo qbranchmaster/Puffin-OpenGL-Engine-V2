@@ -84,5 +84,4 @@ void DefaultSkyboxRenderer::drawSkybox(SkyboxPtr skybox) {
 
     skybox->bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    skybox->unbind();
 }

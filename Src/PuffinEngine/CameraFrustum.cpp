@@ -8,10 +8,11 @@
 using namespace puffin;
 
 void CameraFrustum::setCameraVectors(const glm::vec3 &direction,
-    const glm::vec3 &right, const glm::vec3 &up) {
+    const glm::vec3 &right, const glm::vec3 &up, const glm::vec3 &position) {
     direction_vector_ = glm::normalize(direction);
     right_vector_ = glm::normalize(right);
     up_vector_ = glm::normalize(up);
+    camera_position_ = position;
 }
 
 void CameraFrustum::setCameraParameters(GLfloat near_distance,
@@ -30,8 +31,10 @@ void CameraFrustum::setCameraParameters(GLfloat near_distance,
 void CameraFrustum::calculateFrustumPoints() {
     calculatePlanesSizes();
 
-    glm::vec3 to_near_center = direction_vector_ * near_plane_;
-    glm::vec3 to_far_center = direction_vector_ * far_plane_;
+    glm::vec3 to_near_center = camera_position_ + direction_vector_ *
+        near_plane_;
+    glm::vec3 to_far_center = camera_position_ + direction_vector_ *
+        far_plane_;
 
     glm::vec3 far_top = to_far_center + up_vector_ * (far_height_ / 2.0f);
     glm::vec3 far_bottom = to_far_center - up_vector_ * (far_height_ / 2.0f);
@@ -63,11 +66,11 @@ void CameraFrustum::recalculateToFrame(const glm::mat4 & frame) {
 }
 
 void CameraFrustum::calculatePlanesSizes() {
-    near_height_ = near_plane_ * std::tan(fov_ / 2.0f) * 2.0f;
-    near_width_ = near_height_ * aspect_;
+    near_width_ = near_plane_ * std::tan(fov_ / 2.0f) * 2.0f;
+    near_height_ = near_width_ / aspect_;
 
-    far_height_ = far_plane_ * std::tan(fov_ / 2.0f) * 2.0f;
-    far_width_ = far_height_ * aspect_;
+    far_width_ = far_plane_ * std::tan(fov_ / 2.0f) * 2.0f;
+    far_height_ = far_width_ / aspect_;
 }
 
 glm::vec3 CameraFrustum::calculatePointPosition(const glm::vec3 &start,

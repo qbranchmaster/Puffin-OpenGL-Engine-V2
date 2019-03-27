@@ -30,7 +30,6 @@ struct Material {
     vec3 transparency;
 
 
-
     float reflectivity;
 };
 
@@ -53,11 +52,17 @@ struct Matrices {
     mat4 projection_matrix;
     mat4 model_matrix;
     mat3 normal_matrix;
+    mat4 dir_light_matrix;
 };
 
 struct Other {
     float gamma;
     vec3 bloom_threshold_color;
+};
+
+struct ShadowMapping {
+    bool enabled;
+    sampler2D shadow_map_texture;
 };
 
 in VS_OUT {
@@ -73,11 +78,37 @@ in VS_OUT {
 
     vec3 directional_light_direction_VIEW;
     vec3 directional_light_direction_TANGENT;
+
+    vec4 frag_pos_DIR_LIGHT;
 } fs_in;
 
 uniform Material material;
 uniform Lighting lighting;
 uniform Other other;
+uniform ShadowMapping shadow_mapping;
+
+float calculateShadow(vec4 frag_pos) {
+    if (!shadow_mapping.enabled) {
+        return 1.0f;
+    }
+
+    vec3 proj_coords = frag_pos.xyz / frag_pos.w;
+    proj_coords = proj_coords * 0.5f + 0.5f;
+
+    float closest_depth = texture(shadow_mapping.shadow_map_texture,
+        proj_coords.xy).r;
+    float current_depth = proj_coords.z;
+
+    if (current_depth > 1.0f) {
+        return 1.0f;
+    }
+
+    float bias = 0.005f;
+    float shadow = current_depth - bias > closest_depth  ? 1.0f : 0.0f;
+    shadow = 1.0f - shadow;
+
+    return shadow;
+}
 
 vec3 gammaCorrection(vec3 input_color) {
     vec3 result = pow(input_color, vec3(other.gamma));
@@ -232,10 +263,12 @@ vec3 calculateLighting() {
     vec3 specular = specular_light_factor * specular_color;
 
     // Sum up all lights
-    final_color = ambient + diffuse + specular;
+    final_color = ambient + calculateShadow(fs_in.frag_pos_DIR_LIGHT) *
+        (diffuse + specular);
 
     // Add emissive factor
-    final_color = final_color + emissive_color;
+    // TODO: emissive factor uniform
+    final_color = final_color + emissive_color * 10.0f;
 
     return final_color;
 }

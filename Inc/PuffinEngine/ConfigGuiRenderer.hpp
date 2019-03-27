@@ -18,23 +18,34 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
+#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class ConfigGuiRenderer {
     public:
-        ConfigGuiRenderer(WindowPtr window, RenderSettingsPtr render_settings);
+        ConfigGuiRenderer(WindowPtr window, RenderSettingsPtr render_settings,
+            RenderersSharedDataPtr renderers_shared_data);
 
         void render();
+
+        void enableDebugWindows(GLboolean enabled) {
+            debug_enabled_ = enabled;
+        }
 
     private:
         void setupImGui();
 
         void postprocessDialog();
         void lightingDialog();
+        void shadowMappingDialog();
+        void debugDialog();
+
+        GLboolean debug_enabled_{false};
 
         RenderSettingsPtr render_settings_;
+        RenderersSharedDataPtr renderers_shared_data_;
         WindowPtr target_window_;
     };
 

@@ -18,8 +18,10 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
     target_window_ = window;
     render_settings_ = render_settings;
 
+    renderers_shared_data_.reset(new RenderersSharedData());
+
     config_gui_renderer_.reset(new ConfigGuiRenderer(target_window_,
-        render_settings_));
+        render_settings_, renderers_shared_data_));
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());
@@ -141,6 +143,7 @@ void MasterRenderer::assignMeshRenderer(MeshRendererPtr renderer) {
     }
 
     mesh_renderer_ = renderer;
+    mesh_renderer_->setSharedDataPtr(renderers_shared_data_);
 }
 
 void MasterRenderer::assignShadowMapRenderer(ShadowMapRendererPtr renderer) {
@@ -150,6 +153,7 @@ void MasterRenderer::assignShadowMapRenderer(ShadowMapRendererPtr renderer) {
     }
 
     shadow_map_renderer_ = renderer;
+    shadow_map_renderer_->setSharedDataPtr(renderers_shared_data_);
 }
 
 void MasterRenderer::drawScene(ScenePtr scene) {
@@ -186,8 +190,12 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 }
 
-void MasterRenderer::configGuiEnabled(GLboolean state) {
+void MasterRenderer::configGuiEnable(GLboolean state) {
     config_gui_enabled_ = state;
+}
+
+void MasterRenderer::configGuiEnableDebug(GLboolean state) {
+    config_gui_renderer_->enableDebugWindows(state);
 }
 
 void MasterRenderer::clearDefaultFrameBuffer() {
@@ -205,7 +213,8 @@ void MasterRenderer::clearDefaultFrameBuffer() {
 }
 
 void MasterRenderer::checkGlErrors() {
-    if (glGetError() != GL_NO_ERROR) {
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
         throw Exception("MasterRenderer::checkGlErrors()",
             "OpenGL error occured.");
     }
