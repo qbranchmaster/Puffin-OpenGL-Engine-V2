@@ -76,42 +76,42 @@ MeshEntityPtr Mesh::getEntity(GLuint index) const {
     return entities_[index];
 }
 
-void Mesh::loadFromFile(std::string path) {
-    if (path.empty()) {
-        logError("Mesh::loadFromFile()", "Invalid input.");
-        return;
+glm::mat4 model_mat = glm::mat4(1.0f);
+
+glm::mat4 Mesh::assimpMat4ToGlmMat4(const aiMatrix4x4 *input) {
+    glm::mat4 result(1.0f);
+    if (!input) {
+        return result;
     }
 
-    Assimp::Importer mesh_importer;
-    const aiScene *scene = mesh_importer.ReadFile(path.c_str(),
-        aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
+    result[0] = glm::vec4(input->a1, input->a2, input->a3, input->a4);
+    result[1] = glm::vec4(input->b1, input->b2, input->b3, input->b4);
+    result[2] = glm::vec4(input->c1, input->c2, input->c3, input->c4);
+    result[3] = glm::vec4(input->d1, input->d2, input->d3, input->d4);
 
-    if (!scene) {
-        logError("Mesh::loadFromFile()", "Importer message: " +
-            std::string(mesh_importer.GetErrorString()) + ".");
-        logError("Mesh::loadFromFile()", "File [" + path + "] loading error.");
-        return;
-    }
+    // Transpose from row major to column major
+    result = glm::transpose(result);
 
-    logInfo("Mesh::loadFromFile()", "File [" + path + "] loaded.");
+    return result;
+}
 
-    GLint vertices_count = 0;
-    GLint indices_count = 0;
+void Mesh::processMeshNode(const aiScene *scene, const aiNode *node) {
 
-    std::vector<GLfloat> v_positions;
-    std::vector<GLfloat> v_normals;
-    std::vector<GLfloat> v_tex_coords;
-    std::vector<GLfloat> v_tangents;
-    std::vector<GLfloat> v_bitangents;
-    std::vector<GLuint> v_indices;
 
-    entities_.clear();
 
-    for (GLuint m = 0; m < scene->mNumMeshes; m++) {
-        aiMesh *mesh = scene->mMeshes[m];
+
+
+    model_mat *= assimpMat4ToGlmMat4(&(node->mTransformation));
+
+    for (GLushort i = 0; i < node->mNumMeshes; i++) {
+        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 
         MeshEntityPtr entity(new MeshEntity());
-        entity->setName(mesh->mName.C_Str());
+
+
+
+        entity->setModelMatrix(model_mat);
+
 
         for (GLuint v = 0; v < mesh->mNumVertices; v++) {
             aiVector3D vp(0.0f, 0.0f, 0.0f);
@@ -137,40 +137,40 @@ void Mesh::loadFromFile(std::string path) {
                 bitangent = mesh->mBitangents[v];
             }
 
-            v_positions.push_back(vp.x);
-            v_positions.push_back(vp.y);
-            v_positions.push_back(vp.z);
+            v_positions_.push_back(vp.x);
+            v_positions_.push_back(vp.y);
+            v_positions_.push_back(vp.z);
 
-            v_normals.push_back(vn.x);
-            v_normals.push_back(vn.y);
-            v_normals.push_back(vn.z);
+            v_normals_.push_back(vn.x);
+            v_normals_.push_back(vn.y);
+            v_normals_.push_back(vn.z);
 
-            v_tex_coords.push_back(vt.x);
-            v_tex_coords.push_back(vt.y);
+            v_tex_coords_.push_back(vt.x);
+            v_tex_coords_.push_back(vt.y);
 
-            v_tangents.push_back(tangent.x);
-            v_tangents.push_back(tangent.y);
-            v_tangents.push_back(tangent.z);
+            v_tangents_.push_back(tangent.x);
+            v_tangents_.push_back(tangent.y);
+            v_tangents_.push_back(tangent.z);
 
-            v_bitangents.push_back(bitangent.x);
-            v_bitangents.push_back(bitangent.y);
-            v_bitangents.push_back(bitangent.z);
+            v_bitangents_.push_back(bitangent.x);
+            v_bitangents_.push_back(bitangent.y);
+            v_bitangents_.push_back(bitangent.z);
         }
 
         for (GLuint f = 0; f < mesh->mNumFaces; f++) {
             aiFace *face = &mesh->mFaces[f];
 
             for (GLuint i = 0; i < face->mNumIndices; i++) {
-                v_indices.push_back(face->mIndices[i] + vertices_count);
+                v_indices_.push_back(face->mIndices[i] + vertices_count_);
                 entity->setIndicesCount(entity->getIndicesCount() + 1);
             }
         }
 
-        entity->setStartingVetex(vertices_count);
-        vertices_count += mesh->mNumVertices;
-        entity->setStartingIndex(indices_count);
+        entity->setStartingVetex(vertices_count_);
+        vertices_count_ += mesh->mNumVertices;
+        entity->setStartingIndex(indices_count_);
         entity->setVerticesCount(mesh->mNumVertices);
-        indices_count += entity->getIndicesCount();
+        indices_count_ += entity->getIndicesCount();
 
         if (scene->HasMaterials()) {
             aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -180,7 +180,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path)
                 == AI_SUCCESS) {
                 TexturePtr ambient_tex(new Texture());
-                ambient_tex->loadTexture2D(processTexturePath(path,
+                ambient_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setAmbientTexture(ambient_tex);
             }
@@ -188,7 +188,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
                 == AI_SUCCESS) {
                 TexturePtr diffuse_tex(new Texture());
-                diffuse_tex->loadTexture2D(processTexturePath(path,
+                diffuse_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setDiffuseTexture(diffuse_tex);
             }
@@ -196,7 +196,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path)
                 == AI_SUCCESS) {
                 TexturePtr specular_tex(new Texture());
-                specular_tex->loadTexture2D(processTexturePath(path,
+                specular_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setSpecularTexture(specular_tex);
             }
@@ -204,7 +204,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path)
                 == AI_SUCCESS) {
                 TexturePtr emissive_tex(new Texture());
-                emissive_tex->loadTexture2D(processTexturePath(path,
+                emissive_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setEmissiveTexture(emissive_tex);
             }
@@ -212,7 +212,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) ==
                 AI_SUCCESS) {
                 TexturePtr normalmap_tex(new Texture());
-                normalmap_tex->loadTexture2D(processTexturePath(path,
+                normalmap_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setNormalMapTexture(normalmap_tex);
             }
@@ -220,7 +220,7 @@ void Mesh::loadFromFile(std::string path) {
             if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) ==
                 AI_SUCCESS) {
                 TexturePtr opacity_tex(new Texture());
-                opacity_tex->loadTexture2D(processTexturePath(path,
+                opacity_tex->loadTexture2D(processTexturePath(path_,
                     texture_path), true);
                 mesh_material->setOpacityTexture(opacity_tex);
             }
@@ -269,15 +269,64 @@ void Mesh::loadFromFile(std::string path) {
         entities_.push_back(entity);
     }
 
+    if (node->mNumChildren == 0) {
+        model_mat = glm::mat4(1.0f);
+    }
+
+    for (GLushort i = 0; i < node->mNumChildren; i++) {
+        processMeshNode(scene, node->mChildren[i]);
+    }
+}
+
+void Mesh::freeVertexBuffers() {
+    v_positions_.clear();
+    v_normals_.clear();
+    v_tex_coords_.clear();
+    v_tangents_.clear();
+    v_bitangents_.clear();
+    v_indices_.clear();
+}
+
+void Mesh::loadFromFile(std::string path) {
+    if (path.empty()) {
+        logError("Mesh::loadFromFile()", "Invalid input.");
+        return;
+    }
+
+    Assimp::Importer mesh_importer;
+    const aiScene *scene = mesh_importer.ReadFile(path.c_str(),
+        aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
+
+    if (!scene) {
+        logError("Mesh::loadFromFile()", "Importer message: " +
+            std::string(mesh_importer.GetErrorString()) + ".");
+        logError("Mesh::loadFromFile()", "File [" + path + "] loading error.");
+        return;
+    }
+
+    path_ = path;
+
+    // Zero object state
+    entities_.clear();
+    vertices_count_ = 0;
+    indices_count_ = 0;
+
+    processMeshNode(scene, scene->mRootNode);
+
     bind();
-    setMeshData(v_positions, 0, 3);
-    setMeshData(v_tex_coords, 1, 2);
-    setMeshData(v_normals, 2, 3);
-    setMeshData(v_tangents, 3, 3);
-    setMeshData(v_bitangents, 4, 3);
-    setMeshIndices(v_indices);
+    setMeshData(v_positions_, 0, 3);
+    setMeshData(v_tex_coords_, 1, 2);
+    setMeshData(v_normals_, 2, 3);
+    setMeshData(v_tangents_, 3, 3);
+    setMeshData(v_bitangents_, 4, 3);
+    setMeshIndices(v_indices_);
 
     has_indices_ = true;
+
+    logInfo("Mesh::loadFromFile()", "File [" + path + "] loaded.");
+
+    // OpenGL buffers are set now, so free internal buffers
+    freeVertexBuffers();
 }
 
 std::string Mesh::processTexturePath(std::string model_file_path,

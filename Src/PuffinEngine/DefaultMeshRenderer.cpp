@@ -85,8 +85,7 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         camera_->getViewMatrix());
     default_shader_program_->setUniform("matrices.projection_matrix",
         camera_->getProjectionMatrix());
-    default_shader_program_->setUniform("matrices.model_matrix",
-        mesh->getModelMatrix());
+
     default_shader_program_->setUniform("matrices.normal_matrix",
         mesh->getNormalMatrix());
 
@@ -185,6 +184,10 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
     auto entity = mesh->getEntity(entity_index);
     if (entity) {
         setMeshEntityShadersUniforms(entity);
+
+        auto model_matrix = mesh->getModelMatrix() * entity->getModelMatrix();
+        default_shader_program_->setUniform("matrices.model_matrix",
+            model_matrix);
 
         auto material = entity->getMaterial();
         if (material) {

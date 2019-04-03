@@ -21,6 +21,7 @@
 
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "PuffinEngine/Logger.hpp"
@@ -119,11 +120,19 @@ namespace puffin {
     protected:
         std::string processTexturePath(std::string model_file_path,
             const aiString &texture_path);
+        glm::mat4 assimpMat4ToGlmMat4(const aiMatrix4x4 *matrix);
+        void freeVertexBuffers();
+
+
+        void processMeshNode(const aiScene *scene, const aiNode *node);
 
         GLuint handle_{0};
         GLuint indices_buffer_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
+
+        aiScene *scene_{nullptr};
+        std::string path_;
 
         GLboolean model_matrix_changed_{false};
         glm::mat4 model_matrix_{1.0f};
@@ -134,8 +143,17 @@ namespace puffin {
         glm::vec3 position_{0.0f, 0.0f, 0.0f};
         glm::vec3 scale_{1.0f, 1.0f, 1.0f};
 
-        GLboolean has_indices_{false};
+        std::vector<GLfloat> v_positions_;
+        std::vector<GLfloat> v_normals_;
+        std::vector<GLfloat> v_tex_coords_;
+        std::vector<GLfloat> v_tangents_;
+        std::vector<GLfloat> v_bitangents_;
+        std::vector<GLuint> v_indices_;
 
+        GLint vertices_count_{0};
+        GLint indices_count_{0};
+
+        GLboolean has_indices_{false};
         GLboolean shadow_cast_enabled_{true};
     };
 

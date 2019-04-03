@@ -11,6 +11,10 @@
 #endif // WIN32
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <memory>
 #include <string>
 
@@ -72,11 +76,21 @@ namespace puffin {
             return name_;
         }
 
+        void setModelMatrix(const glm::mat4 &matrix) {
+            model_matrix_ = matrix;
+        }
+
+        glm::mat4 getModelMatrix() const {
+            return model_matrix_;
+        }
+
     private:
         GLuint starting_index_{0};
         GLuint starting_vertex_{0};
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
+
+        glm::mat4 model_matrix_{1.0f};
 
         std::string name_;
 
