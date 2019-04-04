@@ -172,6 +172,12 @@ void ConfigGuiRenderer::shadowMappingDialog() {
     ImGui::SliderFloat("Shadow distance", &shadow_distance, 5.0f, 100.0f);
     render_settings_->lighting()->setShadowDistance(shadow_distance);
 
+    auto shadow_pcf_samples = static_cast<GLint>(render_settings_->lighting()->
+        getShadowMappingPcfSamplesCount());
+    ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 15);
+    render_settings_->lighting()->setShadowMappingPcfsamplesCount(
+        shadow_pcf_samples);
+
     ImGui::End();
 }
 

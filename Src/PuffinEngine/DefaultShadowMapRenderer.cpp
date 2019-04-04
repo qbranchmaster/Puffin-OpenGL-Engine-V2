@@ -59,7 +59,8 @@ glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix() {
     camera_frustum_->recalculateToFrame(dir_light_view_matrix);
     camera_frustum_->calculateBoundingBoxSize();
 
-    auto box_size = camera_frustum_->getSize();
+    // Resize shadow box to minimize disappearing shadows glitch
+    auto box_size = camera_frustum_->getSize() * 2.0f;
     glm::mat4 projection_matrix = glm::ortho(-box_size.x, box_size.x,
         -box_size.y, box_size.y, -box_size.z, box_size.z);
 

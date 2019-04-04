@@ -124,6 +124,12 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
             6);
         default_shader_program_->setUniform("matrices.dir_light_matrix",
             renderers_shared_data_->dir_light_space_matrix);
+        default_shader_program_->setUniform("shadow_mapping.shadow_map_size",
+            static_cast<GLint>(render_settings_->lighting()->
+                getDirectionalLightShadowMapSize()));
+        default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
+            static_cast<GLint>(render_settings_->lighting()->
+                getShadowMappingPcfSamplesCount()));
     }
 }
 

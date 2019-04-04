@@ -64,6 +64,8 @@ struct Other {
 struct ShadowMapping {
     bool enabled;
     sampler2D shadow_map_texture;
+    int shadow_map_size;
+    int pcf_filter_count;
 };
 
 in VS_OUT {
@@ -96,17 +98,35 @@ float calculateShadow(vec4 frag_pos) {
     vec3 proj_coords = frag_pos.xyz / frag_pos.w;
     proj_coords = proj_coords * 0.5f + 0.5f;
 
-    float closest_depth = texture(shadow_mapping.shadow_map_texture,
-        proj_coords.xy).r;
     float current_depth = proj_coords.z;
-
     if (current_depth > 1.0f) {
         return 1.0f;
     }
 
+    float total_texels = (shadow_mapping.pcf_filter_count * 2.0f + 1.0f) *
+        (shadow_mapping.pcf_filter_count * 2.0f + 1.0f);
+    float texel_size = 1.0f / shadow_mapping.shadow_map_size;
+    float total = 0.0f;
+
     float bias = 0.005f;
-    float shadow = current_depth - bias > closest_depth  ? 1.0f : 0.0f;
-    shadow = 1.0f - shadow;
+
+    for (int x = -shadow_mapping.pcf_filter_count;
+        x <= shadow_mapping.pcf_filter_count; x++)
+    {
+        for (int y = -shadow_mapping.pcf_filter_count;
+            y <= shadow_mapping.pcf_filter_count; y++)
+        {
+            float closest_depth = texture(shadow_mapping.shadow_map_texture,
+                proj_coords.xy + vec2(x, y) * texel_size).r;
+
+            if (current_depth > closest_depth + bias) {
+                total += 1.0f;
+            }
+        }
+    }
+
+    total /= total_texels;
+    float shadow = 1.0f - total;
 
     return shadow;
 }

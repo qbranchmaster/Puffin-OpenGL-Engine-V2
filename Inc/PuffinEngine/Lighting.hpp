@@ -104,6 +104,14 @@ namespace puffin {
             return emission_factor_;
         }
 
+        void setShadowMappingPcfsamplesCount(GLuint samples) {
+            shadows_pcf_samples_count_ = samples;
+        }
+
+        GLuint getShadowMappingPcfSamplesCount() const {
+            return shadows_pcf_samples_count_;
+        }
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};
@@ -112,6 +120,7 @@ namespace puffin {
         GLuint directional_light_shadow_map_size_{1024};
         GLfloat shadow_distance_{10.0f};
         GLfloat emission_factor_{10.0f};
+        GLuint shadows_pcf_samples_count_{1};
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 
