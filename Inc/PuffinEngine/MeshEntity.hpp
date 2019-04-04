@@ -23,19 +23,19 @@
 namespace puffin {
     class MeshEntity {
     public:
-        void setStartingIndex(GLuint index) {
+        void setStartingVertexIndex(GLuint index) {
             starting_index_ = index;
         }
 
-        GLuint getStartingIndex() const {
+        GLuint getStartingVertexIndex() const {
             return starting_index_;
         }
 
-        void setStartingVetex(GLuint vetex_index) {
+        void setStartingVetexNumber(GLuint vetex_index) {
             starting_vertex_ = vetex_index;
         }
 
-        GLuint getStartingVertex() const {
+        GLuint getStartingVertexNumber() const {
             return starting_vertex_;
         }
 
@@ -89,12 +89,10 @@ namespace puffin {
         GLuint starting_vertex_{0};
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
-
         glm::mat4 model_matrix_{1.0f};
+        MaterialPtr material_;
 
         std::string name_;
-
-        MaterialPtr material_;
     };
 
     using MeshEntityPtr = std::shared_ptr<MeshEntity>;

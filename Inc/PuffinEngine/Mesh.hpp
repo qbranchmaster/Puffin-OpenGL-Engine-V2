@@ -118,21 +118,35 @@ namespace puffin {
         }
 
     protected:
+        struct NodeData {
+            glm::mat4 model_matrix;
+        };
+
+        struct MeshEntityLoaderData {
+            GLuint starting_vertex;
+            GLuint starting_index;
+            GLuint indices_count;
+            GLuint vertices_count;
+            GLuint material_index;
+        };
+
         std::string processTexturePath(std::string model_file_path,
             const aiString &texture_path);
         glm::mat4 assimpMat4ToGlmMat4(const aiMatrix4x4 *matrix);
+        void freeVertexData();
         void freeVertexBuffers();
+        void processMeshNode(const aiNode *node, NodeData data);
+        void loadMeshEntities(const aiScene *scene);
+        void loadMaterials(const aiScene *scene);
 
-
-        void processMeshNode(const aiScene *scene, const aiNode *node);
+        std::string path_;
 
         GLuint handle_{0};
         GLuint indices_buffer_{0};
         std::map<GLuint, GLuint> data_buffers_;
         std::vector<MeshEntityPtr> entities_;
-
-        aiScene *scene_{nullptr};
-        std::string path_;
+        std::vector<MeshEntityLoaderData> entity_data_;
+        std::vector<MaterialPtr> materials_;
 
         GLboolean model_matrix_changed_{false};
         glm::mat4 model_matrix_{1.0f};

@@ -117,6 +117,6 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
 
         glDrawElements(GL_TRIANGLES, entity->getIndicesCount(),
             GL_UNSIGNED_INT, reinterpret_cast<void*>((
-                entity->getStartingIndex() * sizeof(GLuint))));
+                entity->getStartingVertexIndex() * sizeof(GLuint))));
     }
 }

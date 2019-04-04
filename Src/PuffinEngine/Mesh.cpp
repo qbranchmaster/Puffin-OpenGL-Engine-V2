@@ -12,10 +12,7 @@ Mesh::Mesh() {
 }
 
 Mesh::~Mesh() {
-    for (auto &buffer : data_buffers_) {
-        if (buffer.second != 0)
-            glDeleteBuffers(1, &buffer.second);
-    }
+    freeVertexBuffers();
 
     if (handle_) {
         glDeleteVertexArrays(1, &handle_);
@@ -76,8 +73,6 @@ MeshEntityPtr Mesh::getEntity(GLuint index) const {
     return entities_[index];
 }
 
-glm::mat4 model_mat = glm::mat4(1.0f);
-
 glm::mat4 Mesh::assimpMat4ToGlmMat4(const aiMatrix4x4 *input) {
     glm::mat4 result(1.0f);
     if (!input) {
@@ -95,23 +90,35 @@ glm::mat4 Mesh::assimpMat4ToGlmMat4(const aiMatrix4x4 *input) {
     return result;
 }
 
-void Mesh::processMeshNode(const aiScene *scene, const aiNode *node) {
+void Mesh::processMeshNode(const aiNode *node, NodeData data) {
+    // Update node data
+    data.model_matrix *= assimpMat4ToGlmMat4(&(node->mTransformation));
 
-
-
-
-
-    model_mat *= assimpMat4ToGlmMat4(&(node->mTransformation));
-
-    for (GLushort i = 0; i < node->mNumMeshes; i++) {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+    // Create mesh entities
+    for (GLuint i = 0; i < node->mNumMeshes; i++) {
+        auto mesh_index = node->mMeshes[i];
 
         MeshEntityPtr entity(new MeshEntity());
+        entity->setModelMatrix(data.model_matrix);
+        entity->setName(node->mName.C_Str());
+        entity->setIndicesCount(entity_data_[mesh_index].indices_count);
+        entity->setVerticesCount(entity_data_[mesh_index].vertices_count);
+        entity->setStartingVetexNumber(entity_data_[mesh_index].starting_index);
+        entity->setStartingVertexIndex(entity_data_[mesh_index].starting_index);
+        entity->setMaterial(materials_[entity_data_[mesh_index].material_index]);
+        entities_.push_back(entity);
+    }
 
+    for (GLuint i = 0; i < node->mNumChildren; i++) {
+        processMeshNode(node->mChildren[i], data);
+    }
+}
 
+void Mesh::loadMeshEntities(const aiScene *scene) {
+    for (GLuint i = 0; i < scene->mNumMeshes; i++) {
+        aiMesh *mesh = scene->mMeshes[i];
 
-        entity->setModelMatrix(model_mat);
-
+        MeshEntityLoaderData data = {};
 
         for (GLuint v = 0; v < mesh->mNumVertices; v++) {
             aiVector3D vp(0.0f, 0.0f, 0.0f);
@@ -162,129 +169,139 @@ void Mesh::processMeshNode(const aiScene *scene, const aiNode *node) {
 
             for (GLuint i = 0; i < face->mNumIndices; i++) {
                 v_indices_.push_back(face->mIndices[i] + vertices_count_);
-                entity->setIndicesCount(entity->getIndicesCount() + 1);
             }
+
+            data.indices_count += face->mNumIndices;
         }
 
-        entity->setStartingVetex(vertices_count_);
+        data.starting_vertex = vertices_count_;
         vertices_count_ += mesh->mNumVertices;
-        entity->setStartingIndex(indices_count_);
-        entity->setVerticesCount(mesh->mNumVertices);
-        indices_count_ += entity->getIndicesCount();
+        data.starting_index = indices_count_;
+        data.vertices_count = mesh->mNumVertices;
+        indices_count_ += data.indices_count;
+        data.material_index = mesh->mMaterialIndex;
 
-        if (scene->HasMaterials()) {
-            aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-            MaterialPtr mesh_material(new Material());
+        entity_data_.push_back(data);
+    }
 
-            aiString texture_path;
-            if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path)
-                == AI_SUCCESS) {
-                TexturePtr ambient_tex(new Texture());
-                ambient_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setAmbientTexture(ambient_tex);
-            }
+    loadMaterials(scene);
+}
 
-            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
-                == AI_SUCCESS) {
-                TexturePtr diffuse_tex(new Texture());
-                diffuse_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setDiffuseTexture(diffuse_tex);
-            }
+void Mesh::loadMaterials(const aiScene *scene) {
+    if (!scene->HasMaterials()) {
+        return;
+    }
 
-            if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path)
-                == AI_SUCCESS) {
-                TexturePtr specular_tex(new Texture());
-                specular_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setSpecularTexture(specular_tex);
-            }
+    for (GLuint i = 0; i < scene->mNumMaterials; i++) {
+        aiMaterial *material = scene->mMaterials[i];
+        MaterialPtr mesh_material(new Material());
 
-            if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path)
-                == AI_SUCCESS) {
-                TexturePtr emissive_tex(new Texture());
-                emissive_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setEmissiveTexture(emissive_tex);
-            }
-
-            if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) ==
-                AI_SUCCESS) {
-                TexturePtr normalmap_tex(new Texture());
-                normalmap_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setNormalMapTexture(normalmap_tex);
-            }
-
-            if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) ==
-                AI_SUCCESS) {
-                TexturePtr opacity_tex(new Texture());
-                opacity_tex->loadTexture2D(processTexturePath(path_,
-                    texture_path), true);
-                mesh_material->setOpacityTexture(opacity_tex);
-            }
-
-            aiColor3D kd;
-            if (material->Get(AI_MATKEY_COLOR_DIFFUSE, kd) == AI_SUCCESS) {
-                mesh_material->setKd(glm::vec3(kd.r, kd.g, kd.b));
-            }
-
-            aiColor3D ka;
-            if (material->Get(AI_MATKEY_COLOR_AMBIENT, ka) == AI_SUCCESS) {
-                mesh_material->setKa(glm::vec3(ka.r, ka.g, ka.b));
-            }
-
-            aiColor3D ks;
-            if (material->Get(AI_MATKEY_COLOR_SPECULAR, ks) == AI_SUCCESS) {
-                mesh_material->setKs(glm::vec3(ks.r, ks.g, ks.b));
-            }
-
-            aiColor3D ke;
-            if (material->Get(AI_MATKEY_COLOR_EMISSIVE, ke) == AI_SUCCESS) {
-                mesh_material->setKe(glm::vec3(ke.r, ke.g, ke.b));
-            }
-
-            GLfloat shininess = 0;
-            if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
-                mesh_material->setShininess(static_cast<GLint>(shininess));
-            }
-
-            GLfloat reflectivity = 0;
-            if (material->Get(AI_MATKEY_REFLECTIVITY, reflectivity) ==
-                AI_SUCCESS) {
-                mesh_material->setReflectivity(reflectivity);
-            }
-
-            aiColor3D transparency;
-            if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) ==
-                AI_SUCCESS) {
-                mesh_material->setTransparency(glm::vec3(transparency.r,
-                    transparency.g, transparency.b));
-            }
-
-            entity->setMaterial(mesh_material);
+        aiString texture_path;
+        if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path)
+            == AI_SUCCESS) {
+            TexturePtr ambient_tex(new Texture());
+            ambient_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setAmbientTexture(ambient_tex);
         }
 
-        entities_.push_back(entity);
-    }
+        if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
+            == AI_SUCCESS) {
+            TexturePtr diffuse_tex(new Texture());
+            diffuse_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setDiffuseTexture(diffuse_tex);
+        }
 
-    if (node->mNumChildren == 0) {
-        model_mat = glm::mat4(1.0f);
-    }
+        if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path)
+            == AI_SUCCESS) {
+            TexturePtr specular_tex(new Texture());
+            specular_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setSpecularTexture(specular_tex);
+        }
 
-    for (GLushort i = 0; i < node->mNumChildren; i++) {
-        processMeshNode(scene, node->mChildren[i]);
+        if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path)
+            == AI_SUCCESS) {
+            TexturePtr emissive_tex(new Texture());
+            emissive_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setEmissiveTexture(emissive_tex);
+        }
+
+        if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) ==
+            AI_SUCCESS) {
+            TexturePtr normalmap_tex(new Texture());
+            normalmap_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setNormalMapTexture(normalmap_tex);
+        }
+
+        if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) ==
+            AI_SUCCESS) {
+            TexturePtr opacity_tex(new Texture());
+            opacity_tex->loadTexture2D(processTexturePath(path_,
+                texture_path), true);
+            mesh_material->setOpacityTexture(opacity_tex);
+        }
+
+        aiColor3D kd;
+        if (material->Get(AI_MATKEY_COLOR_DIFFUSE, kd) == AI_SUCCESS) {
+            mesh_material->setKd(glm::vec3(kd.r, kd.g, kd.b));
+        }
+
+        aiColor3D ka;
+        if (material->Get(AI_MATKEY_COLOR_AMBIENT, ka) == AI_SUCCESS) {
+            mesh_material->setKa(glm::vec3(ka.r, ka.g, ka.b));
+        }
+
+        aiColor3D ks;
+        if (material->Get(AI_MATKEY_COLOR_SPECULAR, ks) == AI_SUCCESS) {
+            mesh_material->setKs(glm::vec3(ks.r, ks.g, ks.b));
+        }
+
+        aiColor3D ke;
+        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, ke) == AI_SUCCESS) {
+            mesh_material->setKe(glm::vec3(ke.r, ke.g, ke.b));
+        }
+
+        GLfloat shininess = 0;
+        if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
+            mesh_material->setShininess(static_cast<GLint>(shininess));
+        }
+
+        GLfloat reflectivity = 0;
+        if (material->Get(AI_MATKEY_REFLECTIVITY, reflectivity) ==
+            AI_SUCCESS) {
+            mesh_material->setReflectivity(reflectivity);
+        }
+
+        aiColor3D transparency;
+        if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) ==
+            AI_SUCCESS) {
+            mesh_material->setTransparency(glm::vec3(transparency.r,
+                transparency.g, transparency.b));
+        }
+
+        materials_.push_back(mesh_material);
     }
 }
 
-void Mesh::freeVertexBuffers() {
+void Mesh::freeVertexData() {
     v_positions_.clear();
     v_normals_.clear();
     v_tex_coords_.clear();
     v_tangents_.clear();
     v_bitangents_.clear();
     v_indices_.clear();
+}
+
+void Mesh::freeVertexBuffers() {
+    for (auto &buffer : data_buffers_) {
+        if (buffer.second != 0) {
+            glDeleteBuffers(1, &buffer.second);
+        }
+    }
 }
 
 void Mesh::loadFromFile(std::string path) {
@@ -307,12 +324,22 @@ void Mesh::loadFromFile(std::string path) {
     path_ = path;
 
     // Zero object state
+    freeVertexBuffers();
     entities_.clear();
     vertices_count_ = 0;
     indices_count_ = 0;
 
-    processMeshNode(scene, scene->mRootNode);
+    // Load mesh entities to temporary buffer
+    loadMeshEntities(scene);
 
+    // Travel through mesh tree and get mesh entities data
+    for (GLuint i = 0; i < scene->mRootNode->mNumChildren; i++) {
+        NodeData data = {};
+        data.model_matrix = glm::mat4(1.0f);
+        processMeshNode(scene->mRootNode->mChildren[i], data);
+    }
+
+    // Mesh loading completed, fill OpenGL buffers now
     bind();
     setMeshData(v_positions_, 0, 3);
     setMeshData(v_tex_coords_, 1, 2);
@@ -320,13 +347,14 @@ void Mesh::loadFromFile(std::string path) {
     setMeshData(v_tangents_, 3, 3);
     setMeshData(v_bitangents_, 4, 3);
     setMeshIndices(v_indices_);
-
     has_indices_ = true;
 
-    logInfo("Mesh::loadFromFile()", "File [" + path + "] loaded.");
+    // OpenGL buffers are set now, so free some data
+    freeVertexData();
+    entity_data_.clear();
+    materials_.clear();
 
-    // OpenGL buffers are set now, so free internal buffers
-    freeVertexBuffers();
+    logInfo("Mesh::loadFromFile()", "File [" + path + "] loaded.");
 }
 
 std::string Mesh::processTexturePath(std::string model_file_path,
