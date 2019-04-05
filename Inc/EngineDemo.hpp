@@ -14,7 +14,7 @@ public:
     EngineDemo();
     ~EngineDemo();
 
-    void render();
+	puffin::ScenePtr render();
 
 private:
     void updateWindowCaption();
@@ -32,6 +32,7 @@ private:
     puffin::MeshPtr test_mesh_;
     puffin::ScenePtr scene_;
     puffin::SkyboxPtr skybox_;
+	puffin::TextPtr text_demo_;
     puffin::TexturePtr skybox_texture_;
 };
 

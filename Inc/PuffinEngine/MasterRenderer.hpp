@@ -18,6 +18,7 @@
 #include "PuffinEngine/ConfigGuiRenderer.hpp"
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
+#include "PuffinEngine/FontRenderer.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
@@ -41,11 +42,12 @@ namespace puffin {
         void start();
         void stop();
 
-        void assignRenderingFunction(std::function<void()> function);
+        void assignRenderingFunction(std::function<ScenePtr()> function);
         void assignPostprocessRenderer(PostprocessRendererPtr renderer);
         void assignSkyboxRenderer(SkyboxRendererPtr renderer);
         void assignMeshRenderer(MeshRendererPtr renderer);
         void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
+		void assignFontRenderer(FontRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
 
@@ -59,7 +61,7 @@ namespace puffin {
 
         GLboolean rendering_enabled_{false};
         GLboolean config_gui_enabled_{true};
-        std::function<void()> rendering_function_{nullptr};
+        std::function<ScenePtr()> rendering_function_{nullptr};
 
         CameraPtr camera_;
         FrameBufferPtr default_frame_buffer_;
@@ -73,6 +75,7 @@ namespace puffin {
         RenderersSharedDataPtr renderers_shared_data_;
         SkyboxRendererPtr skybox_renderer_;
         ShadowMapRendererPtr shadow_map_renderer_;
+		FontRendererPtr font_renderer_;
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;

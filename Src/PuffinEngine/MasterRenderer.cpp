@@ -76,8 +76,9 @@ void MasterRenderer::start() {
 
         clearDefaultFrameBuffer();
 
+		ScenePtr rendered_scene = nullptr;
         if (rendering_function_) {
-            rendering_function_();
+            rendered_scene = rendering_function_();
         }
 
         if (postprocess_renderer_) {
@@ -87,6 +88,13 @@ void MasterRenderer::start() {
                 copyFrameBuffer(default_frame_buffer_, 1);
             postprocess_renderer_->render(default_frame_buffer_);
         }
+
+		if (rendered_scene) {
+			for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
+				auto text = rendered_scene->getText(i);
+				font_renderer_->render(default_frame_buffer_, text);
+			}
+		}
 
         if (config_gui_enabled_) {
             config_gui_renderer_->render();
@@ -108,7 +116,8 @@ void MasterRenderer::start() {
     }
 }
 
-void MasterRenderer::assignRenderingFunction(std::function<void()> function) {
+void MasterRenderer::assignRenderingFunction(
+	std::function<ScenePtr()> function) {
     if (!function) {
         logError("MasterRenderer::assignRenderingFunction()", "Null input.");
         return;
@@ -154,6 +163,15 @@ void MasterRenderer::assignShadowMapRenderer(ShadowMapRendererPtr renderer) {
 
     shadow_map_renderer_ = renderer;
     shadow_map_renderer_->setSharedDataPtr(renderers_shared_data_);
+}
+
+void MasterRenderer::assignFontRenderer(FontRendererPtr renderer) {
+	if (!renderer) {
+		logError("MasterRenderer::assignFontRenderer()", "Null input.");
+		return;
+	}
+
+	font_renderer_ = renderer;
 }
 
 void MasterRenderer::drawScene(ScenePtr scene) {

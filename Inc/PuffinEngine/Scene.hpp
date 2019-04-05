@@ -11,6 +11,7 @@
 
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Skybox.hpp"
+#include "PuffinEngine/Text.hpp"
 
 namespace puffin {
     class Scene {
@@ -45,9 +46,32 @@ namespace puffin {
             return active_skybox_;
         }
 
+		void addText(TextPtr text) {
+			if (!text) {
+				logError("Scene::addText()", "Null input.");
+				return;
+			}
+
+			textes_.push_back(text);
+		}
+
+		GLuint getTextesCount() const {
+			return textes_.size();
+		}
+
+		TextPtr getText(GLuint index) {
+			if (index >= textes_.size()) {
+				logError("Scene::getText()", "Invalid input.");
+				return TextPtr();
+			}
+
+			return textes_[index];
+		}
+
     private:
         std::vector<MeshPtr> meshes_;
         SkyboxPtr active_skybox_;
+		std::vector<TextPtr> textes_;
     };
 
     using ScenePtr = std::shared_ptr<Scene>;

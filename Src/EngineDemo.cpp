@@ -94,6 +94,10 @@ void EngineDemo::createScene() {
 
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);
+
+	text_demo_.reset(new Text(L"Puffin OpenGL Engine ver. 2.0",
+		glm::uvec2(150, 500), 24));
+	scene_->addText(text_demo_);
 }
 
 void EngineDemo::pollKeyboard() {
@@ -120,11 +124,13 @@ void EngineDemo::pollMouse() {
     rotateCamera();
 }
 
-void EngineDemo::render() {
+ScenePtr EngineDemo::render() {
     masterRenderer()->drawScene(scene_);
 
     pollKeyboard();
     pollMouse();
+
+	return scene_;
 }
 
 void EngineDemo::updateWindowCaption() {

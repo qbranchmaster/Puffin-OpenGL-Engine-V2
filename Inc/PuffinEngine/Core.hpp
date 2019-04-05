@@ -7,6 +7,7 @@
 #define PUFFIN_CORE_HPP
 
 #include "PuffinEngine/AlphaBlend.hpp"
+#include "PuffinEngine/DefaultFontRenderer.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
@@ -50,6 +51,7 @@ namespace puffin {
 
     private:
         CameraPtr camera_;
+		DefaultFontRendererPtr default_font_renderer_;
         DefaultMeshRendererPtr default_mesh_renderer_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
         DefaultShadowMapRendererPtr default_shadow_map_renderer_;

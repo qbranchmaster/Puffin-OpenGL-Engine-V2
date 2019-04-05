@@ -42,6 +42,7 @@ void Core::createDefaultRenderers() {
         camera_));
     default_shadow_map_renderer_.reset(new DefaultShadowMapRenderer(
         render_settings_, camera_));
+	default_font_renderer_.reset(new DefaultFontRenderer());
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));
@@ -51,6 +52,8 @@ void Core::createDefaultRenderers() {
         <MeshRenderer>(default_mesh_renderer_));
     master_renderer_->assignShadowMapRenderer(std::static_pointer_cast
         <ShadowMapRenderer>(default_shadow_map_renderer_));
+	master_renderer_->assignFontRenderer(std::static_pointer_cast
+		<FontRenderer>(default_font_renderer_));
 }
 
 void Core::start() {
