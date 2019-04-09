@@ -95,8 +95,13 @@ void EngineDemo::createScene() {
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);
 
-	text_demo_.reset(new Text(L"Puffin OpenGL Engine ver. 2.0",
-		glm::uvec2(150, 500), 24));
+	text_demo_.reset(new Text(L"Puffin Engine Demo",
+		glm::uvec2(10, 710), 48));
+    text_demo_->setFontColor(glm::vec3(1.0f, 0.0f, 0.0f));
+    text_demo_->setOutlineColor(glm::vec3(1.0f, 1.0f, 1.0f));
+    text_demo_->setOutlineSize(2);
+    text_demo_->setHorizontalSpacing(2);
+    text_demo_->setFont("DemoData/Fonts/hello-giraffe/hello giraffe.ttf");
 	scene_->addText(text_demo_);
 }
 

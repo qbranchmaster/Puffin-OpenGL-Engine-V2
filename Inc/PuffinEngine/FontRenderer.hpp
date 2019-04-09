@@ -6,14 +6,13 @@
 #ifndef PUFFIN_FONT_RENDERER_HPP
 #define PUFFIN_FONT_RENDERER_HPP
 
-#include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Renderer.hpp"
 #include "PuffinEngine/Text.hpp"
 
 namespace puffin {
 	class FontRenderer : public Renderer {
 	public:
-		virtual void render(FrameBufferPtr frame_buffer, TextPtr text) = 0;
+		virtual void render(TextPtr text) = 0;
 	};
 
 	using FontRendererPtr = std::shared_ptr<FontRenderer>;

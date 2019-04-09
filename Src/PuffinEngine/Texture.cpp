@@ -67,6 +67,15 @@ void Texture::setTextureSlot(GLushort slot_index) {
     }
 }
 
+void Texture::setPixelAlignment(GLushort aligment) {
+    if (aligment != 1 && aligment != 2 && aligment != 4 && aligment != 8) {
+        logError("Texture::setPixelAlignment()", "Invalid value.");
+        return;
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, aligment);
+}
+
 void Texture::unbindTextureType(TextureType type) {
     if (type == TextureType::None || type == TextureType::RawImage) {
         logError("Texture::unbindTextureType()", "Invalid texture type.");
@@ -302,18 +311,37 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
-void Texture::setTexture2DData(void *data, GLboolean generate_mipmaps) {
-    if (!(type_ == TextureType::Texture2D ||
-        type_ == TextureType::Texture2DMultisample)) {
-        logError("Texture::setTexture2DData()", "Invalid texture type.");
+void Texture::setTexture2DData(GLuint width, GLuint height, GLushort channels,
+    void *data, GLboolean generate_mipmaps) {
+    if (channels == 0 || channels > 4) {
+        logError("Texture::setTexture2DData()", "Invalid input.");
         return;
     }
 
+    type_ = TextureType::Texture2D;
+    width_ = width;
+    height_ = height;
+    channels_ = channels;
+
     bind();
 
+    GLuint internal_format = 0;
+    GLuint format = 0;
+
+    switch (channels_) {
+    case 1:
+        internal_format = GL_RED;
+        format = GL_RED;
+        break;
+    case 3:
+        internal_format = GL_RGB;
+        format = GL_BGR;
+        break;
+    }
+
     if (type_ == TextureType::Texture2D) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0,
-            GL_BGR, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width_, height_, 0,
+            format, GL_UNSIGNED_BYTE, data);
     }
     else if (type_ == TextureType::Texture2DMultisample) {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
@@ -349,7 +377,8 @@ void Texture::swapRedBlue() {
     }
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
+            getChannelsCount(), img_handle_.accessPixels());
     }
 }
 
@@ -369,7 +398,8 @@ void Texture::flipVertical() {
     img_handle_.flipVertical();
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
+            getChannelsCount(), img_handle_.accessPixels());
     }
 }
 
@@ -389,6 +419,7 @@ void Texture::flipHorizontal() {
     img_handle_.flipHorizontal();
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
+            getChannelsCount(), img_handle_.accessPixels());
     }
 }

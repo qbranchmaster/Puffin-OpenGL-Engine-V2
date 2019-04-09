@@ -42,7 +42,8 @@ void Core::createDefaultRenderers() {
         camera_));
     default_shadow_map_renderer_.reset(new DefaultShadowMapRenderer(
         render_settings_, camera_));
-	default_font_renderer_.reset(new DefaultFontRenderer());
+	default_font_renderer_.reset(new DefaultFontRenderer(
+        "DemoData/Fonts/unispace/unispace.ttf"));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));

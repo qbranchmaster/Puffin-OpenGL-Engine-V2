@@ -56,6 +56,7 @@ namespace puffin {
             TextureFilter filter);
         static void setTextureSlot(GLushort slot_index);
         static void unbindTextureType(TextureType type);
+        static void setPixelAlignment(GLushort aligment);
 
         GLboolean loadImageRaw(std::string path);
         GLboolean loadTexture2D(std::string path, GLboolean auto_free = true);
@@ -115,7 +116,8 @@ namespace puffin {
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
         void setTextureBorderColor(const glm::vec4 &color);
-        void setTexture2DData(void *data, GLboolean generate_mipmaps = true);
+        void setTexture2DData(GLuint width, GLuint height, GLushort channels,
+            void *data, GLboolean generate_mipmaps = true);
 
         GLuint getHandle() const {
             return handle_;
