@@ -35,7 +35,7 @@ void Core::initialize() {
 
 void Core::createDefaultRenderers() {
     default_postprocess_renderer_.reset(new DefaultPostprocessRenderer(
-        render_settings_));
+        render_settings_, camera_));
     default_skybox_renderer_.reset(new DefaultSkyboxRenderer(render_settings_,
         camera_));
     default_mesh_renderer_.reset(new DefaultMeshRenderer(render_settings_,

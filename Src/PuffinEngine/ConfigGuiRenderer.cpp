@@ -9,8 +9,8 @@ using namespace puffin;
 
 ConfigGuiRenderer::ConfigGuiRenderer(WindowPtr window,
     RenderSettingsPtr render_settings,
-    RenderersSharedDataPtr renderers_shared_data) {
-    if (!window || !render_settings || !renderers_shared_data) {
+    RenderersSharedDataPtr renderers_shared_data, CameraPtr camera) {
+    if (!window || !render_settings || !renderers_shared_data || !camera) {
         throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
             "Not initialized object.");
     }
@@ -18,6 +18,7 @@ ConfigGuiRenderer::ConfigGuiRenderer(WindowPtr window,
     render_settings_ = render_settings;
     target_window_ = window;
     renderers_shared_data_ = renderers_shared_data;
+    camera_ = camera;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -37,6 +38,7 @@ void ConfigGuiRenderer::render() {
     lightingDialog();
     postprocessDialog();
     shadowMappingDialog();
+    cameraDialog();
 
     if (debug_enabled_) {
         debugDialog();
@@ -191,6 +193,42 @@ void ConfigGuiRenderer::debugDialog() {
     ImTextureID texture_handle = (void*)(shadow_map_texture->getHandle());
     ImGui::Image(texture_handle, ImVec2(shadow_map_texture->getWidth() / 4.0f,
         shadow_map_texture->getHeight() / 4.0f));
+
+    ImGui::End();
+}
+
+void ConfigGuiRenderer::cameraDialog() {
+    ImGui::Begin("Camera");
+
+    auto position = camera_->getPosition();
+    float cam_pos[3] = {position.x, position.y, position.z};
+    ImGui::InputFloat3("Position", cam_pos, 2);
+    camera_->setPosition(glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+
+    auto near_plane = camera_->getNearPlane();
+    ImGui::InputFloat("Near plane", &near_plane, 0.1f, 1.0f, 2);
+    auto far_plane = camera_->getFarPlane();
+    ImGui::InputFloat("Far plane", &far_plane, 0.1f, 1.0f, 2);
+    auto fov = camera_->getFov();
+    ImGui::InputFloat("FOV", &fov, 0.1f, 1.0f, 2);
+    auto aspect = camera_->getAspect();
+    ImGui::InputFloat("Aspect", &aspect, 0.1f, 1.0f, 2);
+
+    camera_->setProjection(fov, aspect, near_plane, far_plane);
+
+    bool dof_enabled = render_settings_->postprocess()->isDepthOfFieldEnabled();
+    ImGui::Checkbox("Depth of Field", &dof_enabled);
+    render_settings_->postprocess()->enableDepthOfField(dof_enabled);
+
+    auto aperture = camera_->getAperture();
+    ImGui::InputFloat("Aperture", &aperture, 0.1f, 1.0f, 2);
+    camera_->setAperture(aperture);
+    auto focus = camera_->getFocusDistance();
+    ImGui::InputFloat("Focus distance", &focus, 0.1f, 1.0f, 2);
+    camera_->setFocusDistance(focus);
+    auto max_blur = render_settings_->postprocess()->getDepthOfFieldMaxBlur();
+    ImGui::InputFloat("Max blur", &max_blur, 0.1f, 1.0f, 2);
+    render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
 
     ImGui::End();
 }

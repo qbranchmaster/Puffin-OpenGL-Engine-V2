@@ -18,6 +18,7 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
+#include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Window.hpp"
@@ -26,7 +27,7 @@ namespace puffin {
     class ConfigGuiRenderer {
     public:
         ConfigGuiRenderer(WindowPtr window, RenderSettingsPtr render_settings,
-            RenderersSharedDataPtr renderers_shared_data);
+            RenderersSharedDataPtr renderers_shared_data, CameraPtr camera);
 
         void render();
 
@@ -41,9 +42,11 @@ namespace puffin {
         void lightingDialog();
         void shadowMappingDialog();
         void debugDialog();
+        void cameraDialog();
 
         GLboolean debug_enabled_{false};
 
+        CameraPtr camera_;
         RenderSettingsPtr render_settings_;
         RenderersSharedDataPtr renderers_shared_data_;
         WindowPtr target_window_;

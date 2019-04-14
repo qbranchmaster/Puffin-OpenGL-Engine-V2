@@ -8,13 +8,14 @@
 using namespace puffin;
 
 DefaultPostprocessRenderer::DefaultPostprocessRenderer(
-    RenderSettingsPtr render_settings) {
-    if (!render_settings) {
+    RenderSettingsPtr render_settings, CameraPtr camera) {
+    if (!render_settings || !camera) {
         throw Exception(
             "DefaultPostprocessRenderer::DefaultPostprocessRenderer()",
             "Not initialized object.");
     }
 
+    camera_ = camera;
     render_settings_ = render_settings;
 
     loadShaders();
@@ -49,15 +50,29 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
     default_shader_program_->setUniform("color.tint_color",
         render_settings_->postprocess()->getTintColor());
     default_shader_program_->setUniform("color.screen_texture", 0);
+    default_shader_program_->setUniform("color.depth_texture", 1);
     default_shader_program_->setUniform("color.gamma",
         render_settings_->getGamma());
     default_shader_program_->setUniform("color.exposure",
         render_settings_->getExposure());
     default_shader_program_->setUniform("color.glow_bloom_enabled",
         render_settings_->postprocess()->isGlowBloomEnabled());
+    default_shader_program_->setUniform("color.dof_enabled",
+        render_settings_->postprocess()->isDepthOfFieldEnabled());
 
     if (render_settings_->postprocess()->isGlowBloomEnabled()) {
         default_shader_program_->setUniform("color.glow_bloom_texture", 1);
+    }
+
+    if (render_settings_->postprocess()->isDepthOfFieldEnabled()) {
+        default_shader_program_->setUniform("color.aperture",
+            camera_->getAperture());
+        default_shader_program_->setUniform("color.focus_distance",
+            camera_->getFocusDistance());
+        default_shader_program_->setUniform("color.dof_max_blur",
+            render_settings_->postprocess()->getDepthOfFieldMaxBlur());
+        default_shader_program_->setUniform("color.camera_aspect",
+            camera_->getAspect());
     }
 }
 
@@ -142,6 +157,8 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
 
     Texture::setTextureSlot(0);
     frame_buffer->getTextureBuffer(0)->bind();
+    Texture::setTextureSlot(1);
+    frame_buffer->getDepthTextureBuffer()->bind();
     if (render_settings_->postprocess()->isGlowBloomEnabled()) {
         Texture::setTextureSlot(1);
         bloom_frame_buffer_[0]->getTextureBuffer(0)->bind();

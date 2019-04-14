@@ -118,6 +118,18 @@ namespace puffin {
             return up_;
         }
 
+        void setAperture(GLfloat aperture);
+
+        GLfloat getAperture() const {
+            return aperture_;
+        }
+
+        void setFocusDistance(GLfloat distance);
+
+        GLfloat getFocusDistance() const {
+            return focus_distance_;
+        }
+
     private:
         void calculateProjectionMatrix();
         void calculateViewMatrix();
@@ -151,6 +163,9 @@ namespace puffin {
         GLfloat move_resistance_factor_{0.85f};
         GLfloat ahead_speed_{0.0f};
         GLfloat side_speed_{0.0f};
+
+        GLfloat aperture_{0.06f};
+        GLfloat focus_distance_{0.7f};
     };
 
     using CameraPtr = std::shared_ptr<Camera>;

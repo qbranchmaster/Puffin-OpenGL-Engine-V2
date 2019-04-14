@@ -27,6 +27,8 @@ EngineDemo::EngineDemo() : Core() {
     createTimers();
 
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
+    camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(),
+        0.1f, 15.0f);
     camera()->setFov(0.85f);
 
     Texture::setDefaultTextureFilter(TextureType::Texture2D,

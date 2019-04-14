@@ -2,6 +2,7 @@
 
 struct Color {
     sampler2D screen_texture;
+    sampler2D depth_texture;
 
     sampler2D glow_bloom_texture;
     bool glow_bloom_enabled;
@@ -12,6 +13,12 @@ struct Color {
 
     float gamma;
     float exposure;
+
+    bool dof_enabled;
+    float aperture;
+    float focus_distance;
+    float dof_max_blur;
+    float camera_aspect;
 };
 
 in VS_OUT {
@@ -22,10 +29,91 @@ out vec4 frag_color;
 
 uniform Color color;
 
+vec3 depthOfFieldTexturesSample(vec2 tex_coords, vec2 coords_offset,
+    vec2 blur_value, vec2 aspect_correct) {
+    vec3 result = vec3(0.0f, 0.0f, 0.0f);
+
+    result = vec3(texture2D(color.screen_texture, tex_coords.xy +
+        (coords_offset * aspect_correct) * blur_value) +
+        texture2D(color.glow_bloom_texture, tex_coords.xy + (coords_offset *
+        aspect_correct) * blur_value));
+
+    return result;
+}
+
+vec3 depthOfField(vec3 input_color, vec2 input_coords) {
+    vec2 uv = input_coords;
+    vec2 aspectcorrect = vec2(1.0f, color.camera_aspect);
+    vec4 depth = texture2D(color.depth_texture, uv);
+    float factor = depth.x - color.focus_distance;
+    vec2 dof_blur = vec2(clamp(factor * color.aperture, -color.dof_max_blur,
+        color.dof_max_blur));
+
+    vec2 dof_blur9 = dof_blur * 0.9f;
+    vec2 dof_blur7 = dof_blur * 0.7f;
+    vec2 dof_blur4 = dof_blur * 0.4f;
+
+    vec3 dof_color = vec3(0.0f);
+    dof_color += input_color;
+
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f,   0.40f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.15f,  0.37f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f,  0.29f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.37f,  0.15f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.40f,  0.0f),  dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f, -0.15f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f, -0.29f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f, -0.37f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f, - 0.4f),  dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f,  0.37f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f,  0.29f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f,  0.15f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.4f,   0.0f),  dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.37f, -0.15f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f, -0.29f), dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.15f, -0.37f), dof_blur, aspectcorrect);
+
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.15f,  0.37f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.37f,  0.15f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f, -0.15f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f, -0.37f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f,  0.37f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f,  0.15f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.37f, -0.15f), dof_blur9, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.15f, -0.37f), dof_blur9, aspectcorrect);
+
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f,  0.29f), dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.40f,  0.0f),  dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f, -0.29f), dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f, - 0.4f),  dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f,  0.29f), dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.4f,   0.0f),  dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f, -0.29f), dof_blur7, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f,   0.4f),  dof_blur7, aspectcorrect);
+
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f,  0.29f), dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.4f,   0.0f),  dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f, -0.29f),  dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f,  -0.4f),  dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f,  0.29f), dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.4f,   0.0f),  dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f, -0.29f), dof_blur4, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f,   0.4f),  dof_blur4, aspectcorrect);
+
+    dof_color = dof_color / 41.0f;
+
+    return dof_color;
+}
+
 vec3 sampleAccumTextures(vec2 tex_coords) {
     vec3 result = texture(color.screen_texture, tex_coords).rgb;
     if (color.glow_bloom_enabled) {
         result = result + texture(color.glow_bloom_texture, tex_coords).rgb;
+    }
+
+    // Depth of field
+    if (color.dof_enabled) {
+        result = depthOfField(result, tex_coords);
     }
 
     return result;

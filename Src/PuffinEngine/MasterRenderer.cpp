@@ -21,7 +21,7 @@ MasterRenderer::MasterRenderer(WindowPtr window, CameraPtr camera,
     renderers_shared_data_.reset(new RenderersSharedData());
 
     config_gui_renderer_.reset(new ConfigGuiRenderer(target_window_,
-        render_settings_, renderers_shared_data_));
+        render_settings_, renderers_shared_data_, camera_));
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " +
         System::instance().getGpuVendor());

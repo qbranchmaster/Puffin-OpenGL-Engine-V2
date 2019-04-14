@@ -82,6 +82,28 @@ namespace puffin {
             return glow_bloom_thresh_;
         }
 
+        void enableDepthOfField(GLboolean state) {
+            dof_enabled_ = state;
+        }
+
+        GLboolean isDepthOfFieldEnabled() const {
+            return dof_enabled_;
+        }
+
+        void setDepthOfFieldMaxBlur(GLfloat max_blur) {
+            if (max_blur < 0.0f || max_blur > 1.0f) {
+                logError("Postprocess::setDepthOfFieldMaxBlur()",
+                    "Invalid value.");
+                return;
+            }
+
+            dof_max_blur_ = max_blur;
+        }
+
+        GLfloat getDepthOfFieldMaxBlur() const {
+            return dof_max_blur_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::NONE};
 
@@ -89,6 +111,8 @@ namespace puffin {
         glm::vec3 glow_bloom_thresh_{0.5f, 0.5f, 0.5f};
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
+        GLboolean dof_enabled_{false};
+        GLfloat dof_max_blur_{0.02f};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

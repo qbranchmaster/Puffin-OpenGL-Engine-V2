@@ -6,6 +6,7 @@
 #ifndef PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 #define PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 
+#include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/Mesh.hpp"
@@ -16,7 +17,8 @@
 namespace puffin {
     class DefaultPostprocessRenderer : public PostprocessRenderer {
     public:
-        DefaultPostprocessRenderer(RenderSettingsPtr render_settings);
+        DefaultPostprocessRenderer(RenderSettingsPtr render_settings,
+            CameraPtr camera);
 
         void render(FrameBufferPtr frame_buffer);
 
@@ -27,6 +29,7 @@ namespace puffin {
         void drawMesh(MeshPtr mesh);
         void renderGlowBloom(FrameBufferPtr frame_buffer);
 
+        CameraPtr camera_;
         FrameBufferPtr bloom_frame_buffer_[2];
         MeshPtr screen_mesh_;
         RenderSettingsPtr render_settings_;
