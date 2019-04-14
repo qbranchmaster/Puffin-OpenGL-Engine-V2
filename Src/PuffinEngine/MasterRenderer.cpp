@@ -46,15 +46,14 @@ void MasterRenderer::createDefaultFrameBuffer() {
     auto h = Configuration::instance().getFrameHeight();
 
     default_frame_buffer_.reset(new FrameBuffer(w, h));
-    default_frame_buffer_multisample_.reset(new FrameBuffer(w, h));
-
-    default_frame_buffer_->addRenderBuffer(false);
+    default_frame_buffer_->addDepthTextureBuffer(false, true);
     default_frame_buffer_->addTextureBuffer(0, false, true);
     default_frame_buffer_->addTextureBuffer(1, false, true);
 
-    default_frame_buffer_multisample_->addRenderBuffer(true);
+    default_frame_buffer_multisample_.reset(new FrameBuffer(w, h));
     default_frame_buffer_multisample_->addTextureBuffer(0, true, true);
     default_frame_buffer_multisample_->addTextureBuffer(1, true, true);
+    default_frame_buffer_multisample_->addDepthTextureBuffer(true, true);
 
     if (!default_frame_buffer_->isComplete()) {
         throw Exception("MasterRenderer::createDefaultFrameBuffer()",
@@ -83,9 +82,9 @@ void MasterRenderer::start() {
 
         if (postprocess_renderer_) {
             default_frame_buffer_multisample_->
-                copyFrameBuffer(default_frame_buffer_, 0);
+                copyFrameBuffer(default_frame_buffer_, 0, true);
             default_frame_buffer_multisample_->
-                copyFrameBuffer(default_frame_buffer_, 1);
+                copyFrameBuffer(default_frame_buffer_, 1, false);
             postprocess_renderer_->render(default_frame_buffer_);
         }
 

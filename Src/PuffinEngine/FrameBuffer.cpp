@@ -30,7 +30,7 @@ void FrameBuffer::setClearColor(const glm::vec3 & color) {
 }
 
 void FrameBuffer::copyFrameBuffer(FrameBufferPtr target,
-    GLushort attachment_index) {
+    GLushort attachment_index, GLboolean copy_depth) {
     if (!target) {
         logError("FrameBuffer::copyFrameBuffer()", "Null input.");
         return;
@@ -47,8 +47,13 @@ void FrameBuffer::copyFrameBuffer(FrameBufferPtr target,
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     glDrawBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
 
-    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_,
-        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    GLuint copy_bits = GL_COLOR_BUFFER_BIT;
+    if (copy_depth) {
+        copy_bits |= GL_DEPTH_BUFFER_BIT;
+    }
+
+    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, copy_bits,
+        GL_NEAREST);
 
     target->unbind();
 }
@@ -100,15 +105,18 @@ void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
     glDrawBuffers(texture_buffers_.size(), attachments.data());
 }
 
-void FrameBuffer::addDepthTextureBuffer() {
+void FrameBuffer::addDepthTextureBuffer(GLboolean multisample,
+    GLboolean float_buffer) {
     if (depth_texture_buffer_) {
         return;
     }
 
-    depth_texture_buffer_.reset(new DepthTextureBuffer(width_, height_));
+    depth_texture_buffer_.reset(new DepthTextureBuffer(width_, height_,
+        multisample, float_buffer));
 
     bind(FrameBufferBindType::NORMAL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, multisample ?
+        GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
         depth_texture_buffer_->getHandle(), 0);
 }
 

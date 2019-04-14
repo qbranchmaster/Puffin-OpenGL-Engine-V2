@@ -119,11 +119,13 @@ namespace puffin {
 
         GLboolean isComplete();
 
-        void copyFrameBuffer(FrameBufferPtr target, GLushort attachment_index);
+        void copyFrameBuffer(FrameBufferPtr target, GLushort attachment_index,
+            GLboolean copy_depth = false);
         void addRenderBuffer(GLboolean multisample);
         void addTextureBuffer(GLushort index, GLboolean multisample,
             GLboolean float_buffer);
-        void addDepthTextureBuffer();
+        void addDepthTextureBuffer(GLboolean multisample,
+            GLboolean float_buffer);
 
         TextureBufferPtr getTextureBuffer(GLushort index) const {
             if (index >= texture_buffers_.size()) {

@@ -34,7 +34,8 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
         getDirectionalLightShadowMapSize();
     directional_light_shadow_map_frame_bufer_.reset(
         new FrameBuffer(size, size));
-    directional_light_shadow_map_frame_bufer_->addDepthTextureBuffer();
+    directional_light_shadow_map_frame_bufer_->addDepthTextureBuffer(false,
+        true);
     directional_light_shadow_map_frame_bufer_->disableDrawBuffer();
     directional_light_shadow_map_frame_bufer_->disableReadBuffer();
 

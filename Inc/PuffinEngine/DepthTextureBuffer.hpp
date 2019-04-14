@@ -18,16 +18,27 @@
 namespace puffin {
     class DepthTextureBuffer {
     public:
-        DepthTextureBuffer(GLuint width, GLuint height) {
+        DepthTextureBuffer(GLuint width, GLuint height,
+            GLboolean multisample, GLboolean float_buffer) {
             glGenTextures(1, &handle_);
 
             width_ = width;
             height_ = height;
+            multisample_ = multisample;
 
             bind();
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width_, height_,
-                0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            if (multisample_) {
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+                    Configuration::instance().getMsaaSamples(),
+                    float_buffer ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT,
+                    width_, height_, GL_TRUE);
+            }
+            else {
+                glTexImage2D(GL_TEXTURE_2D, 0, float_buffer ?
+                    GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT, width_, height_,
+                    0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            }
 
             // Setup filtering
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -48,7 +59,8 @@ namespace puffin {
         }
 
         void bind() {
-            glBindTexture(GL_TEXTURE_2D, handle_);
+            glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE :
+                GL_TEXTURE_2D, handle_);
         }
 
         GLuint getWidth() const {
@@ -63,11 +75,16 @@ namespace puffin {
             return handle_;
         }
 
+        GLboolean isMultisampled() const {
+            return multisample_;
+        }
+
     private:
         GLuint handle_{0};
 
         GLuint width_{0};
         GLuint height_{0};
+        GLboolean multisample_{false};
     };
 
     using DepthTextureBufferPtr = std::shared_ptr<DepthTextureBuffer>;

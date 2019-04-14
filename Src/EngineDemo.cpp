@@ -49,7 +49,7 @@ EngineDemo::EngineDemo() : Core() {
     renderSettings()->lighting()->directionalLight()->setDirection(
         glm::vec3(0.5f, -0.5f, -0.5f));
     renderSettings()->lighting()->directionalLight()->setAmbientColor(
-        glm::vec3(0.6f, 0.6f, 0.6f));
+        glm::vec3(0.1f, 0.1f, 0.1f));
     renderSettings()->lighting()->directionalLight()->setDiffuseColor(
         glm::vec3(0.8f, 0.8f, 0.8f));
     renderSettings()->lighting()->directionalLight()->setSpecularColor(
