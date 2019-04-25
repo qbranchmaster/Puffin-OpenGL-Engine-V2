@@ -24,7 +24,7 @@ void main() {
         }
     }
     else {
-        for(int i = 1; i < 5; i++) {
+        for (int i = 1; i < 5; i++) {
             result += texture(image, fs_in.tex_coord +
                 vec2(0.0f, tex_offset.y * i)).rgb * weight[i];
             result += texture(image, fs_in.tex_coord -

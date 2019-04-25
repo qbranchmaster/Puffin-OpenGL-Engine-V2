@@ -61,7 +61,7 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
         render_settings_->postprocess()->isDepthOfFieldEnabled());
 
     if (render_settings_->postprocess()->isGlowBloomEnabled()) {
-        default_shader_program_->setUniform("color.glow_bloom_texture", 1);
+        default_shader_program_->setUniform("color.glow_bloom_texture", 2);
     }
 
     if (render_settings_->postprocess()->isDepthOfFieldEnabled()) {
@@ -159,9 +159,12 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     frame_buffer->getTextureBuffer(0)->bind();
     Texture::setTextureSlot(1);
     frame_buffer->getDepthTextureBuffer()->bind();
-    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
-        Texture::setTextureSlot(1);
+    Texture::setTextureSlot(2);
+    if (render_settings_->postprocess()->isGlowBloomEnabled()) {        
         bloom_frame_buffer_[0]->getTextureBuffer(0)->bind();
+    }
+    else {
+        Texture::unbindTextureType(TextureType::Texture2D);
     }
 
     DepthTest::instance().enable(false);

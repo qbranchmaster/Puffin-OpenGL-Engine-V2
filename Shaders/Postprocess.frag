@@ -64,7 +64,7 @@ vec3 depthOfField(vec3 input_color, vec2 input_coords) {
     dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f, -0.15f), dof_blur, aspectcorrect);
     dof_color += depthOfFieldTexturesSample(uv, vec2( 0.29f, -0.29f), dof_blur, aspectcorrect);
     dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f, -0.37f), dof_blur, aspectcorrect);
-    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f, - 0.4f),  dof_blur, aspectcorrect);
+    dof_color += depthOfFieldTexturesSample(uv, vec2( 0.0f,  -0.4f),  dof_blur, aspectcorrect);
     dof_color += depthOfFieldTexturesSample(uv, vec2(-0.15f,  0.37f), dof_blur, aspectcorrect);
     dof_color += depthOfFieldTexturesSample(uv, vec2(-0.29f,  0.29f), dof_blur, aspectcorrect);
     dof_color += depthOfFieldTexturesSample(uv, vec2( 0.37f,  0.15f), dof_blur, aspectcorrect);
@@ -108,7 +108,7 @@ vec3 depthOfField(vec3 input_color, vec2 input_coords) {
 vec3 sampleAccumTextures(vec2 tex_coords) {
     vec3 result = texture(color.screen_texture, tex_coords).rgb;
     if (color.glow_bloom_enabled) {
-        result = result + texture(color.glow_bloom_texture, tex_coords).rgb;
+		result = result + texture(color.glow_bloom_texture, tex_coords).rgb;
     }
 
     // Depth of field
