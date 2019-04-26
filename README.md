@@ -17,6 +17,8 @@ Previous version of this engine is no longer developed. I decided to create a ne
   - Integration with IMGUI.
 
 ## Screenshots
+### Screenshot #1
+![Screenshot 26.04.2019](https://raw.githubusercontent.com/qbranchmaster/Puffin-OpenGL-Engine-V2/master/Screenshots/26_04_2019.png)
 
 ## Build instructions
 **Required libraries:**
