@@ -233,6 +233,7 @@ void MasterRenderer::checkGlErrors() {
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         throw Exception("MasterRenderer::checkGlErrors()",
-            "OpenGL error occured.");
+            "OpenGL error occured [Error code = " + std::to_string(error) +
+            "].");
     }
 }

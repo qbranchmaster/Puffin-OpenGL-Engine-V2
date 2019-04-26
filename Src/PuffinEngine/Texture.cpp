@@ -133,7 +133,8 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     type_ = TextureType::Texture2D;
 
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_BGR,
+    glTexImage2D(GL_TEXTURE_2D, 0, (channels_ == 4) ? GL_RGBA : GL_RGB,
+        width_, height_, 0, (channels_ == 4) ? GL_BGRA : GL_BGR,
         GL_UNSIGNED_BYTE, img_handle_.accessPixels());
     setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
     setTextureWrap(TextureWrap::REPEAT);
@@ -337,6 +338,9 @@ void Texture::setTexture2DData(GLuint width, GLuint height, GLushort channels,
         internal_format = GL_RGB;
         format = GL_BGR;
         break;
+    case 4:
+        internal_format = GL_RGBA;
+        format = GL_BGRA;
     }
 
     if (type_ == TextureType::Texture2D) {
