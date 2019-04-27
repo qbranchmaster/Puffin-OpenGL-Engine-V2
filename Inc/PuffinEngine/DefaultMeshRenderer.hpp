@@ -11,6 +11,7 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
+#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 
@@ -18,7 +19,7 @@ namespace puffin {
     class DefaultMeshRenderer : public MeshRenderer {
     public:
         DefaultMeshRenderer(RenderSettingsPtr render_settings,
-            CameraPtr camera);
+            RenderersSharedDataPtr shared_data, CameraPtr camera);
 
         void render(FrameBufferPtr frame_buffer, MeshPtr mesh);
 
@@ -30,6 +31,7 @@ namespace puffin {
 
         CameraPtr camera_;
         RenderSettingsPtr render_settings_;
+        RenderersSharedDataPtr shared_data_;
         ShaderProgramPtr default_shader_program_;
     };
 

@@ -12,6 +12,7 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
+#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/ShadowMapRenderer.hpp"
@@ -20,7 +21,7 @@ namespace puffin {
     class DefaultShadowMapRenderer : public ShadowMapRenderer {
     public:
         DefaultShadowMapRenderer(RenderSettingsPtr render_settings,
-            CameraPtr camera);
+            RenderersSharedDataPtr shared_data, CameraPtr camera);
 
         void render(MeshPtr mesh);
 
@@ -33,6 +34,7 @@ namespace puffin {
         CameraPtr camera_;
         CameraFrustumPtr camera_frustum_;
         RenderSettingsPtr render_settings_;
+        RenderersSharedDataPtr shared_data_;
         ShaderProgramPtr directional_light_shader_program_;
 
         FrameBufferPtr directional_light_shadow_map_frame_bufer_;

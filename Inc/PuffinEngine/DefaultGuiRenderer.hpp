@@ -3,8 +3,8 @@
 * Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
-#ifndef PUFFIN_CONFIG_GUI_RENDERER_HPP
-#define PUFFIN_CONFIG_GUI_RENDERER_HPP
+#ifndef PUFFIN_DEFAULT_GUI_RENDERER_HPP
+#define PUFFIN_DEFAULT_GUI_RENDERER_HPP
 
 #ifdef WIN32 // Prevents APIENTRY redefinition
 #include <Windows.h>
@@ -19,21 +19,29 @@
 #include "examples/imgui_impl_opengl3.h"
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/GuiRenderer.hpp"
 #include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
-    class ConfigGuiRenderer {
+    class DefaultGuiRenderer : public GuiRenderer {
     public:
-        ConfigGuiRenderer(WindowPtr window, RenderSettingsPtr render_settings,
-            RenderersSharedDataPtr renderers_shared_data, CameraPtr camera);
+        DefaultGuiRenderer(RenderSettingsPtr render_settings,
+            RenderersSharedDataPtr renderers_shared_data, WindowPtr window,
+            CameraPtr camera);
 
         void render();
+
+        void enable(GLboolean state) {
+            enabled_ = state;
+        }
 
         void enableDebugWindows(GLboolean enabled) {
             debug_enabled_ = enabled;
         }
+
+        GLboolean isCapturingMouse() const;
 
     private:
         void setupImGui();
@@ -44,6 +52,7 @@ namespace puffin {
         void debugDialog();
         void cameraDialog();
 
+        GLboolean enabled_{true};
         GLboolean debug_enabled_{false};
 
         CameraPtr camera_;
@@ -52,7 +61,7 @@ namespace puffin {
         WindowPtr target_window_;
     };
 
-    using ConfigGuiRendererPtr = std::shared_ptr<ConfigGuiRenderer>;
+    using DefaultGuiRendererPtr = std::shared_ptr<DefaultGuiRenderer>;
 } // namespace puffin
 
-#endif // PUFFIN_CONFIG_GUI_RENDERER_HPP
+#endif // PUFFIN_DEFAULT_GUI_RENDERER_HPP

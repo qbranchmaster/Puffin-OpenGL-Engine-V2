@@ -19,12 +19,12 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
     GLboolean result = false;
 
     if (sticky) {
-        if (glfwGetKey(target_window_->handle_, static_cast<GLint>(key))) {
+        if (glfwGetKey(target_window_->getHandle(), static_cast<GLint>(key))) {
             result = true;
         }
     }
     else {
-        auto pressed = glfwGetKey(target_window_->handle_,
+        auto pressed = glfwGetKey(target_window_->getHandle(),
             static_cast<GLint>(key));
 
         if (pressed && key_states_[key] == false) {
@@ -40,7 +40,7 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
 }
 
 GLboolean Input::mouseKeyPressed(MouseButton button) {
-    if (glfwGetMouseButton(target_window_->handle_,
+    if (glfwGetMouseButton(target_window_->getHandle(),
         static_cast<GLint>(button))) {
         return true;
     }
@@ -49,14 +49,14 @@ GLboolean Input::mouseKeyPressed(MouseButton button) {
 }
 
 void Input::setCursorPosition(GLfloat x, GLfloat y) {
-    glfwSetCursorPos(target_window_->handle_, x, y);
+    glfwSetCursorPos(target_window_->getHandle(), x, y);
 }
 
 void Input::getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const {
     GLdouble cur_x = 0;
     GLdouble cur_y = 0;
 
-    glfwGetCursorPos(target_window_->handle_, &cur_x, &cur_y);
+    glfwGetCursorPos(target_window_->getHandle(), &cur_x, &cur_y);
     x_pos = static_cast<GLfloat>(cur_x);
     y_pos = static_cast<GLfloat>(cur_y);
 }

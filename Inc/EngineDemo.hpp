@@ -29,6 +29,7 @@ private:
 
     puffin::TimerPtr fps_update_timer_;
 
+    puffin::DefaultGuiRendererPtr gui_renderer_;
     puffin::MeshPtr test_mesh_;
     puffin::ScenePtr scene_;
     puffin::SkyboxPtr skybox_;

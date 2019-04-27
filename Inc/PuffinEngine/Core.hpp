@@ -8,6 +8,7 @@
 
 #include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/DefaultFontRenderer.hpp"
+#include "PuffinEngine/DefaultGuiRenderer.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
@@ -16,6 +17,7 @@
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
+#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/System.hpp"
 
 namespace puffin {
@@ -52,12 +54,14 @@ namespace puffin {
     private:
         CameraPtr camera_;
 		DefaultFontRendererPtr default_font_renderer_;
+        DefaultGuiRendererPtr default_gui_renderer_;
         DefaultMeshRendererPtr default_mesh_renderer_;
         DefaultPostprocessRendererPtr default_postprocess_renderer_;
         DefaultShadowMapRendererPtr default_shadow_map_renderer_;
         DefaultSkyboxRendererPtr default_skybox_renderer_;
         InputPtr input_;
         MasterRendererPtr master_renderer_;
+        RenderersSharedDataPtr renderers_shared_data_;
         RenderSettingsPtr render_settings_;
         WindowPtr window_;
     };

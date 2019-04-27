@@ -34,16 +34,20 @@ void Core::initialize() {
 }
 
 void Core::createDefaultRenderers() {
+    renderers_shared_data_.reset(new RenderersSharedData());
+
     default_postprocess_renderer_.reset(new DefaultPostprocessRenderer(
         render_settings_, camera_));
     default_skybox_renderer_.reset(new DefaultSkyboxRenderer(render_settings_,
         camera_));
     default_mesh_renderer_.reset(new DefaultMeshRenderer(render_settings_,
-        camera_));
+        renderers_shared_data_, camera_));
     default_shadow_map_renderer_.reset(new DefaultShadowMapRenderer(
-        render_settings_, camera_));
+        render_settings_, renderers_shared_data_, camera_));
 	default_font_renderer_.reset(new DefaultFontRenderer(
         "DemoData/Fonts/unispace/unispace.ttf"));
+    default_gui_renderer_.reset(new DefaultGuiRenderer(render_settings_,
+        renderers_shared_data_, window_, camera_));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));
@@ -55,6 +59,8 @@ void Core::createDefaultRenderers() {
         <ShadowMapRenderer>(default_shadow_map_renderer_));
 	master_renderer_->assignFontRenderer(std::static_pointer_cast
 		<FontRenderer>(default_font_renderer_));
+    master_renderer_->assignGuiRenderer(std::static_pointer_cast
+        <GuiRenderer>(default_gui_renderer_));
 }
 
 void Core::start() {

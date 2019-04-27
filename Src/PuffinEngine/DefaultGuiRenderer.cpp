@@ -3,13 +3,13 @@
 * Coded by: Sebastian 'qbranchmaster' Tabaka
 */
 
-#include "PuffinEngine/ConfigGuiRenderer.hpp"
+#include "PuffinEngine/DefaultGuiRenderer.hpp"
 
 using namespace puffin;
 
-ConfigGuiRenderer::ConfigGuiRenderer(WindowPtr window,
-    RenderSettingsPtr render_settings,
-    RenderersSharedDataPtr renderers_shared_data, CameraPtr camera) {
+DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
+    RenderersSharedDataPtr renderers_shared_data, WindowPtr window,
+    CameraPtr camera) {
     if (!window || !render_settings || !renderers_shared_data || !camera) {
         throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
             "Not initialized object.");
@@ -26,11 +26,15 @@ ConfigGuiRenderer::ConfigGuiRenderer(WindowPtr window,
     setupImGui();
 
     const char *glsl_version = "#version 330";
-    ImGui_ImplGlfw_InitForOpenGL(target_window_->handle_, true);
+    ImGui_ImplGlfw_InitForOpenGL(target_window_->getHandle(), true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-void ConfigGuiRenderer::render() {
+void DefaultGuiRenderer::render() {
+    if (!enabled_) {
+        return;
+    }
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -48,7 +52,11 @@ void ConfigGuiRenderer::render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ConfigGuiRenderer::setupImGui() {
+GLboolean DefaultGuiRenderer::isCapturingMouse() const {
+    return ImGui::GetIO().WantCaptureMouse;
+}
+
+void DefaultGuiRenderer::setupImGui() {
     ImGuiIO &io = ImGui::GetIO();
 
     ImGuiStyle &style = ImGui::GetStyle();
@@ -59,7 +67,7 @@ void ConfigGuiRenderer::setupImGui() {
     ImGui::StyleColorsClassic();
 }
 
-void ConfigGuiRenderer::postprocessDialog() {
+void DefaultGuiRenderer::postprocessDialog() {
     ImGui::Begin("Postprocess");
 
     auto current = render_settings_->postprocess()->getEffect();
@@ -115,7 +123,7 @@ void ConfigGuiRenderer::postprocessDialog() {
     ImGui::End();
 }
 
-void ConfigGuiRenderer::lightingDialog() {
+void DefaultGuiRenderer::lightingDialog() {
     ImGui::Begin("Lighting");
 
     bool enabled = render_settings_->lighting()->isEnabled();
@@ -162,7 +170,7 @@ void ConfigGuiRenderer::lightingDialog() {
     ImGui::End();
 }
 
-void ConfigGuiRenderer::shadowMappingDialog() {
+void DefaultGuiRenderer::shadowMappingDialog() {
     ImGui::Begin("Shadow mapping");
 
     bool shadow_mapping_enabled = render_settings_->lighting()->
@@ -183,7 +191,7 @@ void ConfigGuiRenderer::shadowMappingDialog() {
     ImGui::End();
 }
 
-void ConfigGuiRenderer::debugDialog() {
+void DefaultGuiRenderer::debugDialog() {
     ImGui::Begin("Debug");
 
     ImGui::ShowMetricsWindow();
@@ -197,7 +205,7 @@ void ConfigGuiRenderer::debugDialog() {
     ImGui::End();
 }
 
-void ConfigGuiRenderer::cameraDialog() {
+void DefaultGuiRenderer::cameraDialog() {
     ImGui::Begin("Camera");
 
     auto position = camera_->getPosition();

@@ -59,6 +59,9 @@ EngineDemo::EngineDemo() : Core() {
 
     createScene();
     createDefaultRenderers();
+
+    gui_renderer_ = std::static_pointer_cast<DefaultGuiRenderer>(
+        masterRenderer()->guiRenderer());
 }
 
 EngineDemo::~EngineDemo() {
@@ -91,8 +94,8 @@ void EngineDemo::createScene() {
     skybox_->setTexture(skybox_texture_);
 
     test_mesh_.reset(new Mesh());
-    test_mesh_->loadFromFile("DemoData/Models/pony-cartoon/Pony_cartoon.obj");
-    test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
+    test_mesh_->loadFromFile("DemoData/Models/igor/Igor.obj");
+    test_mesh_->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);
@@ -115,20 +118,22 @@ void EngineDemo::pollKeyboard() {
     if (input()->keyPressed(Key::F1, false)) {
         static GLboolean enabled = true;
         enabled = !enabled;
-        masterRenderer()->configGuiEnable(enabled);
+        gui_renderer_->enable(enabled);
     }
 
     if (input()->keyPressed(Key::F2, false)) {
         static GLboolean enabled = false;
         enabled = !enabled;
-        masterRenderer()->configGuiEnableDebug(enabled);
+        gui_renderer_->enableDebugWindows(enabled);
     }
 
     moveCamera();
 }
 
 void EngineDemo::pollMouse() {
-    rotateCamera();
+    if (!gui_renderer_->isCapturingMouse()) {
+        rotateCamera();
+    }
 }
 
 ScenePtr EngineDemo::render() {

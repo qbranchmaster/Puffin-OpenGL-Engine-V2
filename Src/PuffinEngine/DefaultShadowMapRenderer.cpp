@@ -8,13 +8,15 @@
 using namespace puffin;
 
 DefaultShadowMapRenderer::DefaultShadowMapRenderer(
-    RenderSettingsPtr render_settings, CameraPtr camera) {
-    if (!render_settings || !camera) {
+    RenderSettingsPtr render_settings, RenderersSharedDataPtr shared_data,
+    CameraPtr camera) {
+    if (!render_settings || !shared_data || !camera) {
         throw Exception("DefaultShadowMapRenderer::DefaultShadowMapRenderer()",
             "Not initialized object.");
     }
 
     render_settings_ = render_settings;
+    shared_data_ = shared_data;
     camera_ = camera;
 
     camera_frustum_.reset(new CameraFrustum());
@@ -39,7 +41,7 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
     directional_light_shadow_map_frame_bufer_->disableDrawBuffer();
     directional_light_shadow_map_frame_bufer_->disableReadBuffer();
 
-    renderers_shared_data_->shadow_map_texture =
+    shared_data_->shadow_map_texture =
         directional_light_shadow_map_frame_bufer_->getDepthTextureBuffer();
 }
 
@@ -86,7 +88,7 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
         createDirectionalLightFrameBuffer();
     }
 
-    renderers_shared_data_->dir_light_space_matrix =
+    shared_data_->dir_light_space_matrix =
         calculateDirectionalLightSpaceMatrix();
 
     DepthTest::instance().enable(true);
@@ -104,7 +106,7 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
 
     directional_light_shader_program_->activate();
     directional_light_shader_program_->setUniform(
-        "matrices.light_space_matrix", renderers_shared_data_->
+        "matrices.light_space_matrix", shared_data_->
         dir_light_space_matrix);
     directional_light_shader_program_->setUniform("matrices.model_matrix",
         mesh->getModelMatrix());

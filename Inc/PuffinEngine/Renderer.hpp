@@ -13,23 +13,9 @@
 
 #include <memory>
 
-#include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/RenderersSharedData.hpp"
-
 namespace puffin {
     class Renderer {
-    public:
-        void setSharedDataPtr(RenderersSharedDataPtr data_ptr) {
-            if (!data_ptr) {
-                logError("Renderer::setSharedDataPtr()", "Null input.");
-                return;
-            }
 
-            renderers_shared_data_ = data_ptr;
-        }
-
-    protected:
-        RenderersSharedDataPtr renderers_shared_data_;
     };
 
     using RendererPtr = std::shared_ptr<Renderer>;

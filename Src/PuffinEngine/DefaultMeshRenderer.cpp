@@ -8,13 +8,14 @@
 using namespace puffin;
 
 DefaultMeshRenderer::DefaultMeshRenderer(RenderSettingsPtr render_settings,
-    CameraPtr camera) {
-    if (!render_settings || !camera) {
+    RenderersSharedDataPtr shared_data, CameraPtr camera) {
+    if (!render_settings || !shared_data || !camera) {
         throw Exception("DefaultMeshRenderer::DefaultMeshRenderer()",
             "Not initialized object.");
     }
 
     render_settings_ = render_settings;
+    shared_data_ = shared_data;
     camera_ = camera;
 
     loadShaders();
@@ -38,7 +39,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
 
     if (render_settings_->lighting()->isShadowMappingEnabled()) {
         Texture::setTextureSlot(6);
-        renderers_shared_data_->shadow_map_texture->bind();
+        shared_data_->shadow_map_texture->bind();
     }
 
     // First pass - skip transparent entities
@@ -123,7 +124,7 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         default_shader_program_->setUniform("shadow_mapping.shadow_map_texture",
             6);
         default_shader_program_->setUniform("matrices.dir_light_matrix",
-            renderers_shared_data_->dir_light_space_matrix);
+            shared_data_->dir_light_space_matrix);
         default_shader_program_->setUniform("shadow_mapping.shadow_map_size",
             static_cast<GLint>(render_settings_->lighting()->
                 getDirectionalLightShadowMapSize()));

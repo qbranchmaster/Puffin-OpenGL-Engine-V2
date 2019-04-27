@@ -23,8 +23,6 @@
 
 namespace puffin {
     class Window {
-        friend class ConfigGuiRenderer;
-        friend class Input;
         friend class MasterRenderer;
 
     public:
@@ -41,6 +39,10 @@ namespace puffin {
 
         void setPosition(GLint x, GLint y);
         std::pair<GLint, GLint> getPosition() const;
+
+        GLFWwindow *getHandle() const {
+            return handle_;
+        }
 
     private:
         GLboolean isClosing() const {

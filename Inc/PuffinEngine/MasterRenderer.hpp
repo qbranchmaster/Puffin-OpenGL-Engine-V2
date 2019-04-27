@@ -15,15 +15,14 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/ConfigGuiRenderer.hpp"
 #include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FontRenderer.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
+#include "PuffinEngine/GuiRenderer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
-#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
@@ -48,11 +47,33 @@ namespace puffin {
         void assignMeshRenderer(MeshRendererPtr renderer);
         void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
 		void assignFontRenderer(FontRendererPtr renderer);
+        void assignGuiRenderer(GuiRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
 
-        void configGuiEnable(GLboolean state);
-        void configGuiEnableDebug(GLboolean state);
+        GuiRendererPtr guiRenderer() const {
+            return gui_renderer_;
+        }
+
+        MeshRendererPtr meshRenderer() const {
+            return mesh_renderer_;
+        }
+
+        PostprocessRendererPtr postprocessRenderer() const {
+            return postprocess_renderer_;
+        }
+
+        SkyboxRendererPtr skyboxRenderer() const {
+            return skybox_renderer_;
+        }
+
+        ShadowMapRendererPtr shadowMapRenderer() const {
+            return shadow_map_renderer_;
+        }
+
+        FontRendererPtr fontRenderer() const {
+            return font_renderer_;
+        }
 
     private:
         void createDefaultFrameBuffer();
@@ -60,7 +81,6 @@ namespace puffin {
         void checkGlErrors();
 
         GLboolean rendering_enabled_{false};
-        GLboolean config_gui_enabled_{true};
         std::function<ScenePtr()> rendering_function_{nullptr};
 
         CameraPtr camera_;
@@ -69,10 +89,9 @@ namespace puffin {
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
 
-        ConfigGuiRendererPtr config_gui_renderer_;
+        GuiRendererPtr gui_renderer_;
         MeshRendererPtr mesh_renderer_;
         PostprocessRendererPtr postprocess_renderer_;
-        RenderersSharedDataPtr renderers_shared_data_;
         SkyboxRendererPtr skybox_renderer_;
         ShadowMapRendererPtr shadow_map_renderer_;
 		FontRendererPtr font_renderer_;
