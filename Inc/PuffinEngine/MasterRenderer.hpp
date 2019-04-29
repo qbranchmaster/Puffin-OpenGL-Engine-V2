@@ -30,6 +30,7 @@
 #include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Time.hpp"
+#include "PuffinEngine/Timer.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
@@ -50,6 +51,8 @@ namespace puffin {
         void assignGuiRenderer(GuiRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
+
+        void addTimer(TimerPtr timer);
 
         GuiRendererPtr guiRenderer() const {
             return gui_renderer_;
@@ -88,6 +91,8 @@ namespace puffin {
         FrameBufferPtr default_frame_buffer_multisample_;
         RenderSettingsPtr render_settings_;
         WindowPtr target_window_;
+
+        std::vector<TimerPtr> timers_;
 
         GuiRendererPtr gui_renderer_;
         MeshRendererPtr mesh_renderer_;

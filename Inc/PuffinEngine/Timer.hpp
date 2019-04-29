@@ -11,10 +11,8 @@
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <chrono>
 #include <functional>
 #include <memory>
-#include <thread>
 
 #include "PuffinEngine/Logger.hpp"
 
@@ -22,53 +20,43 @@ namespace puffin {
     using TimeoutCallback = std::function<void(void)>;
 
     class Timer {
+        friend class MasterRenderer;
+
     public:
-        Timer(const TimeoutCallback &timeout) {
-            if (!timeout) {
+        Timer(const TimeoutCallback &timeout_func) {
+            if (!timeout_func) {
                 logError("Timer::Timer()", "Null input.");
                 return;
             }
 
-            timeout_func_ = timeout;
+            timeout_func_ = timeout_func;
         }
 
-        ~Timer() {
-            if (running_) {
-                stop();
-            }
-        }
-
-        GLboolean isRunning() const {
-            return running_;
-        }
-
-        void start(GLuint interval) {
-            if (running_) {
-                logError("Timer::start()", "Timer is already running.");
-                return;
-            }
-
-            interval_ = std::chrono::milliseconds(interval);
-            running_ = true;
-            thread_ = std::thread(&Timer::timerThread, this);
+        void start(GLuint interval_ms) {
+            interval_ = interval_ms;
         }
 
         void stop() {
-            running_ = false;
-            thread_.join();
+            interval_ = 0;
         }
 
     private:
-        void timerThread() {
-            while (running_) {
+        void update(GLdouble delta_time) {
+            if (interval_ == 0) {
+                return;
+            }
+
+            // Delta time is in [s], not [ms]
+            elapsed_time_ += (delta_time * 1000.0);
+            if (elapsed_time_ >= interval_) {
                 timeout_func_();
-                std::this_thread::sleep_for(interval_);
+                elapsed_time_ = 0;
             }
         }
 
-        GLboolean running_{false};
-        std::chrono::milliseconds interval_{0};
-        std::thread thread_;
+        GLuint interval_{0};
+        GLdouble elapsed_time_{0};
+
         TimeoutCallback timeout_func_{nullptr};
     };
 

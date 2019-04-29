@@ -104,6 +104,10 @@ void MasterRenderer::start() {
 
         camera_->updateSpeed(Time::instance().getDelta());
 
+        for (const auto &timer : timers_) {
+            timer->update(Time::instance().getDelta());
+        }
+
         if (target_window_->isClosing()) {
             stop();
         }
@@ -207,6 +211,15 @@ void MasterRenderer::drawScene(ScenePtr scene) {
             }
         }
     }
+}
+
+void MasterRenderer::addTimer(TimerPtr timer) {
+    if (!timer) {
+        logError("MasterRenderer::addTimer()", "Null input.");
+        return;
+    }
+
+    timers_.push_back(timer);
 }
 
 void MasterRenderer::clearDefaultFrameBuffer() {

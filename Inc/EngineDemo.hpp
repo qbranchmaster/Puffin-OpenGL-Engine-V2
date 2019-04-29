@@ -7,11 +7,11 @@
 #define ENGINE_DEMO_HPP
 
 #include "PuffinEngine/Core.hpp"
+#include "PuffinEngine/Timer.hpp"
 
 class EngineDemo : public puffin::Core {
 public:
     EngineDemo();
-    ~EngineDemo();
 
 	puffin::ScenePtr render();
 
@@ -30,6 +30,8 @@ private:
     puffin::SkyboxPtr skybox_;
 	puffin::TextPtr text_demo_;
     puffin::TexturePtr skybox_texture_;
+
+    puffin::TimerPtr fps_caption_timer_;
 };
 
 #endif // ENGINE_DEMO_HPP

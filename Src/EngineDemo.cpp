@@ -58,12 +58,13 @@ EngineDemo::EngineDemo() : Core() {
     createScene();
     createDefaultRenderers();
 
+    fps_caption_timer_.reset(new Timer(std::bind(
+        &EngineDemo::updateWindowCaption, this)));
+    fps_caption_timer_->start(1000);
+    masterRenderer()->addTimer(fps_caption_timer_);
+
     gui_renderer_ = std::static_pointer_cast<DefaultGuiRenderer>(
         masterRenderer()->guiRenderer());
-}
-
-EngineDemo::~EngineDemo() {
-
 }
 
 void EngineDemo::createScene() {
@@ -83,7 +84,7 @@ void EngineDemo::createScene() {
 
     test_mesh_.reset(new Mesh());
     test_mesh_->loadFromFile("DemoData/Models/pony-cartoon/Pony_cartoon.obj");
-    test_mesh_->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);
