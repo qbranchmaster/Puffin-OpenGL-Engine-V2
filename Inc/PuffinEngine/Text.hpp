@@ -15,8 +15,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <fstream>
 #include <memory>
 #include <string>
+
+#include "PuffinEngine/Exception.hpp"
 
 namespace puffin {
 	class Text {
@@ -93,6 +96,13 @@ namespace puffin {
 		}
 
 		void setFont(std::string font) {
+            if (font != "") {
+                std::ifstream file(font);
+                if (!file.good()) {
+                    throw Exception("Text::setFont()", "File does not exist.");
+                }
+            }
+
 			font_ = font;
 		}
 
