@@ -7,7 +7,6 @@
 #define ENGINE_DEMO_HPP
 
 #include "PuffinEngine/Core.hpp"
-#include "PuffinEngine/Timer.hpp"
 
 class EngineDemo : public puffin::Core {
 public:
@@ -23,11 +22,7 @@ private:
     void moveCamera();
     void rotateCamera();
 
-    void createTimers();
-    void stopTimers();
     void createScene();
-
-    puffin::TimerPtr fps_update_timer_;
 
     puffin::DefaultGuiRendererPtr gui_renderer_;
     puffin::MeshPtr test_mesh_;

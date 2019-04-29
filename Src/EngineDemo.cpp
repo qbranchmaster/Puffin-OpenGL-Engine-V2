@@ -24,8 +24,6 @@ EngineDemo::EngineDemo() : Core() {
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("DemoData/Icon.ico");
 
-    createTimers();
-
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
     camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(),
         0.1f, 15.0f);
@@ -65,17 +63,7 @@ EngineDemo::EngineDemo() : Core() {
 }
 
 EngineDemo::~EngineDemo() {
-    stopTimers();
-}
 
-void EngineDemo::createTimers() {
-    fps_update_timer_.reset(new Timer(std::bind(
-        &EngineDemo::updateWindowCaption, this)));
-    fps_update_timer_->start(1000);
-}
-
-void EngineDemo::stopTimers() {
-    fps_update_timer_->stop();
 }
 
 void EngineDemo::createScene() {
@@ -94,7 +82,7 @@ void EngineDemo::createScene() {
     skybox_->setTexture(skybox_texture_);
 
     test_mesh_.reset(new Mesh());
-    test_mesh_->loadFromFile("DemoData/Models/igor/Igor.obj");
+    test_mesh_->loadFromFile("DemoData/Models/pony-cartoon/Pony_cartoon.obj");
     test_mesh_->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     scene_->setSkybox(skybox_);
