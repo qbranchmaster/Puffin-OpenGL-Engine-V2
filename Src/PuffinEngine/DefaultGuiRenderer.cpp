@@ -57,12 +57,43 @@ GLboolean DefaultGuiRenderer::isCapturingMouse() const {
 void DefaultGuiRenderer::setupImGui() {
     ImGuiIO &io = ImGui::GetIO();
 
+    // Setup style
     ImGuiStyle &style = ImGui::GetStyle();
+    style.FrameRounding = 5.0f;
+    style.WindowPadding = ImVec2(8, 8);
+    style.FramePadding = ImVec2(4, 3);
+    style.ItemSpacing = ImVec2(6, 4);
+    style.ItemInnerSpacing = ImVec2(4, 4);
+
+    style.IndentSpacing = 16;
+    style.ScrollbarSize = 12;
+    style.GrabMinSize = 12;
+
+    style.WindowBorderSize = 1.0f;
+    style.ChildBorderSize = 1.0f;
+    style.PopupBorderSize = 1.0f;
+    style.FrameBorderSize = 0.0f;
+    style.TabBorderSize = 0.0f;
+
+    style.WindowRounding = 5.0f;
+    style.ChildRounding = 0.0f;
+    style.FrameRounding = 5.0f;
+    style.PopupRounding = 0.0f;
+    style.GrabRounding = 5.0f;
+    style.TabRounding = 5.0f;
+
+    style.WindowTitleAlign = ImVec2(0.0f, 0.50f);
+    style.ButtonTextAlign = ImVec2(0.50f, 0.50f);
+    style.SelectableTextAlign = ImVec2(0.0f, 0.0f);
+
+    style.DisplaySafeAreaPadding = ImVec2(3, 3);
+
     style.AntiAliasedLines = true;
     style.AntiAliasedFill = true;
 
-    //ImGui::StyleColorsDark();
-    ImGui::StyleColorsClassic();
+    //ImGui::StyleColorsLight();
+    //ImGui::StyleColorsClassic();
+    ImGui::StyleColorsDark();
 }
 
 void DefaultGuiRenderer::renderMainMenuBar() {
