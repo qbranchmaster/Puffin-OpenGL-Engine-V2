@@ -39,6 +39,7 @@ namespace puffin {
         F9           = 298,
         F10          = 299,
         F11          = 300,
+        F12          = 301,
         LEFT_SHIFT   = 340,
         LEFT_CONTROL = 341,
     };

@@ -47,7 +47,7 @@ void Core::createDefaultRenderers() {
 	default_font_renderer_.reset(new DefaultFontRenderer(
         "DemoData/Fonts/unispace/unispace.ttf"));
     default_gui_renderer_.reset(new DefaultGuiRenderer(render_settings_,
-        renderers_shared_data_, window_, camera_));
+        renderers_shared_data_, window_, camera_, master_renderer_));
 
     master_renderer_->assignPostprocessRenderer(std::static_pointer_cast
         <PostprocessRenderer>(default_postprocess_renderer_));

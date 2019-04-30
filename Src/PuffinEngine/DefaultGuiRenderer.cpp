@@ -9,8 +9,9 @@ using namespace puffin;
 
 DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
     RenderersSharedDataPtr renderers_shared_data, WindowPtr window,
-    CameraPtr camera) {
-    if (!window || !render_settings || !renderers_shared_data || !camera) {
+    CameraPtr camera, MasterRendererPtr master_renderer) {
+    if (!window || !render_settings || !renderers_shared_data || !camera ||
+        !master_renderer) {
         throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
             "Not initialized object.");
     }
@@ -19,6 +20,7 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
     target_window_ = window;
     renderers_shared_data_ = renderers_shared_data;
     camera_ = camera;
+    master_renderer_ = master_renderer;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -39,14 +41,10 @@ void DefaultGuiRenderer::render() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    lightingDialog();
-    postprocessDialog();
-    shadowMappingDialog();
-    cameraDialog();
+    renderMainMenuBar();
+    renderAboutDialog();
 
-    if (debug_enabled_) {
-        debugDialog();
-    }
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -67,7 +65,79 @@ void DefaultGuiRenderer::setupImGui() {
     ImGui::StyleColorsClassic();
 }
 
+void DefaultGuiRenderer::renderMainMenuBar() {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Load scene")) {
+
+            }
+
+            if (ImGui::MenuItem("Save scene")) {
+
+            }
+
+            if (ImGui::MenuItem("Reset scene")) {
+
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Quit")) {
+                master_renderer_->stop();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Edit")) {
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Help")) {
+            ImGui::MenuItem("About Puffin Engine", NULL, &render_about_dialog_);
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+}
+
+void DefaultGuiRenderer::renderAboutDialog() {
+    if (!render_about_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoResize;
+
+    ImGui::SetNextWindowSize(ImVec2(496, 110), ImGuiCond_Always);
+
+    if (!ImGui::Begin("About Puffin Engine", &render_about_dialog_,
+        window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Puffin Engine ver. 2.0");
+    ImGui::Separator();
+    ImGui::Text("Coded by: Sebastian 'qbranchmaster' Tabaka");
+    ImGui::Text("Contact:  sebastian.tabaka@outlook.com");
+    ImGui::Text("Repo URL:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
+        "https://github.com/qbranchmaster/Puffin-OpenGL-Engine-V2");
+    if (ImGui::IsItemClicked()) {
+        // TODO: Open URL
+    }
+
+    ImGui::End();
+}
+
 void DefaultGuiRenderer::postprocessDialog() {
+
+
     ImGui::Begin("Postprocess");
 
     auto current = render_settings_->postprocess()->getEffect();

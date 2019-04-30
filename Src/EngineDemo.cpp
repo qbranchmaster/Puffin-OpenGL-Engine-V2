@@ -104,16 +104,11 @@ void EngineDemo::pollKeyboard() {
         stop();
     }
 
-    if (input()->keyPressed(Key::F1, false)) {
+    if (input()->keyPressed(Key::F12, false) &&
+        input()->keyPressed(Key::LEFT_SHIFT)) {
         static GLboolean enabled = true;
         enabled = !enabled;
         gui_renderer_->enable(enabled);
-    }
-
-    if (input()->keyPressed(Key::F2, false)) {
-        static GLboolean enabled = false;
-        enabled = !enabled;
-        gui_renderer_->enableDebugWindows(enabled);
     }
 
     moveCamera();

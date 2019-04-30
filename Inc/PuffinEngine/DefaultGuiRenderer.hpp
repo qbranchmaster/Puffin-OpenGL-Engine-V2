@@ -20,6 +20,7 @@
 
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/GuiRenderer.hpp"
+#include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Window.hpp"
@@ -29,7 +30,7 @@ namespace puffin {
     public:
         DefaultGuiRenderer(RenderSettingsPtr render_settings,
             RenderersSharedDataPtr renderers_shared_data, WindowPtr window,
-            CameraPtr camera);
+            CameraPtr camera, MasterRendererPtr master_renderer);
 
         void render();
 
@@ -37,14 +38,14 @@ namespace puffin {
             enabled_ = state;
         }
 
-        void enableDebugWindows(GLboolean enabled) {
-            debug_enabled_ = enabled;
-        }
-
         GLboolean isCapturingMouse() const;
 
     private:
         void setupImGui();
+
+        void renderMainMenuBar();
+        void renderAboutDialog();
+
 
         void postprocessDialog();
         void lightingDialog();
@@ -52,10 +53,12 @@ namespace puffin {
         void debugDialog();
         void cameraDialog();
 
+        bool render_about_dialog_{false};
+
         GLboolean enabled_{true};
-        GLboolean debug_enabled_{false};
 
         CameraPtr camera_;
+        MasterRendererPtr master_renderer_;
         RenderSettingsPtr render_settings_;
         RenderersSharedDataPtr renderers_shared_data_;
         WindowPtr target_window_;
