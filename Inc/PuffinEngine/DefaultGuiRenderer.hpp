@@ -45,15 +45,16 @@ namespace puffin {
 
         void renderMainMenuBar();
         void renderAboutDialog();
-
-
-        void postprocessDialog();
-        void lightingDialog();
-        void shadowMappingDialog();
-        void debugDialog();
-        void cameraDialog();
+        void renderCameraDialog();
+        void renderPostprocessDialog();
+        void renderLightingDialog();
+        void renderShadowMappingDialog();
 
         bool render_about_dialog_{false};
+        bool render_camera_dialog_{false};
+        bool render_postprocess_dialog_{false};
+        bool render_lighting_dialog_{false};
+        bool render_shadow_map_dialog_{false};
 
         GLboolean enabled_{true};
 

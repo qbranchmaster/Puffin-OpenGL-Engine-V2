@@ -43,8 +43,12 @@ void DefaultGuiRenderer::render() {
 
     renderMainMenuBar();
     renderAboutDialog();
+    renderCameraDialog();
+    renderPostprocessDialog();
+    renderLightingDialog();
+    renderShadowMappingDialog();
 
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -120,7 +124,12 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Edit")) {
+        if (ImGui::BeginMenu("Window")) {
+            ImGui::MenuItem("Camera", NULL, &render_camera_dialog_);
+            ImGui::MenuItem("Lighting", NULL, &render_lighting_dialog_);
+            ImGui::MenuItem("Shadow mapping", NULL, &render_shadow_map_dialog_);
+            ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
+
             ImGui::EndMenu();
         }
 
@@ -166,19 +175,66 @@ void DefaultGuiRenderer::renderAboutDialog() {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::postprocessDialog() {
+void DefaultGuiRenderer::renderCameraDialog() {
+    if (!render_camera_dialog_) {
+        return;
+    }
 
+    ImGuiWindowFlags window_flags = 0;
+    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("Postprocess");
+    if (!ImGui::Begin("Camera", &render_camera_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
 
-    auto current = render_settings_->postprocess()->getEffect();
+    glm::vec3 position = camera_->getPosition();
+    float cam_pos[] = {position.x, position.y, position.z};
+    ImGui::DragFloat3("Position", cam_pos, 0.01f);
+    camera_->setPosition(glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+
+    float rot_tab[] = {camera_->getHorizontalAngle(),
+        camera_->getVerticalAngle()};
+    ImGui::DragFloat2("Rotation", rot_tab, 0.01f);
+    camera_->setRotation(rot_tab[0], rot_tab[1]);
+
+    glm::vec3 dir = camera_->getDirectionVector();
+    std::string dir_str = "Direction: [" + std::to_string(dir.x) + ", " +
+        std::to_string(dir.y) + ", " + std::to_string(dir.z) + "]";
+    ImGui::Text(dir_str.c_str());
+
+    float near_plane = camera_->getNearPlane();
+    ImGui::DragFloat("Near plane", &near_plane, 0.01f);
+    float far_plane = camera_->getFarPlane();
+    ImGui::DragFloat("Far plane", &far_plane, 0.01f);
+    float fov = camera_->getFov();
+    ImGui::SliderFloat("FOV", &fov, 0.01f, 2.65f);
+    float aspect = camera_->getAspect();
+    ImGui::DragFloat("Aspect", &aspect, 0.01f);
+    camera_->setProjection(fov, aspect, near_plane, far_plane);
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderPostprocessDialog() {
+    if (!render_postprocess_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_,
+        window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    PostprocessEffect current = render_settings_->postprocess()->getEffect();
     GLuint selected_index = static_cast<GLuint>(current);
     const char *postprocess_types[] = {"None", "Negative", "Grayscale",
         "Sharpen", "Blur", "Edge", "Tint"};
     static const char *current_item = postprocess_types[selected_index];
-
-    auto color = render_settings_->postprocess()->getTintColor();
-    ImVec4 tint_color = ImVec4(color.r, color.g, color.b, 1.0f);
 
     if (ImGui::BeginCombo("Type", current_item)) {
         for (unsigned int i = 0; i < IM_ARRAYSIZE(postprocess_types); i++) {
@@ -193,151 +249,161 @@ void DefaultGuiRenderer::postprocessDialog() {
         ImGui::EndCombo();
     }
 
-    ImGui::ColorEdit3("Tint color", (float*)&tint_color);
-    render_settings_->postprocess()->setTintColor(glm::vec3(tint_color.x,
-        tint_color.y, tint_color.z));
+    if (render_settings_->postprocess()->getEffect() ==
+        PostprocessEffect::TINT) {
+        glm::vec3 color = render_settings_->postprocess()->getTintColor();
+        float tint_color[] = {color.r, color.g, color.b, 1.0f};
+        ImGui::ColorEdit3("Tint color", tint_color);
+        render_settings_->postprocess()->setTintColor(glm::vec3(tint_color[0],
+            tint_color[1], tint_color[2]));
+    }
 
-    auto k_size = render_settings_->postprocess()->getKernelSize();
-    ImGui::InputFloat("Kernel size", &k_size, 1.0f, 5.0f, "%.2f");
-    render_settings_->postprocess()->setKernelSize(k_size);
+    if (render_settings_->postprocess()->getEffect() ==
+        PostprocessEffect::BLUR ||
+        render_settings_->postprocess()->getEffect() ==
+        PostprocessEffect::EDGE ||
+        render_settings_->postprocess()->getEffect() ==
+        PostprocessEffect::SHARPEN) {
+        float k_size = render_settings_->postprocess()->getKernelSize();
+        ImGui::SliderFloat("Kernel size", &k_size, 1.0f, 500.0f);
+        render_settings_->postprocess()->setKernelSize(k_size);
+    }
 
     float gamma = render_settings_->getGamma();
-    ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
+    ImGui::SliderFloat("Gamma", &gamma, 1.0f, 10.0f);
     render_settings_->setGamma(gamma);
 
     float exposure = render_settings_->getExposure();
-    ImGui::SliderFloat("Exposure", &exposure, 0.1f, 10.0f);
+    ImGui::SliderFloat("Exposure", &exposure, 1.0f, 10.0f);
     render_settings_->setExposure(exposure);
 
     bool enable_bloom = render_settings_->postprocess()->isGlowBloomEnabled();
     ImGui::Checkbox("Glow bloom", &enable_bloom);
     render_settings_->postprocess()->enableGlowBloom(enable_bloom);
 
-    auto bloom_thresh = render_settings_->postprocess()->
-        getGlowBloomThresholdColor();
-    ImVec4 thresh_color = ImVec4(bloom_thresh.r, bloom_thresh.g,
-        bloom_thresh.b, 1.0f);
-    ImGui::ColorEdit3("Glow bloom threshold color", (float*)&thresh_color);
-    render_settings_->postprocess()->setGlowBloomThresholdColor(glm::vec3(
-        thresh_color.x, thresh_color.y, thresh_color.z));
+    if (enable_bloom) {
+        glm::vec3 bloom_thresh = render_settings_->postprocess()->
+            getGlowBloomThresholdColor();
+        float thresh_color[] = {bloom_thresh.r, bloom_thresh.g,
+            bloom_thresh.b};
+        ImGui::ColorEdit3("Threshold color", thresh_color);
+        render_settings_->postprocess()->setGlowBloomThresholdColor(glm::vec3(
+            thresh_color[0], thresh_color[1], thresh_color[2]));
+    }
+
+    bool dof_enabled = render_settings_->postprocess()->isDepthOfFieldEnabled();
+    ImGui::Checkbox("Depth of Field", &dof_enabled);
+    render_settings_->postprocess()->enableDepthOfField(dof_enabled);
+
+    if (dof_enabled) {
+        float aperture = render_settings_->postprocess()->getAperture();
+        ImGui::SliderFloat("Aperture", &aperture, 0.01f, 0.1f);
+        render_settings_->postprocess()->setAperture(aperture);
+        float focus = render_settings_->postprocess()->getFocusDistance();
+        ImGui::SliderFloat("Distance", &focus, 0.0f, 1.0f);
+        render_settings_->postprocess()->setFocusDistance(focus);
+        float max_blur = render_settings_->postprocess()->
+            getDepthOfFieldMaxBlur();
+        ImGui::SliderFloat("Max blur", &max_blur, 0.0f, 1.0f);
+        render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
+    }
 
     ImGui::End();
 }
 
-void DefaultGuiRenderer::lightingDialog() {
-    ImGui::Begin("Lighting");
+void DefaultGuiRenderer::renderLightingDialog() {
+    if (!render_lighting_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    ImGui::SetNextWindowSize(ImVec2(390, 195), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Lighting", &render_lighting_dialog_,
+        window_flags)) {
+        ImGui::End();
+        return;
+    }
 
     bool enabled = render_settings_->lighting()->isEnabled();
     ImGui::Checkbox("Enabled", &enabled);
     render_settings_->lighting()->enable(enabled);
 
     ImGui::Text("Directional light");
-    auto dir_light_direction = render_settings_->lighting()->
+    glm::vec3 dir_light_direction = render_settings_->lighting()->
         directionalLight()->getDirection();
     float direction[3] = {dir_light_direction.x, dir_light_direction.y,
         dir_light_direction.z};
-    ImGui::InputFloat3("Direction", direction, 2);
+    ImGui::DragFloat3("Direction", direction, 0.1f);
     render_settings_->lighting()->directionalLight()->setDirection(
         glm::vec3(direction[0], direction[1], direction[2]));
 
-    auto ambient_dir_color = render_settings_->lighting()->
+    glm::vec3 ambient_dir_color = render_settings_->lighting()->
         directionalLight()->getAmbientColor();
-    ImVec4 amb_dir_color(ambient_dir_color.r, ambient_dir_color.g,
-        ambient_dir_color.b, 1.0f);
-    ImGui::ColorEdit3("Ambient color", (float*)&amb_dir_color);
+    float amb_dir_color[] = {ambient_dir_color.r, ambient_dir_color.g,
+        ambient_dir_color.b};
+    ImGui::ColorEdit3("Ambient color", amb_dir_color);
     render_settings_->lighting()->directionalLight()->setAmbientColor(
-        glm::vec3(amb_dir_color.x, amb_dir_color.y, amb_dir_color.z));
+        glm::vec3(amb_dir_color[0], amb_dir_color[1], amb_dir_color[2]));
 
-    auto diffuse_dir_color = render_settings_->lighting()->
+    glm::vec3 diffuse_dir_color = render_settings_->lighting()->
         directionalLight()->getDiffuseColor();
-    ImVec4 diff_dir_color(diffuse_dir_color.r, diffuse_dir_color.g,
-        diffuse_dir_color.b, 1.0f);
-    ImGui::ColorEdit3("Diffuse color", (float*)&diff_dir_color);
+    float diff_dir_color[] = {diffuse_dir_color.r, diffuse_dir_color.g,
+        diffuse_dir_color.b};
+    ImGui::ColorEdit3("Diffuse color", diff_dir_color);
     render_settings_->lighting()->directionalLight()->setDiffuseColor(
-        glm::vec3(diff_dir_color.x, diff_dir_color.y, diff_dir_color.z));
+        glm::vec3(diff_dir_color[0], diff_dir_color[1], diff_dir_color[2]));
 
-    auto specular_dir_color = render_settings_->lighting()->
+    glm::vec3 specular_dir_color = render_settings_->lighting()->
         directionalLight()->getSpecularColor();
-    ImVec4 spec_dir_color(specular_dir_color.r, specular_dir_color.g,
-        specular_dir_color.b, 1.0f);
-    ImGui::ColorEdit3("Specular color", (float*)&spec_dir_color);
+    float spec_dir_color[] = {specular_dir_color.r, specular_dir_color.g,
+        specular_dir_color.b};
+    ImGui::ColorEdit3("Specular color", spec_dir_color);
     render_settings_->lighting()->directionalLight()->setSpecularColor(
-        glm::vec3(spec_dir_color.x, spec_dir_color.y, spec_dir_color.z));
+        glm::vec3(spec_dir_color[0], spec_dir_color[1], spec_dir_color[2]));
 
-    auto emission_factor = render_settings_->lighting()->getEmissionFactor();
+    float emission_factor = render_settings_->lighting()->getEmissionFactor();
     ImGui::SliderFloat("Emission factor", &emission_factor, 0.0f, 30.0f);
     render_settings_->lighting()->setEmissionFactor(emission_factor);
 
     ImGui::End();
 }
 
-void DefaultGuiRenderer::shadowMappingDialog() {
-    ImGui::Begin("Shadow mapping");
+void DefaultGuiRenderer::renderShadowMappingDialog() {
+    if (!render_shadow_map_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_,
+        window_flags)) {
+        ImGui::End();
+        return;
+    }
 
     bool shadow_mapping_enabled = render_settings_->lighting()->
         isShadowMappingEnabled();
     ImGui::Checkbox("Enabled", &shadow_mapping_enabled);
     render_settings_->lighting()->enableShadowMapping(shadow_mapping_enabled);
 
-    auto shadow_distance = render_settings_->lighting()->getShadowDistance();
-    ImGui::SliderFloat("Shadow distance", &shadow_distance, 5.0f, 100.0f);
+    float shadow_distance = render_settings_->lighting()->getShadowDistance();
+    ImGui::SliderFloat("Shadow distance", &shadow_distance, 1.0f, 100.0f);
     render_settings_->lighting()->setShadowDistance(shadow_distance);
 
-    auto shadow_pcf_samples = static_cast<GLint>(render_settings_->lighting()->
-        getShadowMappingPcfSamplesCount());
-    ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 15);
+    int shadow_pcf_samples = render_settings_->lighting()->
+        getShadowMappingPcfSamplesCount();
+    ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 10);
     render_settings_->lighting()->setShadowMappingPcfsamplesCount(
         shadow_pcf_samples);
 
-    ImGui::End();
-}
-
-void DefaultGuiRenderer::debugDialog() {
-    ImGui::Begin("Debug");
-
-    ImGui::ShowMetricsWindow();
-
-    ImGui::Text("Directional light depth map:");
-    auto shadow_map_texture = renderers_shared_data_->shadow_map_texture;
+    ImGui::Text("Shadow map");
+    DepthTextureBufferPtr shadow_map_texture =
+        renderers_shared_data_->shadow_map_texture;
     ImTextureID texture_handle = (void*)(shadow_map_texture->getHandle());
     ImGui::Image(texture_handle, ImVec2(shadow_map_texture->getWidth() / 4.0f,
         shadow_map_texture->getHeight() / 4.0f));
-
-    ImGui::End();
-}
-
-void DefaultGuiRenderer::cameraDialog() {
-    ImGui::Begin("Camera");
-
-    auto position = camera_->getPosition();
-    float cam_pos[3] = {position.x, position.y, position.z};
-    ImGui::InputFloat3("Position", cam_pos, 2);
-    camera_->setPosition(glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-
-    auto near_plane = camera_->getNearPlane();
-    ImGui::InputFloat("Near plane", &near_plane, 0.1f, 1.0f, 2);
-    auto far_plane = camera_->getFarPlane();
-    ImGui::InputFloat("Far plane", &far_plane, 0.1f, 1.0f, 2);
-    auto fov = camera_->getFov();
-    ImGui::InputFloat("FOV", &fov, 0.1f, 1.0f, 2);
-    auto aspect = camera_->getAspect();
-    ImGui::InputFloat("Aspect", &aspect, 0.1f, 1.0f, 2);
-
-    camera_->setProjection(fov, aspect, near_plane, far_plane);
-
-    bool dof_enabled = render_settings_->postprocess()->isDepthOfFieldEnabled();
-    ImGui::Checkbox("Depth of Field", &dof_enabled);
-    render_settings_->postprocess()->enableDepthOfField(dof_enabled);
-
-    auto aperture = camera_->getAperture();
-    ImGui::InputFloat("Aperture", &aperture, 0.1f, 1.0f, 2);
-    camera_->setAperture(aperture);
-    auto focus = camera_->getFocusDistance();
-    ImGui::InputFloat("Focus distance", &focus, 0.1f, 1.0f, 2);
-    camera_->setFocusDistance(focus);
-    auto max_blur = render_settings_->postprocess()->getDepthOfFieldMaxBlur();
-    ImGui::InputFloat("Max blur", &max_blur, 0.1f, 1.0f, 2);
-    render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
 
     ImGui::End();
 }

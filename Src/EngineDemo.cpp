@@ -96,7 +96,7 @@ void EngineDemo::createScene() {
     text_demo_->setOutlineSize(2);
     text_demo_->setHorizontalSpacing(2);
     text_demo_->setFont("DemoData/Fonts/hello-giraffe/hello giraffe.ttf");
-	scene_->addText(text_demo_);
+	//scene_->addText(text_demo_);
 }
 
 void EngineDemo::pollKeyboard() {

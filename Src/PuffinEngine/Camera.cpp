@@ -90,7 +90,8 @@ void Camera::setAspect(GLfloat aspect) {
 
 void Camera::setProjection(GLfloat fov, GLfloat aspect, GLfloat near_plane,
     GLfloat far_plane) {
-    if (aspect <= 0.0f) {
+    if (near_plane <= 0.0f || far_plane <= 0.0f || far_plane < near_plane ||
+        aspect <= 0.0f || fov <= 0.0f || fov >= 3.14f) {
         logError("Camera::setProjection()", "Invalid value.");
         return;
     }
@@ -101,24 +102,6 @@ void Camera::setProjection(GLfloat fov, GLfloat aspect, GLfloat near_plane,
     far_plane_ = far_plane;
 
     calculateProjectionMatrix();
-}
-
-void Camera::setAperture(GLfloat aperture) {
-    if (aperture < 0.0f) {
-        logError("Camera::setAperture()", "Invalid value.");
-        return;
-    }
-
-    aperture_ = aperture;
-}
-
-void Camera::setFocusDistance(GLfloat distance) {
-    if (distance < 0.0f) {
-        logError("Camera::setFocusDistance()", "Invalid value.");
-        return;
-    }
-
-    focus_distance_ = distance;
 }
 
 void Camera::calculateProjectionMatrix() {

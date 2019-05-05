@@ -66,9 +66,9 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
 
     if (render_settings_->postprocess()->isDepthOfFieldEnabled()) {
         default_shader_program_->setUniform("color.aperture",
-            camera_->getAperture());
+            render_settings_->postprocess()->getAperture());
         default_shader_program_->setUniform("color.focus_distance",
-            camera_->getFocusDistance());
+            render_settings_->postprocess()->getFocusDistance());
         default_shader_program_->setUniform("color.dof_max_blur",
             render_settings_->postprocess()->getDepthOfFieldMaxBlur());
         default_shader_program_->setUniform("color.camera_aspect",
@@ -160,7 +160,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     Texture::setTextureSlot(1);
     frame_buffer->getDepthTextureBuffer()->bind();
     Texture::setTextureSlot(2);
-    if (render_settings_->postprocess()->isGlowBloomEnabled()) {        
+    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
         bloom_frame_buffer_[0]->getTextureBuffer(0)->bind();
     }
     else {

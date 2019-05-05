@@ -104,6 +104,32 @@ namespace puffin {
             return dof_max_blur_;
         }
 
+        void setAperture(GLfloat aperture) {
+            if (aperture < 0.0f) {
+                logError("Postprocess::setAperture()", "Invalid value.");
+                return;
+            }
+
+            aperture_ = aperture;
+        }
+
+        GLfloat getAperture() const {
+            return aperture_;
+        }
+
+        void setFocusDistance(GLfloat distance) {
+            if (distance < 0.0f) {
+                logError("Postprocess::setFocusDistance()", "Invalid value.");
+                return;
+            }
+
+            focus_distance_ = distance;
+        }
+
+        GLfloat getFocusDistance() const {
+            return focus_distance_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::NONE};
 
@@ -111,8 +137,12 @@ namespace puffin {
         glm::vec3 glow_bloom_thresh_{0.5f, 0.5f, 0.5f};
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
+
         GLboolean dof_enabled_{false};
         GLfloat dof_max_blur_{0.02f};
+
+        GLfloat aperture_{0.06f};
+        GLfloat focus_distance_{0.7f};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

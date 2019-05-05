@@ -60,12 +60,22 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
         return;
     }
 
+    // Skybox should not be affected by changing near and far plane values
+    auto near_plane = camera_->getNearPlane();
+    auto far_plane = camera_->getFarPlane();
+    camera_->setProjection(camera_->getFov(), camera_->getAspect(),
+        0.1f, 2.0f);
+
     default_shader_program_->setUniform("matrices.view_matrix",
         camera_->getViewMatrixStatic());
     default_shader_program_->setUniform("matrices.projection_matrix",
         camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix",
         skybox->getModelMatrix());
+
+    // Restore previous near and far plane values
+    camera_->setProjection(camera_->getFov(), camera_->getAspect(),
+        near_plane, far_plane);
 
     default_shader_program_->setUniform("color.cube_texture", 0);
     default_shader_program_->setUniform("color.light_color",

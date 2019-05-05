@@ -51,6 +51,12 @@ namespace puffin {
         }
 
         void setDirection(const glm::vec3 &direction) {
+            if (direction.x == 0.0f && direction.y == 0.0f &&
+                direction.z == 0.0f) {
+                logError("DirectionalLight::setDirection()", "Invalid input.");
+                return;
+            }
+
             direction_ = glm::normalize(direction);
         }
 
