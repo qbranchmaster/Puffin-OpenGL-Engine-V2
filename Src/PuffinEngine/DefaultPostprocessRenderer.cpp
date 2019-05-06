@@ -34,12 +34,12 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
 
 void DefaultPostprocessRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram());
-    default_shader_program_->loadShaders("Shaders/Postprocess.vert",
-        "Shaders/Postprocess.frag");
+    default_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
+        "Data/Shaders/Postprocess.frag");
 
     bloom_shader_program_.reset(new ShaderProgram());
-    bloom_shader_program_->loadShaders("Shaders/Postprocess.vert",
-        "Shaders/PostprocessGlowBloom.frag");
+    bloom_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
+        "Data/Shaders/PostprocessGlowBloom.frag");
 }
 
 void DefaultPostprocessRenderer::setShadersUniforms() {

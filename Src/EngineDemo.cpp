@@ -22,7 +22,7 @@ EngineDemo::EngineDemo() : Core() {
         this));
 
     window()->setCaption("Puffin Engine Demo");
-    window()->setWindowIcon("DemoData/Icon.ico");
+    window()->setWindowIcon("Data/Icon.ico");
 
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
     camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(),
@@ -73,17 +73,17 @@ void EngineDemo::createScene() {
 
     skybox_texture_.reset(new Texture());
     skybox_texture_->loadTextureCube({
-        "DemoData/Skybox/right.jpg",
-        "DemoData/Skybox/left.jpg",
-        "DemoData/Skybox/up.jpg",
-        "DemoData/Skybox/down.jpg",
-        "DemoData/Skybox/back.jpg",
-        "DemoData/Skybox/front.jpg"});
+        "Demo/Skybox/right.jpg",
+        "Demo/Skybox/left.jpg",
+        "Demo/Skybox/up.jpg",
+        "Demo/Skybox/down.jpg",
+        "Demo/Skybox/back.jpg",
+        "Demo/Skybox/front.jpg"});
 
     skybox_->setTexture(skybox_texture_);
 
     test_mesh_.reset(new Mesh());
-    test_mesh_->loadFromFile("DemoData/Models/pony-cartoon/Pony_cartoon.obj");
+    test_mesh_->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
     test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
     scene_->setSkybox(skybox_);
@@ -95,7 +95,7 @@ void EngineDemo::createScene() {
     text_demo_->setOutlineColor(glm::vec3(1.0f, 1.0f, 1.0f));
     text_demo_->setOutlineSize(2);
     text_demo_->setHorizontalSpacing(2);
-    text_demo_->setFont("DemoData/Fonts/hello-giraffe/hello giraffe.ttf");
+    text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");
 	//scene_->addText(text_demo_);
 }
 

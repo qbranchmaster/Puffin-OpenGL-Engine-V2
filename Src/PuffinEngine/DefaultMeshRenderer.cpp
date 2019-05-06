@@ -72,8 +72,8 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
 
 void DefaultMeshRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram());
-    default_shader_program_->loadShaders("Shaders/Mesh.vert",
-        "Shaders/Mesh.frag");
+    default_shader_program_->loadShaders("Data/Shaders/Mesh.vert",
+        "Data/Shaders/Mesh.frag");
 }
 
 void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {

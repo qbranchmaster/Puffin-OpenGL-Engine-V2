@@ -80,8 +80,8 @@ void DefaultFontRenderer::render(TextPtr text) {
 
 void DefaultFontRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram());
-    default_shader_program_->loadShaders("Shaders/Font.vert",
-        "Shaders/Font.frag");
+    default_shader_program_->loadShaders("Data/Shaders/Font.vert",
+        "Data/Shaders/Font.frag");
 }
 
 void DefaultFontRenderer::setShaderUniforms(TextPtr text) {

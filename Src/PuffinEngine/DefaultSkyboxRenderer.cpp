@@ -22,8 +22,8 @@ DefaultSkyboxRenderer::DefaultSkyboxRenderer(RenderSettingsPtr render_settings,
 
 void DefaultSkyboxRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram());
-    default_shader_program_->loadShaders("Shaders/Skybox.vert",
-        "Shaders/Skybox.frag");
+    default_shader_program_->loadShaders("Data/Shaders/Skybox.vert",
+        "Data/Shaders/Skybox.frag");
 }
 
 void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer,

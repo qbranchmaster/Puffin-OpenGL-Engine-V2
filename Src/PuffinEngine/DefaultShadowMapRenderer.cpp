@@ -27,8 +27,8 @@ DefaultShadowMapRenderer::DefaultShadowMapRenderer(
 void DefaultShadowMapRenderer::loadShaders() {
     directional_light_shader_program_.reset(new ShaderProgram());
     directional_light_shader_program_->loadShaders(
-        "Shaders/DepthMapDirectionalLight.vert",
-        "Shaders/DepthMapDirectionalLight.frag");
+        "Data/Shaders/DepthMapDirectionalLight.vert",
+        "Data/Shaders/DepthMapDirectionalLight.frag");
 }
 
 void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
