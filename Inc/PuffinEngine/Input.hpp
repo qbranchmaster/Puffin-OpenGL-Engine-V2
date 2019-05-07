@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_INPUT_HPP
@@ -20,13 +21,14 @@ namespace puffin {
 
         GLboolean keyPressed(Key key, GLboolean sticky = true);
         GLboolean mouseKeyPressed(MouseButton button);
+
         void setCursorPosition(GLfloat x, GLfloat y);
         void getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const;
 
     private:
-        WindowPtr target_window_;
-
         std::map<Key, GLboolean> key_states_;
+
+        WindowPtr target_window_;
     };
 
     using InputPtr = std::shared_ptr<Input>;

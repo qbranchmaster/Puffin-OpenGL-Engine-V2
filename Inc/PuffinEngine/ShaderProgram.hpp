@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_SHADER_PROGRAM_HPP
@@ -22,6 +23,7 @@
 #include <vector>
 
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class ShaderProgram {
@@ -29,14 +31,13 @@ namespace puffin {
         ShaderProgram();
         ~ShaderProgram();
 
-        void activate() const {
-            if (!handle_) {
-                logError("ShaderProgram::activate()",
-                    "Cannot activate null shader program.");
+        void activate() {
+            if (StateMachine::instance().bound_shader_program_ == handle_) {
                 return;
             }
 
             glUseProgram(handle_);
+            StateMachine::instance().bound_shader_program_ = handle_;
         }
 
         void loadShaders(std::string vs_path, std::string fs_path);
@@ -45,8 +46,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -57,8 +57,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -69,8 +68,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -81,8 +79,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -93,8 +90,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -105,8 +101,7 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", "Uniform [" +
-                    uniform_name + "] does not exist in this shader program.");
+                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -114,18 +109,18 @@ namespace puffin {
         }
 
     private:
-        GLint loadShaderCode(std::string file_path,
-            std::string &shader_code) const;
-        GLint compileShader(GLuint shader_handle) const;
-        GLint checkShaderCompileStatus(GLuint shader_handle) const;
-        std::string getShaderCompileMessage(GLuint shader_handle) const;
+        GLint loadShaderCode(std::string file_path, std::string &shader_code);
 
-        GLint linkProgram() const;
-        GLint checkProgramLinkStatus() const;
-        std::string getProgramLinkMessage() const;
+        GLint compileShader(GLuint shader_handle);
+        GLint checkShaderCompileStatus(GLuint shader_handle);
+        std::string getShaderCompileMessage(GLuint shader_handle);
+
+        GLint linkProgram();
+        GLint checkProgramLinkStatus();
+        std::string getProgramLinkMessage();
 
         void fetchUniforms();
-        GLint getUniformLocation(std::string uniform_name) const;
+        GLint getUniformLocation(std::string uniform_name);
 
         GLuint handle_{0};
         GLuint handle_vs_{0};

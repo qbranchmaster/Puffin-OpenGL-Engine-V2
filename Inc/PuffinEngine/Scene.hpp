@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_SCENE_HPP
@@ -18,7 +19,7 @@ namespace puffin {
     public:
         void addMesh(MeshPtr mesh) {
             if (!mesh) {
-                logError("Scene::addMesh()", "Null input.");
+                logError("Scene::addMesh()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -31,7 +32,7 @@ namespace puffin {
 
         MeshPtr getMesh(GLuint index) {
             if (index >= meshes_.size()) {
-                logError("Scene::getMesh()", "Invalid input.");
+                logError("Scene::getMesh()", PUFFIN_MSG_OUT_OF_RANGE(0, meshes_.size()));
                 return MeshPtr();
             }
 
@@ -46,32 +47,32 @@ namespace puffin {
             return active_skybox_;
         }
 
-		void addText(TextPtr text) {
-			if (!text) {
-				logError("Scene::addText()", "Null input.");
-				return;
-			}
+        void addText(TextPtr text) {
+            if (!text) {
+                logError("Scene::addText()", PUFFIN_MSG_NULL_OBJECT);
+                return;
+            }
 
-			textes_.push_back(text);
-		}
+            textes_.push_back(text);
+        }
 
-		GLuint getTextesCount() const {
-			return textes_.size();
-		}
+        GLuint getTextesCount() const {
+            return textes_.size();
+        }
 
-		TextPtr getText(GLuint index) {
-			if (index >= textes_.size()) {
-				logError("Scene::getText()", "Invalid input.");
-				return TextPtr();
-			}
+        TextPtr getText(GLuint index) {
+            if (index >= textes_.size()) {
+                logError("Scene::getText()", PUFFIN_MSG_OUT_OF_RANGE(0, textes_.size()));
+                return TextPtr();
+            }
 
-			return textes_[index];
-		}
+            return textes_[index];
+        }
 
     private:
         std::vector<MeshPtr> meshes_;
         SkyboxPtr active_skybox_;
-		std::vector<TextPtr> textes_;
+        std::vector<TextPtr> textes_;
     };
 
     using ScenePtr = std::shared_ptr<Scene>;

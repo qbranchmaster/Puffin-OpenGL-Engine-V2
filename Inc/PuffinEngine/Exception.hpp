@@ -1,15 +1,17 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_EXCEPTION_HPP
 #define PUFFIN_EXCEPTION_HPP
 
+#include <exception>
 #include <string>
 
 namespace puffin {
-    class Exception {
+    class Exception : public std::exception {
     public:
         Exception(std::string source, std::string message) {
             if (!message.empty()) {
@@ -19,6 +21,8 @@ namespace puffin {
             if (!source.empty()) {
                 source_ = source;
             }
+
+            what_msg_ = std::string("--- [EXCEPTION] --- [" + source_ + "] " + message_);
         }
 
         std::string getMessage() const {
@@ -29,14 +33,15 @@ namespace puffin {
             return source_;
         }
 
-        std::string what() const {
-            return std::string("Raised exception [" + message_ +
-                "] from [" + source_ + "].");
+        const char* what() const {
+            return what_msg_.c_str();
         }
 
     private:
-        std::string message_{"EMPTY_MESSAGE"};
-        std::string source_{"UNKNOWN_SOURCE"};
+        std::string message_{"NO_MESSAGE"};
+        std::string source_{"NO_SOURCE"};
+
+        std::string what_msg_;
     };
 } // namespace puffin
 

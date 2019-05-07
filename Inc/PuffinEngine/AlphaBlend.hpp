@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_ALPHA_BLEND_HPP
@@ -13,30 +14,17 @@
 
 namespace puffin {
     enum class BlendFunction {
-        ADDITIVE,
-        NORMAL,
+        Additive,
+        Normal,
     };
 
     class AlphaBlend {
+        friend class Core;
+
     public:
         static AlphaBlend& instance() {
             static AlphaBlend singleton;
             return singleton;
-        }
-
-        void fetchState() {
-            glGetBooleanv(GL_BLEND, &enabled_);
-
-            GLint value = 0;
-            glGetIntegerv(GL_BLEND_SRC_ALPHA, &value);
-            switch (value) {
-            case GL_ONE:
-                blend_function_ = BlendFunction::ADDITIVE;
-                break;
-            case GL_ONE_MINUS_SRC_ALPHA:
-                blend_function_ = BlendFunction::NORMAL;
-                break;
-            }
         }
 
         void enable(GLboolean state) {
@@ -64,10 +52,10 @@ namespace puffin {
             }
 
             switch (function) {
-            case BlendFunction::ADDITIVE:
+            case BlendFunction::Additive:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
                 break;
-            case BlendFunction::NORMAL:
+            case BlendFunction::Normal:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 break;
             }
@@ -84,8 +72,26 @@ namespace puffin {
         AlphaBlend(const AlphaBlend &) = delete;
         void operator=(const AlphaBlend &) = delete;
 
+        /**
+        * Reads initial state.
+        */
+        void fetchState() {
+            glGetBooleanv(GL_BLEND, &enabled_);
+
+            GLint value = 0;
+            glGetIntegerv(GL_BLEND_SRC_ALPHA, &value);
+            switch (value) {
+            case GL_ONE:
+                blend_function_ = BlendFunction::Additive;
+                break;
+            case GL_ONE_MINUS_SRC_ALPHA:
+                blend_function_ = BlendFunction::Normal;
+                break;
+            }
+        }
+
         GLboolean enabled_{false};
-        BlendFunction blend_function_{BlendFunction::NORMAL};
+        BlendFunction blend_function_{BlendFunction::Normal};
     };
 } // namespace puffin
 

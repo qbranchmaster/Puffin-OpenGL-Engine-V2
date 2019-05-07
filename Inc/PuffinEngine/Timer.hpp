@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_TIMER_HPP
@@ -25,7 +26,7 @@ namespace puffin {
     public:
         Timer(const TimeoutCallback &timeout_func) {
             if (!timeout_func) {
-                logError("Timer::Timer()", "Null input.");
+                logError("Timer::Timer()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 

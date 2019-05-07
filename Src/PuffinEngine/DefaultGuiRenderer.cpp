@@ -28,7 +28,7 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
     setupImGui();
 
     const char *glsl_version = "#version 330";
-    ImGui_ImplGlfw_InitForOpenGL(target_window_->getHandle(), true);
+    ImGui_ImplGlfw_InitForOpenGL(target_window_->handle_, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 

@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_SYSTEM_HPP
@@ -36,6 +37,7 @@ namespace puffin {
         GLushort getMonitorsCount() const;
         std::string getMonitorName(GLushort index) const;
         std::pair<GLuint, GLuint> getMonitorSize(GLushort index) const;
+
         std::vector<GLushort> getSupportedMsaaSamples() const;
 
     private:

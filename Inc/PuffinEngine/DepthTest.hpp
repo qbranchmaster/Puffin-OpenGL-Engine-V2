@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_DEPTH_TEST_HPP
@@ -13,15 +14,12 @@
 
 namespace puffin {
     class DepthTest {
+        friend class Core;
+
     public:
         static DepthTest& instance() {
             static DepthTest singleton;
             return singleton;
-        }
-
-        void fetchState() {
-            glGetBooleanv(GL_DEPTH_TEST, &enabled_);
-            glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask_enabled_);
         }
 
         void enable(GLboolean state) {
@@ -60,6 +58,14 @@ namespace puffin {
         DepthTest() {}
         DepthTest(const DepthTest &) = delete;
         void operator=(const DepthTest &) = delete;
+
+        /**
+        * Reads initial state.
+        */
+        void fetchState() {
+            glGetBooleanv(GL_DEPTH_TEST, &enabled_);
+            glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask_enabled_);
+        }
 
         GLboolean enabled_{false};
         GLboolean depth_mask_enabled_{false};

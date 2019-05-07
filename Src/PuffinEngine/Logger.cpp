@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/Logger.hpp"
@@ -13,8 +14,7 @@ void Logger::enable(GLboolean console_enabled, std::string file_name) {
     if (!file_name.empty()) {
         log_file_.open(file_name.c_str(), std::ios::out | std::ios::trunc);
         if (!log_file_.is_open()) {
-            throw Exception("Logger::enable()", "Opening file [" + file_name +
-                "] error.");
+            throw Exception("Logger::enable()", "Opening file [" + file_name + "] error.");
         }
 
         log_file_ << getHeader();
@@ -45,8 +45,7 @@ std::string Logger::getHeader() const {
     std::string separator(header_size, '~');
     std::string header_text = "Puffin Engine Log";
     std::string header(header_size, ' ');
-    header.replace(header_size / 2 - header_text.size() / 2,
-        header_text.size(), header_text);
+    header.replace(header_size / 2 - header_text.size() / 2, header_text.size(), header_text);
 
     return std::string(separator + "\n" + header + "\n" + separator + "\n");
 }
@@ -73,11 +72,11 @@ void Logger::log(std::string source, std::string message, MessageType type) {
     }
 
     if (source.empty()) {
-        source = "UNKNOWN_SOURCE";
+        source = "NO_SOURCE";
     }
 
     if (message.empty()) {
-        message = "EMPTY_MESSAGE";
+        message = "NO_MESSAGE";
     }
 
     std::string time;
@@ -106,8 +105,7 @@ void Logger::log(std::string source, std::string message, MessageType type) {
         new_line_pos = message.find('\n');
         std::string str = message.substr(0, new_line_pos);
 
-        std::string complete_message = time + msg_type + " | " + source +
-            ": " + str + "\n";
+        std::string complete_message = time + msg_type + " | " + source + ": " + str + "\n";
 
         if (log_file_) {
             log_file_ << complete_message << std::flush;

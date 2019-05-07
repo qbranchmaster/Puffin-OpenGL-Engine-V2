@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/System.hpp"
@@ -58,8 +59,7 @@ std::vector<GLushort> System::getSupportedMsaaSamples() const {
 
 void System::initGlfw() const {
     if (glfwInit() != GLFW_TRUE) {
-        throw Exception("System::initGlfw()",
-            "Window manager initialization error.");
+        throw Exception("System::initGlfw()", "Window manager initialization error.");
     }
 }
 
@@ -70,7 +70,6 @@ void System::terminateGlfw() const {
 void System::initGl() const {
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        throw Exception("System::initGl()",
-            "OpenGL core initialization error.");
+        throw Exception("System::initGl()", "OpenGL core initialization error.");
     }
 }

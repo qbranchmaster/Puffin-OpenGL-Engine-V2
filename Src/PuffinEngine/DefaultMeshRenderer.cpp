@@ -60,7 +60,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, MeshPtr mesh) {
     // TODO: Sort them in order.
 
     AlphaBlend::instance().enable(true);
-    AlphaBlend::instance().setBlendFunction(BlendFunction::NORMAL);
+    AlphaBlend::instance().setBlendFunction(BlendFunction::Normal);
 
     for (const auto &i : skipped_en) {
         auto entity = mesh->getEntity(i);

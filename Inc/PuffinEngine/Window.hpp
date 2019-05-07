@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_WINDOW_HPP
@@ -16,13 +17,14 @@
 #include <string>
 
 #include "PuffinEngine/Configuration.hpp"
-#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
     class Window {
+        friend class DefaultGuiRenderer;
+        friend class Input;
         friend class MasterRenderer;
 
     public:
@@ -40,12 +42,8 @@ namespace puffin {
         void setPosition(GLint x, GLint y);
         std::pair<GLint, GLint> getPosition() const;
 
-        GLFWwindow *getHandle() const {
-            return handle_;
-        }
-
     private:
-        GLboolean isClosing() const {
+        GLboolean isClosing() {
             if (glfwWindowShouldClose(handle_)) {
                 return true;
             }
@@ -53,16 +51,16 @@ namespace puffin {
             return false;
         }
 
-        void pollEvents() const {
+        void pollEvents() {
             glfwPollEvents();
         }
 
-        void swapBuffers() const {
+        void swapBuffers() {
             glfwSwapBuffers(handle_);
         }
 
         GLFWwindow *handle_{nullptr};
-        std::string caption_{"Puffin Window"};
+        std::string caption_{"Puffin Engine"};
     };
 
     using WindowPtr = std::shared_ptr<Window>;

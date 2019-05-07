@@ -44,7 +44,7 @@ void DefaultFontRenderer::render(TextPtr text) {
 
     DepthTest::instance().enable(false);
     AlphaBlend::instance().enable(true);
-    AlphaBlend::instance().setBlendFunction(BlendFunction::NORMAL);
+    AlphaBlend::instance().setBlendFunction(BlendFunction::Normal);
 
     auto font_face = createFontFace(text);
     FT_Set_Pixel_Sizes(font_face, 0, text->getFontSize());

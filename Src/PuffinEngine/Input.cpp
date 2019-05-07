@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/Input.hpp"
@@ -9,7 +10,7 @@ using namespace puffin;
 
 Input::Input(WindowPtr window) {
     if (!window) {
-        throw Exception("Input::Input()", "Not initialized object.");
+        throw Exception("Input::Input()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     target_window_ = window;
@@ -19,13 +20,12 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
     GLboolean result = false;
 
     if (sticky) {
-        if (glfwGetKey(target_window_->getHandle(), static_cast<GLint>(key))) {
+        if (glfwGetKey(target_window_->handle_, static_cast<GLint>(key))) {
             result = true;
         }
     }
     else {
-        auto pressed = glfwGetKey(target_window_->getHandle(),
-            static_cast<GLint>(key));
+        auto pressed = glfwGetKey(target_window_->handle_, static_cast<GLint>(key));
 
         if (pressed && key_states_[key] == false) {
             result = true;
@@ -40,8 +40,7 @@ GLboolean Input::keyPressed(Key key, GLboolean sticky) {
 }
 
 GLboolean Input::mouseKeyPressed(MouseButton button) {
-    if (glfwGetMouseButton(target_window_->getHandle(),
-        static_cast<GLint>(button))) {
+    if (glfwGetMouseButton(target_window_->handle_, static_cast<GLint>(button))) {
         return true;
     }
 
@@ -49,14 +48,14 @@ GLboolean Input::mouseKeyPressed(MouseButton button) {
 }
 
 void Input::setCursorPosition(GLfloat x, GLfloat y) {
-    glfwSetCursorPos(target_window_->getHandle(), x, y);
+    glfwSetCursorPos(target_window_->handle_, x, y);
 }
 
 void Input::getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const {
     GLdouble cur_x = 0;
     GLdouble cur_y = 0;
 
-    glfwGetCursorPos(target_window_->getHandle(), &cur_x, &cur_y);
+    glfwGetCursorPos(target_window_->handle_, &cur_x, &cur_y);
     x_pos = static_cast<GLfloat>(cur_x);
     y_pos = static_cast<GLfloat>(cur_y);
 }

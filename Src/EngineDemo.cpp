@@ -100,12 +100,12 @@ void EngineDemo::createScene() {
 }
 
 void EngineDemo::pollKeyboard() {
-    if (input()->keyPressed(Key::ESCAPE, false)) {
+    if (input()->keyPressed(Key::Escape, false)) {
         stop();
     }
 
     if (input()->keyPressed(Key::F12, false) &&
-        input()->keyPressed(Key::LEFT_SHIFT)) {
+        input()->keyPressed(Key::LeftShift)) {
         static GLboolean enabled = true;
         enabled = !enabled;
         gui_renderer_->enable(enabled);
@@ -135,7 +135,7 @@ void EngineDemo::updateWindowCaption() {
 }
 
 void EngineDemo::moveCamera() {
-    if (input()->keyPressed(Key::LEFT_SHIFT, true)) {
+    if (input()->keyPressed(Key::LeftShift, true)) {
         camera()->setMoveSpeed(2.0f);
     }
     else {
@@ -165,7 +165,7 @@ void EngineDemo::rotateCamera() {
 
     constexpr GLfloat mouse_speed = 0.002f;
 
-    if (input()->mouseKeyPressed(MouseButton::LEFT)) {
+    if (input()->mouseKeyPressed(MouseButton::Left)) {
         GLfloat cur_x = 0.0f;
         GLfloat cur_y = 0.0f;
         input()->getCursorPosition(cur_x, cur_y);

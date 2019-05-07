@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/ShaderProgram.hpp"
@@ -32,7 +33,7 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
     if (vs_path.empty() || fs_path.empty()) {
-        logError("ShaderProgram::loadShaders()", "Invalid value.");
+        logError("ShaderProgram::loadShaders()", PUFFIN_MSG_EMPTY_PATH);
         return;
     }
 
@@ -51,8 +52,8 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
 
         std::string shader_data;
         if (loadShaderCode(*file_ptr, shader_data)) {
-            logError("ShaderProgram::loadShaders()",
-                "Reading shader file [" + *file_ptr + "] error.");
+            logError("ShaderProgram::loadShaders()", "Reading shader file [" + *file_ptr +
+                "] error.");
             return;
         }
 
@@ -64,19 +65,19 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
             "] compile message:\n" + getShaderCompileMessage(*handle_ptr));
 
         if (result) {
-            logError("ShaderProgram::loadShaders()", "Shader file [" +
-                *file_ptr + "] compile error.");
+            logError("ShaderProgram::loadShaders()", "Shader file [" + *file_ptr +
+                "] compile error.");
             return;
         }
 
-        logInfo("ShaderProgram::loadShaders()", "Shader file [" +
-            *file_ptr + "] compile success.");
+        logInfo("ShaderProgram::loadShaders()", "Shader file [" + *file_ptr +
+            "] compile success.");
     }
 
     if (linkProgram()) {
         logError("ShaderProgram::loadShaders()", "Shader program link error.");
-        logInfo("ShaderProgram::loadShaders()",
-            "Shader program link message:\n" + getProgramLinkMessage());
+        logInfo("ShaderProgram::loadShaders()", "Shader program link message:\n" +
+            getProgramLinkMessage());
         return;
     }
 
@@ -84,13 +85,13 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
     logInfo("ShaderProgram::loadShaders()", "Shader program link success.");
 }
 
-GLint ShaderProgram::loadShaderCode(std::string file_path,
-    std::string &shader_code) const {
+GLint ShaderProgram::loadShaderCode(std::string file_path, std::string &shader_code) {
     std::ifstream shader_file(file_path, std::ios::in);
     if (shader_file.is_open()) {
         std::string line;
-        while (std::getline(shader_file, line))
+        while (std::getline(shader_file, line)) {
             shader_code += line + "\n";
+        }
 
         shader_file.close();
     }
@@ -101,7 +102,7 @@ GLint ShaderProgram::loadShaderCode(std::string file_path,
     return 0;
 }
 
-GLint ShaderProgram::compileShader(GLuint shader_handle) const {
+GLint ShaderProgram::compileShader(GLuint shader_handle) {
     glCompileShader(shader_handle);
     if (checkShaderCompileStatus(shader_handle)) {
         return -1;
@@ -110,7 +111,7 @@ GLint ShaderProgram::compileShader(GLuint shader_handle) const {
     return 0;
 }
 
-GLint ShaderProgram::checkShaderCompileStatus(GLuint shader_handle) const {
+GLint ShaderProgram::checkShaderCompileStatus(GLuint shader_handle) {
     GLint shader_status = -1;
     glGetShaderiv(shader_handle, GL_COMPILE_STATUS, &shader_status);
     if (shader_status != GL_TRUE) {
@@ -120,7 +121,7 @@ GLint ShaderProgram::checkShaderCompileStatus(GLuint shader_handle) const {
     return 0;
 }
 
-std::string ShaderProgram::getShaderCompileMessage(GLuint shader_handle) const {
+std::string ShaderProgram::getShaderCompileMessage(GLuint shader_handle) {
     GLint log_size = 256;
     glGetShaderiv(shader_handle, GL_INFO_LOG_LENGTH, &log_size);
 
@@ -139,7 +140,7 @@ std::string ShaderProgram::getShaderCompileMessage(GLuint shader_handle) const {
     return compile_msg;
 }
 
-GLint ShaderProgram::linkProgram() const {
+GLint ShaderProgram::linkProgram() {
     glAttachShader(handle_, handle_vs_);
     glAttachShader(handle_, handle_fs_);
 
@@ -151,7 +152,7 @@ GLint ShaderProgram::linkProgram() const {
     return 0;
 }
 
-GLint ShaderProgram::checkProgramLinkStatus() const {
+GLint ShaderProgram::checkProgramLinkStatus() {
     GLint link_status = -1;
     glGetProgramiv(handle_, GL_LINK_STATUS, &link_status);
     if (link_status != GL_TRUE) {
@@ -161,7 +162,7 @@ GLint ShaderProgram::checkProgramLinkStatus() const {
     return 0;
 }
 
-std::string ShaderProgram::getProgramLinkMessage() const {
+std::string ShaderProgram::getProgramLinkMessage() {
     GLint log_size = 256;
     glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &log_size);
 
@@ -185,28 +186,26 @@ void ShaderProgram::fetchUniforms() {
     std::vector<GLint> values(properties.size());
 
     GLint uniforms_count = 0;
-    glGetProgramInterfaceiv(handle_, GL_UNIFORM, GL_ACTIVE_RESOURCES,
-        &uniforms_count);
+    glGetProgramInterfaceiv(handle_, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniforms_count);
 
     std::vector<GLchar> name_buffer;
     for (GLint i = 0; i < uniforms_count; i++) {
-        glGetProgramResourceiv(handle_, GL_UNIFORM, i, properties.size(),
-            &properties[0], values.size(), NULL, &values[0]);
+        glGetProgramResourceiv(handle_, GL_UNIFORM, i, properties.size(), &properties[0],
+            values.size(), NULL, &values[0]);
 
         name_buffer.clear();
         name_buffer.resize(values[0]);
 
-        glGetProgramResourceName(handle_, GL_UNIFORM, i, name_buffer.size(),
-            nullptr, &name_buffer[0]);
-        std::string uniform_name((GLchar*)&name_buffer[0],
-            name_buffer.size() - 1);
+        glGetProgramResourceName(handle_, GL_UNIFORM, i, name_buffer.size(), nullptr,
+            &name_buffer[0]);
+        std::string uniform_name((GLchar*) &name_buffer[0], name_buffer.size() - 1);
 
         GLint location = glGetUniformLocation(handle_, uniform_name.c_str());
         uniforms_[uniform_name] = location;
     }
 }
 
-GLint ShaderProgram::getUniformLocation(std::string uniform_name) const {
+GLint ShaderProgram::getUniformLocation(std::string uniform_name) {
     auto location = uniforms_.find(uniform_name);
     if (location == uniforms_.end()) {
         return -1;

@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_FACE_CULL_HPP
@@ -13,34 +14,18 @@
 
 namespace puffin {
     enum class CulledSide {
-        BACK,
-        FRONT,
-        FRONT_AND_BACK,
+        Back,
+        Front,
+        FrontAndBack,
     };
 
     class FaceCull {
+        friend class Core;
+
     public:
         static FaceCull& instance() {
             static FaceCull singleton;
             return singleton;
-        }
-
-        void fetchState() {
-            glGetBooleanv(GL_CULL_FACE, &enabled_);
-
-            GLint value = 0;
-            glGetIntegerv(GL_CULL_FACE_MODE, &value);
-            switch (value) {
-            case GL_BACK:
-                culled_side_ = CulledSide::BACK;
-                break;
-            case GL_FRONT:
-                culled_side_ = CulledSide::FRONT;
-                break;
-            case GL_FRONT_AND_BACK:
-                culled_side_ = CulledSide::FRONT_AND_BACK;
-                break;
-            }
         }
 
         void enable(GLboolean state) {
@@ -68,13 +53,13 @@ namespace puffin {
             }
 
             switch (culled_side) {
-            case CulledSide::BACK:
+            case CulledSide::Back:
                 glCullFace(GL_BACK);
                 break;
-            case CulledSide::FRONT:
+            case CulledSide::Front:
                 glCullFace(GL_FRONT);
                 break;
-            case CulledSide::FRONT_AND_BACK:
+            case CulledSide::FrontAndBack:
                 glCullFace(GL_FRONT_AND_BACK);
                 break;
             }
@@ -91,8 +76,29 @@ namespace puffin {
         FaceCull(const FaceCull &) = delete;
         void operator=(const FaceCull &) = delete;
 
+        /**
+        * Reads initial state.
+        */
+        void fetchState() {
+            glGetBooleanv(GL_CULL_FACE, &enabled_);
+
+            GLint value = 0;
+            glGetIntegerv(GL_CULL_FACE_MODE, &value);
+            switch (value) {
+            case GL_BACK:
+                culled_side_ = CulledSide::Back;
+                break;
+            case GL_FRONT:
+                culled_side_ = CulledSide::Front;
+                break;
+            case GL_FRONT_AND_BACK:
+                culled_side_ = CulledSide::FrontAndBack;
+                break;
+            }
+        }
+
         GLboolean enabled_{false};
-        CulledSide culled_side_{CulledSide::BACK};
+        CulledSide culled_side_{CulledSide::Back};
     };
 } // namespace puffin
 

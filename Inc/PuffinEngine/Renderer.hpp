@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_RENDERER_HPP
@@ -15,7 +16,6 @@
 
 namespace puffin {
     class Renderer {
-
     };
 
     using RendererPtr = std::shared_ptr<Renderer>;
