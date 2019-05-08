@@ -17,7 +17,7 @@ namespace puffin {
         friend class Core;
 
     public:
-        static DepthTest& instance() {
+        static DepthTest &instance() {
             static DepthTest singleton;
             return singleton;
         }

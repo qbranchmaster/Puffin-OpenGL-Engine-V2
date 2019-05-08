@@ -22,7 +22,7 @@ namespace puffin {
         friend class Core;
 
     public:
-        static AlphaBlend& instance() {
+        static AlphaBlend &instance() {
             static AlphaBlend singleton;
             return singleton;
         }

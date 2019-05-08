@@ -10,17 +10,17 @@ using namespace puffin;
 
 std::string System::getGpuName() const {
     const GLubyte *data = glGetString(GL_RENDERER);
-    return std::string(reinterpret_cast<const char*>(data));
+    return std::string(reinterpret_cast<const char *>(data));
 }
 
 std::string System::getGpuVendor() const {
     const GLubyte *data = glGetString(GL_VENDOR);
-    return std::string(reinterpret_cast<const char*>(data));
+    return std::string(reinterpret_cast<const char *>(data));
 }
 
 std::string System::getGlslVersion() const {
     const GLubyte *data = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    return std::string(reinterpret_cast<const char*>(data));
+    return std::string(reinterpret_cast<const char *>(data));
 }
 
 GLushort System::getMonitorsCount() const {
@@ -31,9 +31,9 @@ GLushort System::getMonitorsCount() const {
 
 std::string System::getMonitorName(GLushort index) const {
     GLint count = 0;
-    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    GLFWmonitor **monitors = glfwGetMonitors(&count);
     if (index >= count) {
-        logError("System::getMonitorName()", "Invalid value.");
+        logError("System::getMonitorName()", PUFFIN_MSG_OUT_OF_RANGE(0, count));
         return std::string("");
     }
 
@@ -43,9 +43,9 @@ std::string System::getMonitorName(GLushort index) const {
 
 std::pair<GLuint, GLuint> System::getMonitorSize(GLushort index) const {
     GLint count = 0;
-    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    GLFWmonitor **monitors = glfwGetMonitors(&count);
     if (index >= count) {
-        logError("System::getMonitorSize()", "Invalid value.");
+        logError("System::getMonitorSize()", PUFFIN_MSG_OUT_OF_RANGE(0, count));
         return std::make_pair(0, 0);
     }
 

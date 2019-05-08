@@ -40,7 +40,7 @@ void Logger::enableTimeStamp(GLboolean state) {
     add_timestamp_ = state;
 }
 
-std::string Logger::getHeader() const {
+std::string Logger::getHeader() {
     constexpr std::size_t header_size = 80;
     std::string separator(header_size, '~');
     std::string header_text = "Puffin Engine Log";
@@ -50,7 +50,7 @@ std::string Logger::getHeader() const {
     return std::string(separator + "\n" + header + "\n" + separator + "\n");
 }
 
-std::string Logger::getTimeStampNow() const {
+std::string Logger::getTimeStampNow() {
     time_t actual_time = 0;
     std::time(&actual_time);
     tm time_info = {};

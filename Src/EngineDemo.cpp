@@ -160,18 +160,18 @@ void EngineDemo::moveCamera() {
 }
 
 void EngineDemo::rotateCamera() {
-    static GLfloat cursor_x = 0.0f;
-    static GLfloat cursor_y = 0.0f;
+    static GLdouble cursor_x = 0.0;
+    static GLdouble cursor_y = 0.0;
 
-    constexpr GLfloat mouse_speed = 0.002f;
+    constexpr GLdouble mouse_speed = 0.002;
 
     if (input()->mouseKeyPressed(MouseButton::Left)) {
-        GLfloat cur_x = 0.0f;
-        GLfloat cur_y = 0.0f;
+        GLdouble cur_x = 0.0;
+        GLdouble cur_y = 0.0;
         input()->getCursorPosition(cur_x, cur_y);
 
-        GLfloat x_diff = cur_x - cursor_x;
-        GLfloat y_diff = cur_y - cursor_y;
+        GLdouble x_diff = cur_x - cursor_x;
+        GLdouble y_diff = cur_y - cursor_y;
 
         camera()->rotate(y_diff * mouse_speed, x_diff * mouse_speed);
 

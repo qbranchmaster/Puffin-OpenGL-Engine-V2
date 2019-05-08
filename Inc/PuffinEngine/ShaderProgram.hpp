@@ -46,7 +46,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -57,7 +58,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -68,7 +70,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -79,7 +82,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -90,7 +94,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 
@@ -101,7 +106,8 @@ namespace puffin {
             activate();
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
-                logError("ShaderProgram::setUniform()", PUFFIN_MSG_UNIFORM_NOT_EXISTS(uniform_name));
+                logError("ShaderProgram::setUniform()",
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
                 return;
             }
 

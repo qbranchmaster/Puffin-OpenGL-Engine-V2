@@ -47,15 +47,10 @@ GLboolean Input::mouseKeyPressed(MouseButton button) {
     return false;
 }
 
-void Input::setCursorPosition(GLfloat x, GLfloat y) {
+void Input::setCursorPosition(GLdouble x, GLdouble y) {
     glfwSetCursorPos(target_window_->handle_, x, y);
 }
 
-void Input::getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const {
-    GLdouble cur_x = 0;
-    GLdouble cur_y = 0;
-
-    glfwGetCursorPos(target_window_->handle_, &cur_x, &cur_y);
-    x_pos = static_cast<GLfloat>(cur_x);
-    y_pos = static_cast<GLfloat>(cur_y);
+void Input::getCursorPosition(GLdouble &x_pos, GLdouble &y_pos) const {
+    glfwGetCursorPos(target_window_->handle_, &x_pos, &y_pos);
 }

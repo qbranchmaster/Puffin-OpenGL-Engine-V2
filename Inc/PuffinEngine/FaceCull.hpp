@@ -23,7 +23,7 @@ namespace puffin {
         friend class Core;
 
     public:
-        static FaceCull& instance() {
+        static FaceCull &instance() {
             static FaceCull singleton;
             return singleton;
         }

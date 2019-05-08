@@ -33,7 +33,7 @@ namespace puffin {
             return source_;
         }
 
-        const char* what() const {
+        const char *what() const {
             return what_msg_.c_str();
         }
 

@@ -71,8 +71,8 @@ namespace puffin {
 
     private:
         std::vector<MeshPtr> meshes_;
-        SkyboxPtr active_skybox_;
         std::vector<TextPtr> textes_;
+        SkyboxPtr active_skybox_{nullptr};
     };
 
     using ScenePtr = std::shared_ptr<Scene>;

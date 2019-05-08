@@ -29,7 +29,7 @@ namespace puffin {
 
     class Logger {
     public:
-        static Logger& instance() {
+        static Logger &instance() {
             static Logger singleton;
             return singleton;
         }
@@ -51,8 +51,8 @@ namespace puffin {
         Logger(const Logger &) = delete;
         void operator=(const Logger &) = delete;
 
-        std::string getHeader() const;
-        std::string getTimeStampNow() const;
+        std::string getHeader();
+        std::string getTimeStampNow();
 
         GLboolean enabled_{false};
         GLboolean console_enabled_{false};

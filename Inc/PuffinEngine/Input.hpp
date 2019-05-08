@@ -10,7 +10,6 @@
 #include <map>
 #include <memory>
 
-#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/KeyCodes.hpp"
 #include "PuffinEngine/Window.hpp"
 
@@ -22,13 +21,13 @@ namespace puffin {
         GLboolean keyPressed(Key key, GLboolean sticky = true);
         GLboolean mouseKeyPressed(MouseButton button);
 
-        void setCursorPosition(GLfloat x, GLfloat y);
-        void getCursorPosition(GLfloat &x_pos, GLfloat &y_pos) const;
+        void setCursorPosition(GLdouble x, GLdouble y);
+        void getCursorPosition(GLdouble &x_pos, GLdouble &y_pos) const;
 
     private:
         std::map<Key, GLboolean> key_states_;
 
-        WindowPtr target_window_;
+        WindowPtr target_window_{nullptr};
     };
 
     using InputPtr = std::shared_ptr<Input>;

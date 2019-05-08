@@ -17,7 +17,7 @@ namespace puffin {
         friend class ShaderProgram;
 
     public:
-        static StateMachine& instance() {
+        static StateMachine &instance() {
             static StateMachine singleton;
             return singleton;
         }
@@ -27,7 +27,7 @@ namespace puffin {
         StateMachine(const StateMachine &) = delete;
         void operator=(const StateMachine &) = delete;
 
-        GLuint bound_shader_program_;
+        GLuint bound_shader_program_{0};
     };
 } // namespace puffin
 

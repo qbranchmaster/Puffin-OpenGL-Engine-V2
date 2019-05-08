@@ -17,7 +17,6 @@
 #include <utility>
 #include <vector>
 
-#include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/Logger.hpp"
 
 namespace puffin {
@@ -25,7 +24,7 @@ namespace puffin {
         friend class Core;
 
     public:
-        static System& instance() {
+        static System &instance() {
             static System singleton;
             return singleton;
         }
