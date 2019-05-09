@@ -6,6 +6,9 @@
 #define PUFFIN_MSG_NULL_OBJECT                                \
     "Null object."
 
+#define PUFFIN_MSG_INVALID_VALUE                              \
+    "Invalid value."
+
 #define PUFFIN_MSG_OUT_OF_RANGE(a,b)                          \
     "Value out of range (" + std::to_string(a) + ", " + std::to_string(b) + ")."
 

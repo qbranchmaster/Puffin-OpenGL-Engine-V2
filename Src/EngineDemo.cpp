@@ -32,7 +32,7 @@ EngineDemo::EngineDemo() : Core() {
     Texture::setDefaultTextureFilter(TextureType::Texture2D,
         TextureFilter::TRILINEAR);
 
-    renderSettings()->postprocess()->setEffect(PostprocessEffect::NONE);
+    renderSettings()->postprocess()->setEffect(PostprocessEffect::None);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
     renderSettings()->postprocess()->enableGlowBloom(false);
 

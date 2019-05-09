@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_DIRECTIONAL_LIGHT_HPP
@@ -51,9 +52,8 @@ namespace puffin {
         }
 
         void setDirection(const glm::vec3 &direction) {
-            if (direction.x == 0.0f && direction.y == 0.0f &&
-                direction.z == 0.0f) {
-                logError("DirectionalLight::setDirection()", "Invalid input.");
+            if (direction.x == 0.0f && direction.y == 0.0f && direction.z == 0.0f) {
+                logError("DirectionalLight::setDirection()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 

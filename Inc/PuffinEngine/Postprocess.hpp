@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_POSTPROCESS_HPP
@@ -19,13 +20,13 @@
 
 namespace puffin {
     enum class PostprocessEffect {
-        NONE,
-        NEGATIVE,
-        GRAYSCALE,
-        SHARPEN,
-        BLUR,
-        EDGE,
-        TINT,
+        None,
+        Negative,
+        Grayscale,
+        Sharpen,
+        Blur,
+        Edge,
+        Tint,
     };
 
     class Postprocess {
@@ -51,7 +52,7 @@ namespace puffin {
 
         void setKernelSize(GLfloat size) {
             if (size <= 0.0f) {
-                logError("Postprocess::setKernelSize()", "Invalid value.");
+                logError("Postprocess::setKernelSize()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -92,8 +93,7 @@ namespace puffin {
 
         void setDepthOfFieldMaxBlur(GLfloat max_blur) {
             if (max_blur < 0.0f || max_blur > 1.0f) {
-                logError("Postprocess::setDepthOfFieldMaxBlur()",
-                    "Invalid value.");
+                logError("Postprocess::setDepthOfFieldMaxBlur()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -105,8 +105,8 @@ namespace puffin {
         }
 
         void setAperture(GLfloat aperture) {
-            if (aperture < 0.0f) {
-                logError("Postprocess::setAperture()", "Invalid value.");
+            if (aperture <= 0.0f) {
+                logError("Postprocess::setAperture()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -118,8 +118,8 @@ namespace puffin {
         }
 
         void setFocusDistance(GLfloat distance) {
-            if (distance < 0.0f) {
-                logError("Postprocess::setFocusDistance()", "Invalid value.");
+            if (distance <= 0.0f) {
+                logError("Postprocess::setFocusDistance()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -131,10 +131,11 @@ namespace puffin {
         }
 
     private:
-        PostprocessEffect effect_{PostprocessEffect::NONE};
+        PostprocessEffect effect_{PostprocessEffect::None};
 
         GLboolean glow_bloom_enabled_{false};
         glm::vec3 glow_bloom_thresh_{0.5f, 0.5f, 0.5f};
+
         glm::vec3 tint_color_{1.0f, 1.0f, 1.0f};
         GLfloat kernel_size_{300.0f};
 

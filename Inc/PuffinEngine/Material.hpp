@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_MATERIAL_HPP
@@ -23,7 +24,7 @@ namespace puffin {
     public:
         void setAmbientTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setAmbientTexture()", "Null input.");
+                logError("Material::setAmbientTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -36,7 +37,7 @@ namespace puffin {
 
         void setDiffuseTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setDiffuseTexture()", "Null input.");
+                logError("Material::setDiffuseTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -49,7 +50,7 @@ namespace puffin {
 
         void setSpecularTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setSpecularTexture()", "Null input.");
+                logError("Material::setSpecularTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -62,7 +63,7 @@ namespace puffin {
 
         void setEmissiveTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setEmissiveTexture()", "Null input.");
+                logError("Material::setEmissiveTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -75,7 +76,7 @@ namespace puffin {
 
         void setNormalMapTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setNormalMapTexture()", "Null input.");
+                logError("Material::setNormalMapTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -88,7 +89,7 @@ namespace puffin {
 
         void setOpacityTexture(TexturePtr texture) {
             if (!texture) {
-                logError("Material::setOpacityTexture()", "Null input.");
+                logError("Material::setOpacityTexture()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -145,7 +146,7 @@ namespace puffin {
 
         void setReflectivity(GLfloat value) {
             if (value < 0.0f) {
-                logError("Material::setReflectivity()", "Invalid value.");
+                logError("Material::setReflectivity()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -157,6 +158,11 @@ namespace puffin {
         }
 
         void setShininess(GLint value) {
+            if (value < 0) {
+                logError("Material::setShininess()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
             shininess_ = value;
         }
 
@@ -170,8 +176,7 @@ namespace puffin {
                 glm::clamp(transparency.g, 0.0f, 1.0f),
                 glm::clamp(transparency.b, 0.0f, 1.0f));
 
-            if (transparency_.r < 1.0f || transparency_.g < 1.0f ||
-                transparency_.b < 1.0f) {
+            if (transparency_.r < 1.0f || transparency_.g < 1.0f || transparency_.b < 1.0f) {
                 has_transparency_ = true;
             }
             else {
@@ -199,12 +204,12 @@ namespace puffin {
         GLboolean has_transparency_{false};
         glm::vec3 transparency_{1.0f, 1.0f, 1.0f};
 
-        TexturePtr ambient_texture_;
-        TexturePtr diffuse_texture_;
-        TexturePtr specular_texture_;
-        TexturePtr normalmap_texture_;
-        TexturePtr emissive_texture_;
-        TexturePtr opacity_texture_;
+        TexturePtr ambient_texture_{nullptr};
+        TexturePtr diffuse_texture_{nullptr};
+        TexturePtr specular_texture_{nullptr};
+        TexturePtr normalmap_texture_{nullptr};
+        TexturePtr emissive_texture_{nullptr};
+        TexturePtr opacity_texture_{nullptr};
     };
 
     using MaterialPtr = std::shared_ptr<Material>;

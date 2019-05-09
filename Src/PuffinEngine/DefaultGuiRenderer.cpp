@@ -250,7 +250,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     }
 
     if (render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::TINT) {
+        PostprocessEffect::Tint) {
         glm::vec3 color = render_settings_->postprocess()->getTintColor();
         float tint_color[] = {color.r, color.g, color.b, 1.0f};
         ImGui::ColorEdit3("Tint color", tint_color);
@@ -259,11 +259,11 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     }
 
     if (render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::BLUR ||
+        PostprocessEffect::Blur ||
         render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::EDGE ||
+        PostprocessEffect::Edge ||
         render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::SHARPEN) {
+        PostprocessEffect::Sharpen) {
         float k_size = render_settings_->postprocess()->getKernelSize();
         ImGui::SliderFloat("Kernel size", &k_size, 1.0f, 500.0f);
         render_settings_->postprocess()->setKernelSize(k_size);
