@@ -7,11 +7,6 @@
 #ifndef PUFFIN_MESH_HPP
 #define PUFFIN_MESH_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
-#include <GL/glew.h>
-
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>

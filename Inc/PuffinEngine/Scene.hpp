@@ -13,6 +13,7 @@
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Skybox.hpp"
 #include "PuffinEngine/Text.hpp"
+#include "PuffinEngine/WaterTile.hpp"
 
 namespace puffin {
     class Scene {
@@ -69,9 +70,32 @@ namespace puffin {
             return textes_[index];
         }
 
+        void addWaterTile(WaterTilePtr water_tile) {
+            if (!water_tile) {
+                logError("Scene::addWaterTile()", PUFFIN_MSG_NULL_OBJECT);
+                return;
+            }
+
+            water_tiles_.push_back(water_tile);
+        }
+
+        GLuint getWaterTilesCount() const {
+            return water_tiles_.size();
+        }
+
+        WaterTilePtr getWaterTile(GLuint index) {
+            if (index >= water_tiles_.size()) {
+                logError("Scene::getWaterTile()", PUFFIN_MSG_OUT_OF_RANGE(0, water_tiles_.size()));
+                return WaterTilePtr();
+            }
+
+            return water_tiles_[index];
+        }
+
     private:
         std::vector<MeshPtr> meshes_;
         std::vector<TextPtr> textes_;
+        std::vector<WaterTilePtr> water_tiles_;
         SkyboxPtr active_skybox_{nullptr};
     };
 

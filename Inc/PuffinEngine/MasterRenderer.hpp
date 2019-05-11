@@ -31,6 +31,7 @@
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Timer.hpp"
+#include "PuffinEngine/WaterRenderer.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
@@ -49,6 +50,7 @@ namespace puffin {
         void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
 		void assignFontRenderer(FontRendererPtr renderer);
         void assignGuiRenderer(GuiRendererPtr renderer);
+        void assignWaterRenderer(WaterRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
 
@@ -78,6 +80,10 @@ namespace puffin {
             return font_renderer_;
         }
 
+        WaterRendererPtr waterRenderer() const {
+            return water_renderer_;
+        }
+
     private:
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
@@ -94,12 +100,13 @@ namespace puffin {
 
         std::vector<TimerPtr> timers_;
 
-        GuiRendererPtr gui_renderer_;
-        MeshRendererPtr mesh_renderer_;
-        PostprocessRendererPtr postprocess_renderer_;
-        SkyboxRendererPtr skybox_renderer_;
-        ShadowMapRendererPtr shadow_map_renderer_;
-		FontRendererPtr font_renderer_;
+        GuiRendererPtr gui_renderer_{nullptr};
+        MeshRendererPtr mesh_renderer_{nullptr};
+        PostprocessRendererPtr postprocess_renderer_{nullptr};
+        SkyboxRendererPtr skybox_renderer_{nullptr};
+        ShadowMapRendererPtr shadow_map_renderer_{nullptr};
+        FontRendererPtr font_renderer_{nullptr};
+        WaterRendererPtr water_renderer_{nullptr};
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;

@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0 Demo
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef ENGINE_DEMO_HPP
@@ -13,23 +14,23 @@ class EngineDemo : public puffin::Core {
 public:
     EngineDemo();
 
-	puffin::ScenePtr render();
-
 private:
+    puffin::ScenePtr render();
+
     void updateWindowCaption();
     void pollKeyboard();
     void pollMouse();
     void moveCamera();
     void rotateCamera();
-
     void createScene();
 
     puffin::DefaultGuiRendererPtr gui_renderer_;
     puffin::MeshPtr test_mesh_;
     puffin::ScenePtr scene_;
     puffin::SkyboxPtr skybox_;
-	puffin::TextPtr text_demo_;
+    puffin::TextPtr text_demo_;
     puffin::TexturePtr skybox_texture_;
+    puffin::WaterTilePtr water_tile_;
 
     puffin::TimerPtr fps_caption_timer_;
 };

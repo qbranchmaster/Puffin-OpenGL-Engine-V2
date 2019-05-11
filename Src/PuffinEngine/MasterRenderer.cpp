@@ -179,6 +179,15 @@ void MasterRenderer::assignGuiRenderer(GuiRendererPtr renderer) {
     gui_renderer_ = renderer;
 }
 
+void MasterRenderer::assignWaterRenderer(WaterRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignWaterRenderer()", "Null input.");
+        return;
+    }
+
+    water_renderer_ = renderer;
+}
+
 void MasterRenderer::drawScene(ScenePtr scene) {
     if (!scene) {
         logError("MasterRenderer::drawScene()", "Null input.");
@@ -210,6 +219,10 @@ void MasterRenderer::drawScene(ScenePtr scene) {
                     mesh);
             }
         }
+    }
+
+    if (water_renderer_) {
+        water_renderer_->render(default_frame_buffer_, scene);
     }
 }
 

@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_CORE_HPP
@@ -13,6 +14,7 @@
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
+#include "PuffinEngine/DefaultWaterRenderer.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/Input.hpp"
@@ -52,18 +54,21 @@ namespace puffin {
         void stop();
 
     private:
-        CameraPtr camera_;
-		DefaultFontRendererPtr default_font_renderer_;
-        DefaultGuiRendererPtr default_gui_renderer_;
-        DefaultMeshRendererPtr default_mesh_renderer_;
-        DefaultPostprocessRendererPtr default_postprocess_renderer_;
-        DefaultShadowMapRendererPtr default_shadow_map_renderer_;
-        DefaultSkyboxRendererPtr default_skybox_renderer_;
-        InputPtr input_;
-        MasterRendererPtr master_renderer_;
-        RenderersSharedDataPtr renderers_shared_data_;
-        RenderSettingsPtr render_settings_;
-        WindowPtr window_;
+        CameraPtr camera_{nullptr};
+        InputPtr input_{nullptr};
+        WindowPtr window_{nullptr};
+
+        MasterRendererPtr master_renderer_{nullptr};
+        RenderersSharedDataPtr renderers_shared_data_{nullptr};
+        RenderSettingsPtr render_settings_{nullptr};
+
+        DefaultFontRendererPtr default_font_renderer_{nullptr};
+        DefaultGuiRendererPtr default_gui_renderer_{nullptr};
+        DefaultMeshRendererPtr default_mesh_renderer_{nullptr};
+        DefaultPostprocessRendererPtr default_postprocess_renderer_{nullptr};
+        DefaultShadowMapRendererPtr default_shadow_map_renderer_{nullptr};
+        DefaultSkyboxRendererPtr default_skybox_renderer_{nullptr};
+        DefaultWaterRendererPtr default_water_renderer_{nullptr};
     };
 } // namespace puffin
 

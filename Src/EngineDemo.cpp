@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0 Demo
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "EngineDemo.hpp"
@@ -12,33 +13,29 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enableTimeStamp(true);
 
     Configuration::instance().setFrameResolution(1280, 720);
-    Configuration::instance().setMsaaSamples(4);
+    Configuration::instance().setMsaaSamples(2);
     Configuration::instance().setOpenGLVersion(4, 0);
     Configuration::instance().enableFullscreen(false);
     Configuration::instance().setTargetMonitorIndex(0);
 
     initialize();
-    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render,
-        this));
+    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
 
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
-    camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(),
-        0.1f, 15.0f);
+    camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(), 0.1f, 15.0f);
     camera()->setFov(0.85f);
 
-    Texture::setDefaultTextureFilter(TextureType::Texture2D,
-        TextureFilter::TRILINEAR);
+    Texture::setDefaultTextureFilter(TextureType::Texture2D, TextureFilter::TRILINEAR);
 
     renderSettings()->postprocess()->setEffect(PostprocessEffect::None);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
     renderSettings()->postprocess()->enableGlowBloom(false);
 
     renderSettings()->lighting()->enable(true);
-    renderSettings()->lighting()->setSkyboxLightingColor(
-        glm::vec3(0.9f, 0.9f, 0.9f));
+    renderSettings()->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
 
     renderSettings()->lighting()->enableShadowMapping(true);
     renderSettings()->lighting()->setDirectionalLightShadowMapSize(1024);
@@ -58,13 +55,11 @@ EngineDemo::EngineDemo() : Core() {
     createScene();
     createDefaultRenderers();
 
-    fps_caption_timer_.reset(new Timer(std::bind(
-        &EngineDemo::updateWindowCaption, this)));
+    fps_caption_timer_.reset(new Timer(std::bind(&EngineDemo::updateWindowCaption, this)));
     fps_caption_timer_->start(1000);
     masterRenderer()->addTimer(fps_caption_timer_);
 
-    gui_renderer_ = std::static_pointer_cast<DefaultGuiRenderer>(
-        masterRenderer()->guiRenderer());
+    gui_renderer_ = std::static_pointer_cast<DefaultGuiRenderer>(masterRenderer()->guiRenderer());
 }
 
 void EngineDemo::createScene() {
@@ -89,14 +84,18 @@ void EngineDemo::createScene() {
     scene_->setSkybox(skybox_);
     scene_->addMesh(test_mesh_);
 
-	text_demo_.reset(new Text(L"Puffin Engine Demo",
-		glm::uvec2(10, 710), 48));
+    text_demo_.reset(new Text(L"Puffin Engine Demo", glm::uvec2(10, 710), 48));
     text_demo_->setFontColor(glm::vec3(1.0f, 0.0f, 0.0f));
     text_demo_->setOutlineColor(glm::vec3(1.0f, 1.0f, 1.0f));
     text_demo_->setOutlineSize(2);
     text_demo_->setHorizontalSpacing(2);
     text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");
-	//scene_->addText(text_demo_);
+    //scene_->addText(text_demo_);
+
+    water_tile_.reset(new WaterTile());
+    water_tile_->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
+    water_tile_->setScale(glm::vec3(5.0f, 5.0f, 5.0f));
+    scene_->addWaterTile(water_tile_);
 }
 
 void EngineDemo::pollKeyboard() {
@@ -104,8 +103,7 @@ void EngineDemo::pollKeyboard() {
         stop();
     }
 
-    if (input()->keyPressed(Key::F12, false) &&
-        input()->keyPressed(Key::LeftShift)) {
+    if (input()->keyPressed(Key::F12, false) && input()->keyPressed(Key::LeftShift)) {
         static GLboolean enabled = true;
         enabled = !enabled;
         gui_renderer_->enable(enabled);
@@ -126,12 +124,12 @@ ScenePtr EngineDemo::render() {
     pollKeyboard();
     pollMouse();
 
-	return scene_;
+    return scene_;
 }
 
 void EngineDemo::updateWindowCaption() {
-    window()->setCaption("Puffin Engine Demo [FPS: " +
-        std::to_string(Time::instance().getFpsRate()) + "]");
+    window()->setCaption("Puffin Engine Demo [FPS: " + std::to_string(
+        Time::instance().getFpsRate()) + "]");
 }
 
 void EngineDemo::moveCamera() {
@@ -173,17 +171,18 @@ void EngineDemo::rotateCamera() {
         GLdouble x_diff = cur_x - cursor_x;
         GLdouble y_diff = cur_y - cursor_y;
 
-        camera()->rotate(y_diff * mouse_speed, x_diff * mouse_speed);
+        camera()->rotate((GLfloat)(y_diff * mouse_speed), (GLfloat)(x_diff * mouse_speed));
 
         // Clamp vertical angle from 0 to 90 degrees.
         GLfloat v_angle = camera()->getVerticalAngle();
-        if (v_angle > glm::half_pi<GLfloat>())
+        if (v_angle > glm::half_pi<GLfloat>()) {
             v_angle = glm::half_pi<GLfloat>();
-        else if (v_angle < -glm::half_pi<GLfloat>())
+        }
+        else if (v_angle < -glm::half_pi<GLfloat>()) {
             v_angle = -glm::half_pi<GLfloat>();
+        }
 
-        camera()->setRotation(camera()->getHorizontalAngle(),
-            v_angle);
+        camera()->setRotation(camera()->getHorizontalAngle(), v_angle);
 
         cursor_x = cur_x;
         cursor_y = cur_y;
