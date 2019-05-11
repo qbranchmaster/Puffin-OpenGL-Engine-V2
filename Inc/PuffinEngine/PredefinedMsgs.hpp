@@ -39,4 +39,10 @@
 #define PUFFIN_MSG_FILE_CANNOT_OPEN(file_path)                \
     "Error loading file [" + file_path + "]."
 
+#define PUFFIN_MSG_FILE_LOADED(file_path)                     \
+    "File [" + file_path + "] loaded."
+
+#define PUFFIN_MSG_TEXTURE_INVALID_TYPE                       \
+    "Invalid texture type."
+
 #endif // PUFFIN_PREDEFINED_MSGS_HPP

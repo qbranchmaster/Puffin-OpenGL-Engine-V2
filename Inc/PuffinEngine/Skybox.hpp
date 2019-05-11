@@ -1,16 +1,17 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_SKYBOX_HPP
 #define PUFFIN_SKYBOX_HPP
 
-#include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/BaseMesh.hpp"
 #include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
-    class Skybox : public Mesh {
+    class Skybox : public BaseMesh {
     public:
         Skybox();
 
@@ -21,7 +22,7 @@ namespace puffin {
         }
 
     private:
-        TexturePtr texture_;
+        TexturePtr texture_{nullptr};
     };
 
     using SkyboxPtr = std::shared_ptr<Skybox>;

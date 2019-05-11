@@ -1,19 +1,20 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/Skybox.hpp"
 
 using namespace puffin;
 
-Skybox::Skybox() : Mesh() {
+Skybox::Skybox() {
     std::vector<GLfloat> data = {
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
         -1.0f,  1.0f, -1.0f,
 
         -1.0f, -1.0f,  1.0f,
@@ -23,33 +24,33 @@ Skybox::Skybox() : Mesh() {
         -1.0f,  1.0f,  1.0f,
         -1.0f, -1.0f,  1.0f,
 
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
 
-        -1.0f, -1.0f, 1.0f,
-        -1.0f,  1.0f, 1.0f,
-        1.0f,  1.0f, 1.0f,
-        1.0f,  1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-        -1.0f, 1.0f, -1.0f,
-        1.0f, 1.0f, -1.0f,
-        1.0f, 1.0f,  1.0f,
-        1.0f, 1.0f,  1.0f,
-        -1.0f, 1.0f,  1.0f,
-        -1.0f, 1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
 
         -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f
+         1.0f, -1.0f,  1.0f
     };
 
     bind();
@@ -58,12 +59,12 @@ Skybox::Skybox() : Mesh() {
 
 void Skybox::setTexture(TexturePtr texture) {
     if (!texture) {
-        logError("Skybox::setTexture()", "Null input.");
+        logError("Skybox::setTexture()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
     if (texture->getType() != TextureType::TextureCube) {
-        logError("Skybox::setTexture()", "Invalid texture type.");
+        logError("Skybox::setTexture()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         return;
     }
 

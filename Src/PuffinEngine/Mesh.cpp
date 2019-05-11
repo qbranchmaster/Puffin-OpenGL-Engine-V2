@@ -1,77 +1,12 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/Mesh.hpp"
 
 using namespace puffin;
-
-Mesh::Mesh() {
-    glGenVertexArrays(1, &handle_);
-}
-
-Mesh::~Mesh() {
-    freeVertexBuffers();
-
-    if (handle_) {
-        glDeleteVertexArrays(1, &handle_);
-    }
-}
-
-void Mesh::setScale(const glm::vec3 &scale) {
-    scale_ = scale;
-    scale_matrix_ = glm::scale(glm::mat4(1.0f), scale_);
-    model_matrix_changed_ = true;
-}
-
-void Mesh::translate(const glm::vec3 &translation) {
-    translation_matrix_ = glm::translate(translation_matrix_,
-        translation);
-    position_ += translation;
-    model_matrix_changed_ = true;
-}
-
-void Mesh::setPosition(const glm::vec3 &position) {
-    translation_matrix_ = glm::mat4(1.0f);
-    position_ = glm::vec3(0.0f, 0.0f, 0.0f);
-    translate(position);
-}
-
-void Mesh::zeroTranslation() {
-    translation_matrix_ = glm::mat4(1.0f);
-    model_matrix_changed_ = true;
-}
-
-void Mesh::rotate(GLfloat angle, const glm::vec3 &axis) {
-    rotation_matrix_ = glm::rotate(rotation_matrix_, angle, axis);
-    model_matrix_changed_ = true;
-}
-
-void Mesh::setRotationAngle(GLfloat angle, const glm::vec3 &axis) {
-    rotation_matrix_ = glm::mat4(1.0f);
-    rotate(angle, axis);
-}
-
-void Mesh::zeroRotation() {
-    rotation_matrix_ = glm::mat4(1.0f);
-    model_matrix_changed_ = true;
-}
-
-MeshEntityPtr Mesh::addEntity() {
-    MeshEntityPtr entity(new MeshEntity());
-    entities_.push_back(entity);
-    return entity;
-}
-
-MeshEntityPtr Mesh::getEntity(GLuint index) const {
-    if (index >= entities_.size()) {
-        logError("Mesh::getEntity()", "Invalid value.");
-        return MeshEntityPtr();
-    }
-
-    return entities_[index];
-}
 
 glm::mat4 Mesh::assimpMat4ToGlmMat4(const aiMatrix4x4 *input) {
     glm::mat4 result(1.0f);
@@ -187,7 +122,7 @@ void Mesh::loadMeshEntities(const aiScene *scene) {
     loadMaterials(scene);
 }
 
-void Mesh::loadMaterials(const aiScene *scene) {
+void Mesh::loadMaterials(const aiScene * scene) {
     if (!scene->HasMaterials()) {
         return;
     }
@@ -197,51 +132,39 @@ void Mesh::loadMaterials(const aiScene *scene) {
         MaterialPtr mesh_material(new Material());
 
         aiString texture_path;
-        if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path)
-            == AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_AMBIENT, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr ambient_tex(new Texture());
-            ambient_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            ambient_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setAmbientTexture(ambient_tex);
         }
 
-        if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path)
-            == AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr diffuse_tex(new Texture());
-            diffuse_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            diffuse_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setDiffuseTexture(diffuse_tex);
         }
 
-        if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path)
-            == AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_SPECULAR, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr specular_tex(new Texture());
-            specular_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            specular_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setSpecularTexture(specular_tex);
         }
 
-        if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path)
-            == AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr emissive_tex(new Texture());
-            emissive_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            emissive_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setEmissiveTexture(emissive_tex);
         }
 
-        if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) ==
-            AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_NORMALS, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr normalmap_tex(new Texture());
-            normalmap_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            normalmap_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setNormalMapTexture(normalmap_tex);
         }
 
-        if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) ==
-            AI_SUCCESS) {
+        if (material->GetTexture(aiTextureType_OPACITY, 0, &texture_path) == AI_SUCCESS) {
             TexturePtr opacity_tex(new Texture());
-            opacity_tex->loadTexture2D(processTexturePath(path_,
-                texture_path), true);
+            opacity_tex->loadTexture2D(processTexturePath(path_, texture_path), true);
             mesh_material->setOpacityTexture(opacity_tex);
         }
 
@@ -271,42 +194,23 @@ void Mesh::loadMaterials(const aiScene *scene) {
         }
 
         GLfloat reflectivity = 0;
-        if (material->Get(AI_MATKEY_REFLECTIVITY, reflectivity) ==
-            AI_SUCCESS) {
+        if (material->Get(AI_MATKEY_REFLECTIVITY, reflectivity) == AI_SUCCESS) {
             mesh_material->setReflectivity(reflectivity);
         }
 
         aiColor3D transparency;
-        if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) ==
-            AI_SUCCESS) {
-            mesh_material->setTransparency(glm::vec3(transparency.r,
-                transparency.g, transparency.b));
+        if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) == AI_SUCCESS) {
+            mesh_material->setTransparency(glm::vec3(transparency.r, transparency.g,
+                transparency.b));
         }
 
         materials_.push_back(mesh_material);
     }
 }
 
-void Mesh::freeVertexData() {
-    v_positions_.clear();
-    v_normals_.clear();
-    v_tex_coords_.clear();
-    v_tangents_.clear();
-    v_bitangents_.clear();
-    v_indices_.clear();
-}
-
-void Mesh::freeVertexBuffers() {
-    for (auto &buffer : data_buffers_) {
-        if (buffer.second != 0) {
-            glDeleteBuffers(1, &buffer.second);
-        }
-    }
-}
-
 void Mesh::loadFromFile(std::string path) {
     if (path.empty()) {
-        logError("Mesh::loadFromFile()", "Invalid input.");
+        logError("Mesh::loadFromFile()", PUFFIN_MSG_FILE_EMPTY_PATH);
         return;
     }
 
@@ -317,7 +221,7 @@ void Mesh::loadFromFile(std::string path) {
     if (!scene) {
         logError("Mesh::loadFromFile()", "Importer message: " +
             std::string(mesh_importer.GetErrorString()) + ".");
-        logError("Mesh::loadFromFile()", "File [" + path + "] loading error.");
+        logError("Mesh::loadFromFile()", PUFFIN_MSG_FILE_CANNOT_OPEN(path));
         return;
     }
 
@@ -347,18 +251,17 @@ void Mesh::loadFromFile(std::string path) {
     setMeshData(v_tangents_, 3, 3);
     setMeshData(v_bitangents_, 4, 3);
     setMeshIndices(v_indices_);
-    has_indices_ = true;
 
     // OpenGL buffers are set now, so free some data
     freeVertexData();
     entity_data_.clear();
     materials_.clear();
 
-    logInfo("Mesh::loadFromFile()", "File [" + path + "] loaded.");
+    logInfo("Mesh::loadFromFile()", PUFFIN_MSG_FILE_LOADED(path_));
 }
 
 std::string Mesh::processTexturePath(std::string model_file_path,
-    const aiString &texture_path) {
+    const aiString & texture_path) {
     std::size_t slash_pos = model_file_path.find_last_of("/\\");
     std::string path = model_file_path.substr(0, slash_pos);
     std::string name = texture_path.C_Str();
@@ -368,32 +271,4 @@ std::string Mesh::processTexturePath(std::string model_file_path,
 
     std::string file_path = path + "/" + name;
     return file_path;
-}
-
-void Mesh::setMeshData(std::vector<GLfloat> data, GLuint index,
-    GLuint vertex_size, GLboolean dynamic_draw) {
-    bind();
-
-    if (data_buffers_[index] == 0) {
-        glGenBuffers(1, &data_buffers_[index]);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, data_buffers_[index]);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(),
-        dynamic_draw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-
-    glVertexAttribPointer(index, vertex_size, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(index);
-}
-
-void Mesh::setMeshIndices(std::vector<GLuint> data) {
-    bind();
-
-    if (indices_buffer_ == 0) {
-        glGenBuffers(1, &indices_buffer_);
-    }
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(GLuint),
-        data.data(), GL_STATIC_DRAW);
 }

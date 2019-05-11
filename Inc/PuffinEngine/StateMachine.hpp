@@ -14,6 +14,7 @@
 
 namespace puffin {
     class StateMachine {
+        friend class BaseMesh;
         friend class ShaderProgram;
 
     public:
@@ -27,6 +28,7 @@ namespace puffin {
         StateMachine(const StateMachine &) = delete;
         void operator=(const StateMachine &) = delete;
 
+        GLuint bound_mesh_{0};
         GLuint bound_shader_program_{0};
     };
 } // namespace puffin
