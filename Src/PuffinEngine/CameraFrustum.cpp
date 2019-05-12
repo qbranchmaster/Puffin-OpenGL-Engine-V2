@@ -1,24 +1,25 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #include "PuffinEngine/CameraFrustum.hpp"
 
 using namespace puffin;
 
-void CameraFrustum::setCameraVectors(const glm::vec3 &direction,
-    const glm::vec3 &right, const glm::vec3 &up, const glm::vec3 &position) {
+void CameraFrustum::setCameraVectors(const glm::vec3 &direction, const glm::vec3 &right,
+    const glm::vec3 &up, const glm::vec3 &position) {
     direction_vector_ = glm::normalize(direction);
     right_vector_ = glm::normalize(right);
     up_vector_ = glm::normalize(up);
     camera_position_ = position;
 }
 
-void CameraFrustum::setCameraParameters(GLfloat near_distance,
-    GLfloat far_distance, GLfloat aspect, GLfloat fov) {
+void CameraFrustum::setCameraParameters(GLfloat near_distance, GLfloat far_distance,
+    GLfloat aspect, GLfloat fov) {
     if (aspect <= 0.0f || fov <= 0.0f) {
-        logError("CameraFrustum::setCameraParameters()", "Invalid value.");
+        logError("CameraFrustum::setCameraParameters()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
@@ -31,32 +32,22 @@ void CameraFrustum::setCameraParameters(GLfloat near_distance,
 void CameraFrustum::calculateFrustumPoints() {
     calculatePlanesSizes();
 
-    glm::vec3 to_near_center = camera_position_ + direction_vector_ *
-        near_plane_;
-    glm::vec3 to_far_center = camera_position_ + direction_vector_ *
-        far_plane_;
+    glm::vec3 to_near_center = camera_position_ + direction_vector_ * near_plane_;
+    glm::vec3 to_far_center = camera_position_ + direction_vector_ * far_plane_;
 
     glm::vec3 far_top = to_far_center + up_vector_ * (far_height_ / 2.0f);
     glm::vec3 far_bottom = to_far_center - up_vector_ * (far_height_ / 2.0f);
     glm::vec3 near_top = to_near_center + up_vector_ * (near_height_ / 2.0f);
     glm::vec3 near_bottom = to_near_center - up_vector_ * (near_height_ / 2.0f);
 
-    frustum_points_[0] = calculatePointPosition(far_top, right_vector_,
-        far_width_);
-    frustum_points_[1] = calculatePointPosition(far_top, -right_vector_,
-        far_width_);
-    frustum_points_[2] = calculatePointPosition(far_bottom, right_vector_,
-        far_width_);
-    frustum_points_[3] = calculatePointPosition(far_bottom, -right_vector_,
-        far_width_);
-    frustum_points_[4] = calculatePointPosition(near_top, right_vector_,
-        near_width_);
-    frustum_points_[5] = calculatePointPosition(near_top, -right_vector_,
-        near_width_);
-    frustum_points_[6] = calculatePointPosition(near_bottom, right_vector_,
-        near_width_);
-    frustum_points_[7] = calculatePointPosition(near_bottom, -right_vector_,
-        near_width_);
+    frustum_points_[0] = calculatePointPosition(far_top, right_vector_, far_width_);
+    frustum_points_[1] = calculatePointPosition(far_top, -right_vector_, far_width_);
+    frustum_points_[2] = calculatePointPosition(far_bottom, right_vector_, far_width_);
+    frustum_points_[3] = calculatePointPosition(far_bottom, -right_vector_, far_width_);
+    frustum_points_[4] = calculatePointPosition(near_top, right_vector_, near_width_);
+    frustum_points_[5] = calculatePointPosition(near_top, -right_vector_, near_width_);
+    frustum_points_[6] = calculatePointPosition(near_bottom, right_vector_, near_width_);
+    frustum_points_[7] = calculatePointPosition(near_bottom, -right_vector_, near_width_);
 }
 
 void CameraFrustum::recalculateToFrame(const glm::mat4 & frame) {

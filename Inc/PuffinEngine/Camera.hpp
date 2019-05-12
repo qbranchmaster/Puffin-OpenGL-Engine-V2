@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_CAMERA_HPP
@@ -22,10 +23,10 @@
 
 namespace puffin {
     enum class CameraMoveDirection {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT,
+        Forward,
+        Backward,
+        Left,
+        Right,
     };
 
     class Camera {
@@ -41,6 +42,10 @@ namespace puffin {
 
         GLfloat getVerticalAngle() const {
             return vertical_angle_;
+        }
+
+        void flipPitch() {
+            setRotation(horizontal_angle_, -vertical_angle_);
         }
 
         void setPosition(const glm::vec3 &position);
@@ -75,8 +80,7 @@ namespace puffin {
             return aspect_;
         }
 
-        void setProjection(GLfloat fov, GLfloat aspect, GLfloat near_plane,
-            GLfloat far_plane);
+        void setProjection(GLfloat fov, GLfloat aspect, GLfloat near_plane, GLfloat far_plane);
 
         glm::mat4 getProjectionMatrix() const {
             return projection_matrix_;
@@ -144,11 +148,11 @@ namespace puffin {
 
         GLfloat aspect_{16.0f / 9.0f};
         GLfloat near_plane_{0.1f};
-        GLfloat far_plane_{100.0f};
+        GLfloat far_plane_{10.0f};
         GLfloat fov_{1.05f};
 
         GLfloat camera_move_speed_{1.0f};
-        GLfloat move_resistance_factor_{0.85f};
+        GLfloat move_resistance_factor_{0.90f};
         GLfloat ahead_speed_{0.0f};
         GLfloat side_speed_{0.0f};
     };

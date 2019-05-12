@@ -151,19 +151,19 @@ void EngineDemo::moveCamera() {
     }
 
     if (input()->keyPressed(Key::A, true)) {
-        camera()->move(CameraMoveDirection::LEFT);
+        camera()->move(CameraMoveDirection::Left);
     }
 
     if (input()->keyPressed(Key::D, true)) {
-        camera()->move(CameraMoveDirection::RIGHT);
+        camera()->move(CameraMoveDirection::Right);
     }
 
     if (input()->keyPressed(Key::W, true)) {
-        camera()->move(CameraMoveDirection::FORWARD);
+        camera()->move(CameraMoveDirection::Forward);
     }
 
     if (input()->keyPressed(Key::S, true)) {
-        camera()->move(CameraMoveDirection::BACKWARD);
+        camera()->move(CameraMoveDirection::Backward);
     }
 }
 

@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_CAMERA_FRUSTUM_HPP
@@ -23,11 +24,10 @@
 namespace puffin {
     class CameraFrustum {
     public:
-        void setCameraVectors(const glm::vec3 &direction,
-            const glm::vec3 &right, const glm::vec3 &up,
-            const glm::vec3 &position);
-        void setCameraParameters(GLfloat near_distance, GLfloat far_distance,
-            GLfloat aspect, GLfloat fov);
+        void setCameraVectors(const glm::vec3 &direction, const glm::vec3 &right,
+            const glm::vec3 &up, const glm::vec3 &position);
+        void setCameraParameters(GLfloat near_distance, GLfloat far_distance, GLfloat aspect,
+            GLfloat fov);
 
         void calculateFrustumPoints();
         void recalculateToFrame(const glm::mat4 &frame);
@@ -43,13 +43,13 @@ namespace puffin {
 
     private:
         void calculatePlanesSizes();
-        glm::vec3 calculatePointPosition(const glm::vec3 &start,
-            const glm::vec3 &direction, GLfloat width);
+        glm::vec3 calculatePointPosition(const glm::vec3 & start, const glm::vec3 & direction,
+            GLfloat width);
 
         GLfloat near_plane_{1.0f};
         GLfloat far_plane_{10.0f};
-        GLfloat aspect_{1.0f};
-        GLfloat fov_{0.85f};
+        GLfloat aspect_{16.0f / 9.0f};
+        GLfloat fov_{1.05f};
 
         GLfloat far_width_{0.0f};
         GLfloat far_height_{0.0f};
