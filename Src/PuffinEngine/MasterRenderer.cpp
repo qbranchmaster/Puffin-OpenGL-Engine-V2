@@ -194,11 +194,7 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 
     if (skybox_renderer_) {
-        auto skybox = scene->getSkybox();
-        if (skybox) {
-            skybox_renderer_->render(default_frame_buffer_multisample_,
-                skybox);
-        }
+        skybox_renderer_->render(default_frame_buffer_multisample_, scene);
     }
 
     if (shadow_map_renderer_ && render_settings_->lighting()->

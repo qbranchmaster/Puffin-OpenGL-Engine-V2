@@ -17,12 +17,14 @@ public:
 private:
     puffin::ScenePtr render();
 
-    void updateWindowCaption();
     void pollKeyboard();
     void pollMouse();
     void moveCamera();
     void rotateCamera();
     void createScene();
+
+    void updateWindowCaption();
+    void rotateSkybox();
 
     puffin::DefaultGuiRendererPtr gui_renderer_;
     puffin::MeshPtr test_mesh_;
@@ -33,6 +35,7 @@ private:
     puffin::WaterTilePtr water_tile_;
 
     puffin::TimerPtr fps_caption_timer_;
+    puffin::TimerPtr skybox_rotate_timer_;
 };
 
 #endif // ENGINE_DEMO_HPP

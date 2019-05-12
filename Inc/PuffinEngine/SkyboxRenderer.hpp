@@ -1,6 +1,7 @@
 /*
 * Puffin OpenGL Engine ver. 2.0
 * Coded by: Sebastian 'qbranchmaster' Tabaka
+* Contact: sebastian.tabaka@outlook.com
 */
 
 #ifndef PUFFIN_SKYBOX_RENDERER_HPP
@@ -8,12 +9,12 @@
 
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Renderer.hpp"
-#include "PuffinEngine/Skybox.hpp"
+#include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
     class SkyboxRenderer : public Renderer {
     public:
-        virtual void render(FrameBufferPtr frame_buffer, SkyboxPtr skybox) = 0;
+        virtual void render(FrameBufferPtr frame_buffer, ScenePtr scene) = 0;
     };
 
     using SkyboxRendererPtr = std::shared_ptr<SkyboxRenderer>;

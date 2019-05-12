@@ -59,6 +59,10 @@ EngineDemo::EngineDemo() : Core() {
     fps_caption_timer_->start(1000);
     masterRenderer()->addTimer(fps_caption_timer_);
 
+    skybox_rotate_timer_.reset(new Timer(std::bind(&EngineDemo::rotateSkybox, this)));
+    skybox_rotate_timer_->start(100);
+    masterRenderer()->addTimer(skybox_rotate_timer_);
+
     gui_renderer_ = std::static_pointer_cast<DefaultGuiRenderer>(masterRenderer()->guiRenderer());
 }
 
@@ -130,6 +134,12 @@ ScenePtr EngineDemo::render() {
 void EngineDemo::updateWindowCaption() {
     window()->setCaption("Puffin Engine Demo [FPS: " + std::to_string(
         Time::instance().getFpsRate()) + "]");
+}
+
+void EngineDemo::rotateSkybox() {
+    static GLfloat rotation_angle = 0.0f;
+    skybox_->setRotationAngle(rotation_angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    rotation_angle += 0.0005f;
 }
 
 void EngineDemo::moveCamera() {
