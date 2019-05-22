@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_WINDOW_HPP
 #define PUFFIN_WINDOW_HPP
@@ -16,7 +16,7 @@
 #include <memory>
 #include <string>
 
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Texture.hpp"

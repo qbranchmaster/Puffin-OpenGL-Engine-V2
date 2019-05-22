@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_SHADER_PROGRAM_HPP
 #define PUFFIN_SHADER_PROGRAM_HPP
@@ -28,8 +28,16 @@
 namespace puffin {
     class ShaderProgram {
     public:
-        ShaderProgram();
+        ShaderProgram(std::string name);
         ~ShaderProgram();
+
+        std::string getName() const {
+            return name_;
+        }
+
+        GLuint getHandle() const {
+            return handle_;
+        }
 
         void activate() {
             if (StateMachine::instance().bound_shader_program_ == handle_) {
@@ -47,7 +55,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -59,7 +67,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -71,7 +79,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -83,7 +91,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -95,7 +103,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -107,7 +115,7 @@ namespace puffin {
             auto location = getUniformLocation(uniform_name);
             if (location == -1) {
                 logError("ShaderProgram::setUniform()",
-                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name));
+                    PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(name_, uniform_name));
                 return;
             }
 
@@ -127,6 +135,8 @@ namespace puffin {
 
         void fetchUniforms();
         GLint getUniformLocation(std::string uniform_name);
+
+        std::string name_{"unnamed_shader_program"};
 
         GLuint handle_{0};
         GLuint handle_vs_{0};

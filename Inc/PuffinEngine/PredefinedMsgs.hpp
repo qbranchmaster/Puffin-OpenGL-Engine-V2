@@ -1,48 +1,74 @@
+/*
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
+
 #ifndef PUFFIN_PREDEFINED_MSGS_HPP
 #define PUFFIN_PREDEFINED_MSGS_HPP
 
 #include <string>
 
-#define PUFFIN_MSG_NULL_OBJECT                                \
-    "Null object."
+constexpr auto PUFFIN_MSG_NULL_OBJECT = "Null object.";
 
-#define PUFFIN_MSG_INVALID_VALUE                              \
-    "Invalid value."
+constexpr auto PUFFIN_MSG_INVALID_VALUE = "Invalid value.";
 
-#define PUFFIN_MSG_OUT_OF_RANGE(a,b)                          \
-    "Value out of range (" + std::to_string(a) + ", " + std::to_string(b) + ")."
+template<typename T1, typename T2>
+constexpr auto PUFFIN_MSG_OUT_OF_RANGE(T1 a, T2 b) {
+    return "Value out of range (" + std::to_string(a) + ", " + std::to_string(b) + ").";
+}
 
-#define PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(uniform_name)    \
-    "Uniform [" + uniform_name + "] does not exist."
+template<typename T1, typename T2>
+constexpr auto PUFFIN_MSG_SHADER_UNIFORM_NOT_EXISTS(T1 shader_name, T2 uniform_name) {
+    return "Uniform [" + uniform_name + "] does not exist in shader program [" + shader_name + "].";
+}
 
-#define PUFFIN_MSG_SHADER_COMPILE_MESSAGE(shader_name,msg)    \
-    "Shader file [" + shader_name + "] compile message:\n" + msg
+template<typename T1, typename T2>
+constexpr auto PUFFIN_MSG_SHADER_COMPILE_MESSAGE(T1 shader_file, T2 msg) {
+    return "Shader file [" + shader_file + "] compile message:\n" + msg;
+}
 
-#define PUFFIN_MSG_SHADER_COMPILE_ERROR(shader_name)          \
-    "Shader file [" + shader_name + "] compile error."
+template<typename T>
+constexpr auto PUFFIN_MSG_SHADER_COMPILE_ERROR(T shader_file) {
+    return "Shader file [" + shader_file + "] compile error.";
+}
 
-#define PUFFIN_MSG_SHADER_COMPILE_SUCCESS(shader_name)        \
-    "Shader file [" + shader_name + "] compile success."
+template<typename T>
+constexpr auto PUFFIN_MSG_SHADER_COMPILE_SUCCESS(T shader_file) {
+    return "Shader file [" + shader_file + "] compile success.";
+}
 
-#define PUFFIN_MSG_SHADER_LINK_ERROR                          \
-    "Shader program link error."
+template<typename T>
+constexpr auto PUFFIN_MSG_SHADER_LINK_ERROR(T shader_name) {
+    return "Shader program [" + shader_name + "] link error.";
+}
 
-#define PUFFIN_MSG_SHADER_LINK_MESSAGE(msg)                   \
-    "Shader program link message:\n" + msg
+template<typename T1, typename T2>
+constexpr auto PUFFIN_MSG_SHADER_LINK_MESSAGE(T1 shader_name, T2 msg) {
+    return "Shader program [" + shader_name + "] link message:\n" + msg;
+}
 
-#define PUFFIN_MSG_SHADER_LINK_SUCCESS                        \
-    "Shader program link success."
+template<typename T>
+constexpr auto PUFFIN_MSG_SHADER_LINK_SUCCESS(T shader_name) {
+    return "Shader program [" + shader_name + "] link success.";
+}
 
-#define PUFFIN_MSG_FILE_EMPTY_PATH                            \
-    "File path is empty."
+constexpr auto PUFFIN_MSG_FILE_EMPTY_PATH = "File path is empty.";
 
-#define PUFFIN_MSG_FILE_CANNOT_OPEN(file_path)                \
-    "Error loading file [" + file_path + "]."
+template<typename T>
+constexpr auto PUFFIN_MSG_FILE_CANNOT_OPEN(T file_path) {
+    return "Error loading file [" + file_path + "].";
+}
 
-#define PUFFIN_MSG_FILE_LOADED(file_path)                     \
-    "File [" + file_path + "] loaded."
+template<typename T>
+constexpr auto PUFFIN_MSG_FILE_LOADED(T file_path) {
+    return "File [" + file_path + "] loaded.";
+}
 
-#define PUFFIN_MSG_TEXTURE_INVALID_TYPE                       \
-    "Invalid texture type."
+constexpr auto PUFFIN_MSG_TEXTURE_INVALID_TYPE = "Invalid texture type.";
+
+constexpr auto PUFFIN_MSG_TEXTURE_INVALID_FILTER = "Invalid texture filter.";
+
+constexpr auto PUFFIN_MSG_TEXTURE_INVALID_WRAP = "Invalid texture wrap.";
 
 #endif // PUFFIN_PREDEFINED_MSGS_HPP

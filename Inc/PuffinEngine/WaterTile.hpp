@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_WATER_TILE_HPP
 #define PUFFIN_WATER_TILE_HPP
@@ -13,6 +13,7 @@ namespace puffin {
     class WaterTile : public BaseMesh {
     public:
         WaterTile() {
+            // clang-format off
             std::vector<GLfloat> positions = {
                 -1.0f, 0.0f, -1.0f,
                 -1.0f, 0.0f,  1.0f,
@@ -21,16 +22,15 @@ namespace puffin {
                 -1.0f, 0.0f,  1.0f,
                  1.0f, 0.0f,  1.0f
             };
+            // clang-format on
 
             bind();
             setMeshData(positions, 0, 3);
         }
 
         void setWaterColor(const glm::vec3 &color) {
-            water_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f));
+            water_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f), glm::clamp(color.b, 0.0f, 1.0f));
         }
 
         glm::vec3 getWaterColor() const {

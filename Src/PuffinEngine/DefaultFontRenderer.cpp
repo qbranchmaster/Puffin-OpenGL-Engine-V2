@@ -79,7 +79,7 @@ void DefaultFontRenderer::render(TextPtr text) {
 }
 
 void DefaultFontRenderer::loadShaders() {
-    default_shader_program_.reset(new ShaderProgram());
+    default_shader_program_.reset(new ShaderProgram("font_shader_program"));
     default_shader_program_->loadShaders("Data/Shaders/Font.vert",
         "Data/Shaders/Font.frag");
 }
@@ -117,7 +117,7 @@ void DefaultFontRenderer::createCharacterMesh() {
 
     character_texture_.reset(new Texture());
     character_texture_->setTexture2DData(0, 0, 1, nullptr);
-    character_texture_->setTextureFilter(TextureFilter::BILINEAR);
+    character_texture_->setTextureFilter(TextureFilter::Bilinear);
 }
 
 FT_Face DefaultFontRenderer::createFontFace(TextPtr text) {
@@ -250,11 +250,11 @@ FT_BitmapGlyph DefaultFontRenderer::getCharacterGlyph(FT_Face font_face,
 }
 
 GLfloat DefaultFontRenderer::calculateScreenCoordX(GLfloat x) {
-    static auto v_width = Configuration::instance().getFrameWidth();
+    static auto v_width = InitConfig::instance().getFrameWidth();
     return (x / static_cast<GLfloat>(v_width) * 2.0f - 1.0f);
 }
 
 GLfloat DefaultFontRenderer::calculateScreenCoordY(GLfloat y) {
-    static auto v_height = Configuration::instance().getFrameHeight();
+    static auto v_height = InitConfig::instance().getFrameHeight();
     return (1.0f - y / static_cast<GLfloat>(v_height) * 2.0f);
 }

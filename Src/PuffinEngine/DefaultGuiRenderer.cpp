@@ -8,9 +8,9 @@
 using namespace puffin;
 
 DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
-    RenderersSharedDataPtr renderers_shared_data, WindowPtr window,
+    WindowPtr window,
     CameraPtr camera, MasterRendererPtr master_renderer) {
-    if (!window || !render_settings || !renderers_shared_data || !camera ||
+    if (!window || !render_settings || !camera ||
         !master_renderer) {
         throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
             "Not initialized object.");
@@ -18,7 +18,6 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
 
     render_settings_ = render_settings;
     target_window_ = window;
-    renderers_shared_data_ = renderers_shared_data;
     camera_ = camera;
     master_renderer_ = master_renderer;
 
@@ -269,13 +268,13 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         render_settings_->postprocess()->setKernelSize(k_size);
     }
 
-    float gamma = render_settings_->getGamma();
+    float gamma = render_settings_->postprocess()->getGamma();
     ImGui::SliderFloat("Gamma", &gamma, 1.0f, 10.0f);
-    render_settings_->setGamma(gamma);
+    render_settings_->postprocess()->setGamma(gamma);
 
-    float exposure = render_settings_->getExposure();
+    float exposure = render_settings_->postprocess()->getExposure();
     ImGui::SliderFloat("Exposure", &exposure, 1.0f, 10.0f);
-    render_settings_->setExposure(exposure);
+    render_settings_->postprocess()->setExposure(exposure);
 
     bool enable_bloom = render_settings_->postprocess()->isGlowBloomEnabled();
     ImGui::Checkbox("Glow bloom", &enable_bloom);
@@ -399,11 +398,11 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
         shadow_pcf_samples);
 
     ImGui::Text("Shadow map");
-    DepthTextureBufferPtr shadow_map_texture =
+    /*DepthTextureBufferPtr shadow_map_texture =
         renderers_shared_data_->shadow_map_texture;
     ImTextureID texture_handle = (void*)(shadow_map_texture->getHandle());
     ImGui::Image(texture_handle, ImVec2(shadow_map_texture->getWidth() / 4.0f,
-        shadow_map_texture->getHeight() / 4.0f));
+        shadow_map_texture->getHeight() / 4.0f));*/
 
     ImGui::End();
 }

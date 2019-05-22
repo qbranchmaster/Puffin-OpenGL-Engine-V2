@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/Input.hpp"
 
@@ -18,7 +18,6 @@ Input::Input(WindowPtr window) {
 
 GLboolean Input::keyPressed(Key key, GLboolean sticky) {
     GLboolean result = false;
-
     if (sticky) {
         if (glfwGetKey(target_window_->handle_, static_cast<GLint>(key))) {
             result = true;

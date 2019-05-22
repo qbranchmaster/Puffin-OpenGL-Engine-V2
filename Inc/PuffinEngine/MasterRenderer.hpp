@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_MASTER_RENDERER_HPP
 #define PUFFIN_MASTER_RENDERER_HPP
@@ -15,7 +16,6 @@
 #include <memory>
 
 #include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/Configuration.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FontRenderer.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
@@ -24,8 +24,6 @@
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
-#include "PuffinEngine/Scene.hpp"
-#include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/ShadowMapRenderer.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
@@ -37,18 +35,18 @@
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window, CameraPtr camera,
-            RenderSettingsPtr render_settings);
+        MasterRenderer(WindowPtr window, CameraPtr camera, RenderSettingsPtr render_settings);
 
         void start();
         void stop();
 
         void assignRenderingFunction(std::function<ScenePtr()> function);
+
         void assignPostprocessRenderer(PostprocessRendererPtr renderer);
         void assignSkyboxRenderer(SkyboxRendererPtr renderer);
         void assignMeshRenderer(MeshRendererPtr renderer);
         void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
-		void assignFontRenderer(FontRendererPtr renderer);
+        void assignFontRenderer(FontRendererPtr renderer);
         void assignGuiRenderer(GuiRendererPtr renderer);
         void assignWaterRenderer(WaterRendererPtr renderer);
 
@@ -87,16 +85,17 @@ namespace puffin {
     private:
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
+
         void checkGlErrors();
 
         GLboolean rendering_enabled_{false};
         std::function<ScenePtr()> rendering_function_{nullptr};
 
-        CameraPtr camera_;
-        FrameBufferPtr default_frame_buffer_;
-        FrameBufferPtr default_frame_buffer_multisample_;
-        RenderSettingsPtr render_settings_;
-        WindowPtr target_window_;
+        CameraPtr camera_{nullptr};
+        FrameBufferPtr default_frame_buffer_{nullptr};
+        FrameBufferPtr default_frame_buffer_multisample_{nullptr};
+        RenderSettingsPtr render_settings_{nullptr};
+        WindowPtr target_window_{nullptr};
 
         std::vector<TimerPtr> timers_;
 

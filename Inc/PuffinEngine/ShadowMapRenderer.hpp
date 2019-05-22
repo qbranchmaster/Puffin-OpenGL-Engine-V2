@@ -1,18 +1,19 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_SHADOW_MAP_RENDERER_HPP
 #define PUFFIN_SHADOW_MAP_RENDERER_HPP
 
-#include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Renderer.hpp"
+#include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
     class ShadowMapRenderer : public Renderer {
     public:
-        virtual void render(MeshPtr mesh) = 0;
+        virtual void render(ScenePtr scene) = 0;
     };
 
     using ShadowMapRendererPtr = std::shared_ptr<ShadowMapRenderer>;

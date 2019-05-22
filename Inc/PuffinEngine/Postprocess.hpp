@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_POSTPROCESS_HPP
 #define PUFFIN_POSTPROCESS_HPP
@@ -40,10 +40,8 @@ namespace puffin {
         }
 
         void setTintColor(const glm::vec3 &color) {
-            tint_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f));
+            tint_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f), glm::clamp(color.b, 0.0f, 1.0f));
         }
 
         glm::vec3 getTintColor() const {
@@ -72,11 +70,8 @@ namespace puffin {
         }
 
         void setGlowBloomThresholdColor(const glm::vec3 &threshold) {
-            glow_bloom_thresh_ = glm::vec3(
-                glm::clamp(threshold.r, 0.0f, 1.0f),
-                glm::clamp(threshold.g, 0.0f, 1.0f),
-                glm::clamp(threshold.b, 0.0f, 1.0f)
-            );
+            glow_bloom_thresh_ = glm::vec3(glm::clamp(threshold.r, 0.0f, 1.0f),
+                glm::clamp(threshold.g, 0.0f, 1.0f), glm::clamp(threshold.b, 0.0f, 1.0f));
         }
 
         glm::vec3 getGlowBloomThresholdColor() const {
@@ -130,6 +125,32 @@ namespace puffin {
             return focus_distance_;
         }
 
+        void setGamma(GLfloat gamma) {
+            if (gamma <= 0.0f) {
+                logError("Postprocess::setGamma()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            gamma_ = gamma;
+        }
+
+        GLfloat getGamma() const {
+            return gamma_;
+        }
+
+        void setExposure(GLfloat exposure) {
+            if (exposure <= 0.0f) {
+                logError("Postprocess::setExposure()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            exposure_ = exposure;
+        }
+
+        GLfloat getExposure() const {
+            return exposure_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::None};
 
@@ -144,6 +165,9 @@ namespace puffin {
 
         GLfloat aperture_{0.06f};
         GLfloat focus_distance_{0.7f};
+
+        GLfloat gamma_{2.2f};
+        GLfloat exposure_{1.0f};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

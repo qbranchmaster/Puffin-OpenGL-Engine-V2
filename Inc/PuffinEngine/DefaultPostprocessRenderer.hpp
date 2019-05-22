@@ -7,7 +7,7 @@
 #define PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 
 #include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"

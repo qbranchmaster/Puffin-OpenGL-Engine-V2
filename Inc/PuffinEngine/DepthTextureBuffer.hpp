@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEPTH_TEXTURE_BUFFER_HPP
 #define PUFFIN_DEPTH_TEXTURE_BUFFER_HPP
@@ -13,13 +14,14 @@
 
 #include <memory>
 
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class DepthTextureBuffer {
     public:
-        DepthTextureBuffer(GLuint width, GLuint height,
-            GLboolean multisample, GLboolean float_buffer) {
+        DepthTextureBuffer(
+            GLuint width, GLuint height, GLboolean multisample, GLboolean float_buffer) {
             glGenTextures(1, &handle_);
 
             width_ = width;
@@ -30,28 +32,25 @@ namespace puffin {
 
             if (multisample_) {
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-                    Configuration::instance().getMsaaSamples(),
-                    float_buffer ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT,
-                    width_, height_, GL_TRUE);
+                    InitConfig::instance().getMsaaSamples(),
+                    float_buffer ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT, width_, height_,
+                    GL_TRUE);
             }
             else {
-                glTexImage2D(GL_TEXTURE_2D, 0, float_buffer ?
-                    GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT, width_, height_,
-                    0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+                glTexImage2D(GL_TEXTURE_2D, 0,
+                    float_buffer ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT, width_, height_, 0,
+                    GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
             }
 
             // Setup filtering
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             // Setup wrap
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
             // Setup border color
             GLfloat border_color[] = {1.0f, 0.0f, 0.0f, 0.0f};
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR,
-                border_color);
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
         }
 
         ~DepthTextureBuffer() {
@@ -59,8 +58,12 @@ namespace puffin {
         }
 
         void bind() {
-            glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE :
-                GL_TEXTURE_2D, handle_);
+            if (StateMachine::instance().bound_texture_ == handle_) {
+                return;
+            }
+
+            glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, handle_);
+            StateMachine::instance().bound_texture_ = handle_;
         }
 
         GLuint getWidth() const {

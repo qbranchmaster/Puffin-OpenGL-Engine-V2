@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_TIME_HPP
 #define PUFFIN_TIME_HPP
@@ -43,8 +43,8 @@ namespace puffin {
 
         void endDeltaMeasure() {
             delta_t1_ = std::chrono::system_clock::now();
-            delta_ = static_cast<GLdouble>(std::chrono::duration_cast<std::chrono::microseconds>
-                (delta_t1_ - delta_t0_).count()) / 1000000.0;
+            delta_ = static_cast<GLdouble>(std::chrono::duration_cast<std::chrono::microseconds>(
+                         delta_t1_ - delta_t0_).count()) / 1000000.0;
         }
 
         void update() {

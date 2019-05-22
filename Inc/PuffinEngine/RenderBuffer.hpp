@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_RENDER_BUFFER_HPP
 #define PUFFIN_RENDER_BUFFER_HPP
@@ -13,7 +14,8 @@
 
 #include <memory>
 
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class RenderBuffer {
@@ -29,12 +31,10 @@ namespace puffin {
 
             if (multisample) {
                 glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-                    Configuration::instance().getMsaaSamples(),
-                    GL_DEPTH24_STENCIL8, width_, height_);
+                    InitConfig::instance().getMsaaSamples(), GL_DEPTH24_STENCIL8, width_, height_);
             }
             else {
-                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-                    width_, height_);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
             }
         }
 
@@ -43,7 +43,12 @@ namespace puffin {
         }
 
         void bind() {
+            if (StateMachine::instance().bound_render_buffer_ == handle_) {
+                return;
+            }
+
             glBindRenderbuffer(GL_RENDERBUFFER, handle_);
+            StateMachine::instance().bound_render_buffer_ = handle_;
         }
 
         GLuint getWidth() const {

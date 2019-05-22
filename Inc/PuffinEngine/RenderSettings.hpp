@@ -1,12 +1,12 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_RENDER_SETTINGS_HPP
 #define PUFFIN_RENDER_SETTINGS_HPP
 
-#include "PuffinEngine/Fog.hpp"
 #include "PuffinEngine/Lighting.hpp"
 #include "PuffinEngine/Postprocess.hpp"
 
@@ -14,13 +14,8 @@ namespace puffin {
     class RenderSettings {
     public:
         RenderSettings() {
-            fog_.reset(new Fog());
             lighting_.reset(new Lighting());
             postprocess_.reset(new Postprocess());
-        }
-
-        FogPtr fog() const {
-            return fog_;
         }
 
         LightingPtr lighting() const {
@@ -31,39 +26,9 @@ namespace puffin {
             return postprocess_;
         }
 
-        void setGamma(GLfloat gamma) {
-            if (gamma <= 0.0f) {
-                logError("RenderSettings::setGamma()", "Invalid value.");
-                return;
-            }
-
-            gamma_ = gamma;
-        }
-
-        GLfloat getGamma() const {
-            return gamma_;
-        }
-
-        void setExposure(GLfloat exposure) {
-            if (exposure <= 0.0f) {
-                logError("RenderSettings::setExposure()", "Invalid value.");
-                return;
-            }
-
-            exposure_ = exposure;
-        }
-
-        GLfloat getExposure() const {
-            return exposure_;
-        }
-
     private:
-        GLfloat gamma_{2.2f};
-        GLfloat exposure_{1.0f};
-
-        FogPtr fog_;
-        LightingPtr lighting_;
-        PostprocessPtr postprocess_;
+        LightingPtr lighting_{nullptr};
+        PostprocessPtr postprocess_{nullptr};
     };
 
     using RenderSettingsPtr = std::shared_ptr<RenderSettings>;

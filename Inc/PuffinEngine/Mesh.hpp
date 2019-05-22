@@ -1,15 +1,15 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_MESH_HPP
 #define PUFFIN_MESH_HPP
 
-#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 
 #include "PuffinEngine/BaseMesh.hpp"
 
@@ -51,6 +51,7 @@ namespace puffin {
         void loadMaterials(const aiScene *scene);
 
         std::string path_;
+
         GLint vertices_count_{0};
         GLint indices_count_{0};
 

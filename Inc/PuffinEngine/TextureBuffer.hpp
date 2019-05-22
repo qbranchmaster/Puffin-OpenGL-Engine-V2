@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_TEXTURE_BUFFER_HPP
 #define PUFFIN_TEXTURE_BUFFER_HPP
@@ -13,13 +14,13 @@
 
 #include <memory>
 
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class TextureBuffer {
     public:
-        TextureBuffer(GLuint width, GLuint height, GLboolean multisample,
-            GLboolean float_buffer) {
+        TextureBuffer(GLuint width, GLuint height, GLboolean multisample, GLboolean float_buffer) {
             glGenTextures(1, &handle_);
 
             width_ = width;
@@ -30,14 +31,12 @@ namespace puffin {
 
             if (multisample_) {
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-                    Configuration::instance().getMsaaSamples(),
-                    float_buffer ? GL_RGB16F : GL_RGB, width_, height_,
-                    GL_TRUE);
+                    InitConfig::instance().getMsaaSamples(), float_buffer ? GL_RGB16F : GL_RGB,
+                    width_, height_, GL_TRUE);
             }
             else {
-                glTexImage2D(GL_TEXTURE_2D, 0, float_buffer ? GL_RGB16F :
-                    GL_RGB, width_, height_, 0, GL_RGB, GL_FLOAT,
-                    nullptr);
+                glTexImage2D(GL_TEXTURE_2D, 0, float_buffer ? GL_RGB16F : GL_RGB, width_, height_,
+                    0, GL_RGB, GL_FLOAT, nullptr);
             }
 
             // Setup default filtering
@@ -53,8 +52,12 @@ namespace puffin {
         }
 
         void bind() {
-            glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE :
-                GL_TEXTURE_2D, handle_);
+            if (handle_ == StateMachine::instance().bound_texture_) {
+                return;
+            }
+
+            glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, handle_);
+            StateMachine::instance().bound_texture_ = handle_;
         }
 
         GLuint getWidth() const {

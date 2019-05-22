@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_LIGHTING_HPP
 #define PUFFIN_LIGHTING_HPP
@@ -41,11 +42,8 @@ namespace puffin {
         }
 
         void setSkyboxLightingColor(const glm::vec3 &color) {
-            skybox_light_color_ = glm::vec3(
-                glm::clamp(color.r, 0.0f, 1.0f),
-                glm::clamp(color.g, 0.0f, 1.0f),
-                glm::clamp(color.b, 0.0f, 1.0f)
-            );
+            skybox_light_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f), glm::clamp(color.b, 0.0f, 1.0f));
         }
 
         glm::vec3 getSkyboxLightColor() const {
@@ -66,8 +64,7 @@ namespace puffin {
 
         void setDirectionalLightShadowMapSize(GLuint size) {
             if (size == 0) {
-                logError("Lighting::setDirectionalLightShadowMapSize()",
-                    "Invalid value.");
+                logError("Lighting::setDirectionalLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -80,7 +77,7 @@ namespace puffin {
 
         void setShadowDistance(GLfloat distance) {
             if (distance <= 0.0f) {
-                logError("Lighting::setShadowDistance()", "Invalid value.");
+                logError("Lighting::setShadowDistance()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -93,7 +90,7 @@ namespace puffin {
 
         void setEmissionFactor(GLfloat factor) {
             if (factor < 0.0f) {
-                logError("Lighting::setEmissionFactor()", "Invalid value.");
+                logError("Lighting::setEmissionFactor()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -124,7 +121,7 @@ namespace puffin {
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 
-        DirectionalLightPtr directional_light_;
+        DirectionalLightPtr directional_light_{nullptr};
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;

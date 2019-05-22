@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_FACE_CULL_HPP
 #define PUFFIN_FACE_CULL_HPP
@@ -77,8 +77,8 @@ namespace puffin {
         void operator=(const FaceCull &) = delete;
 
         /**
-        * Reads initial state.
-        */
+         * Reads initial state.
+         */
         void fetchState() {
             glGetBooleanv(GL_CULL_FACE, &enabled_);
 

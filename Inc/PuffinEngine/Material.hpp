@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_MATERIAL_HPP
 #define PUFFIN_MATERIAL_HPP
@@ -71,7 +71,7 @@ namespace puffin {
         }
 
         TexturePtr getEmissiveTexture() const {
-            return emissive_texture_;;
+            return emissive_texture_;
         }
 
         void setNormalMapTexture(TexturePtr texture) {
@@ -101,9 +101,7 @@ namespace puffin {
         }
 
         void setKa(const glm::vec3 &ka) {
-            ka_ = glm::vec3(
-                glm::clamp(ka.r, 0.0f, 1.0f),
-                glm::clamp(ka.g, 0.0f, 1.0f),
+            ka_ = glm::vec3(glm::clamp(ka.r, 0.0f, 1.0f), glm::clamp(ka.g, 0.0f, 1.0f),
                 glm::clamp(ka.b, 0.0f, 1.0f));
         }
 
@@ -112,9 +110,7 @@ namespace puffin {
         }
 
         void setKd(const glm::vec3 &kd) {
-            kd_ = glm::vec3(
-                glm::clamp(kd.r, 0.0f, 1.0f),
-                glm::clamp(kd.g, 0.0f, 1.0f),
+            kd_ = glm::vec3(glm::clamp(kd.r, 0.0f, 1.0f), glm::clamp(kd.g, 0.0f, 1.0f),
                 glm::clamp(kd.b, 0.0f, 1.0f));
         }
 
@@ -123,9 +119,7 @@ namespace puffin {
         }
 
         void setKs(const glm::vec3 &ks) {
-            ks_ = glm::vec3(
-                glm::clamp(ks.r, 0.0f, 1.0f),
-                glm::clamp(ks.g, 0.0f, 1.0f),
+            ks_ = glm::vec3(glm::clamp(ks.r, 0.0f, 1.0f), glm::clamp(ks.g, 0.0f, 1.0f),
                 glm::clamp(ks.b, 0.0f, 1.0f));
         }
 
@@ -134,9 +128,7 @@ namespace puffin {
         }
 
         void setKe(const glm::vec3 &ke) {
-            ke_ = glm::vec3(
-                glm::clamp(ke.r, 0.0f, 1.0f),
-                glm::clamp(ke.g, 0.0f, 1.0f),
+            ke_ = glm::vec3(glm::clamp(ke.r, 0.0f, 1.0f), glm::clamp(ke.g, 0.0f, 1.0f),
                 glm::clamp(ke.b, 0.0f, 1.0f));
         }
 
@@ -171,10 +163,8 @@ namespace puffin {
         }
 
         void setTransparency(const glm::vec3 &transparency) {
-            transparency_ = glm::vec3(
-                glm::clamp(transparency.r, 0.0f, 1.0f),
-                glm::clamp(transparency.g, 0.0f, 1.0f),
-                glm::clamp(transparency.b, 0.0f, 1.0f));
+            transparency_ = glm::vec3(glm::clamp(transparency.r, 0.0f, 1.0f),
+                glm::clamp(transparency.g, 0.0f, 1.0f), glm::clamp(transparency.b, 0.0f, 1.0f));
 
             if (transparency_.r < 1.0f || transparency_.g < 1.0f || transparency_.b < 1.0f) {
                 has_transparency_ = true;

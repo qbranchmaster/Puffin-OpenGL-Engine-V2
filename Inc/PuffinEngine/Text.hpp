@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_TEXT_HPP
 #define PUFFIN_TEXT_HPP
@@ -19,121 +20,117 @@
 #include <memory>
 #include <string>
 
-#include "PuffinEngine/Exception.hpp"
+#include "PuffinEngine/Logger.hpp"
 
 namespace puffin {
-	class Text {
-	public:
-		Text(std::wstring text, const glm::uvec2 &position,
-			GLuint font_size, std::string font = "") {
-			setText(text);
-			setPosition(position.x, position.y);
-			setFontSize(font_size);
-			setFont(font);
-		}
+    class Text {
+    public:
+        Text(std::wstring text, const glm::uvec2 &position, GLuint font_size,
+            std::string font = "") {
+            setText(text);
+            setPosition(position.x, position.y);
+            setFontSize(font_size);
+            setFont(font);
+        }
 
-		void setPosition(GLint x, GLint y) {
-			position_.x = x;
-			position_.y = y;
-		}
+        void setPosition(GLint x, GLint y) {
+            position_.x = x;
+            position_.y = y;
+        }
 
-		glm::ivec2 getPosition() const {
-			return position_;
-		}
+        glm::ivec2 getPosition() const {
+            return position_;
+        }
 
-		void setVerticalSpacing(GLint spacing) {
-			vertical_spacing_ = spacing;
-		}
+        void setVerticalSpacing(GLint spacing) {
+            vertical_spacing_ = spacing;
+        }
 
-		GLint getVerticalSpacing() const {
-			return vertical_spacing_;
-		}
+        GLint getVerticalSpacing() const {
+            return vertical_spacing_;
+        }
 
-		void setHorizontalSpacing(GLint spacing) {
-			horizontal_spacing_ = spacing;
-		}
+        void setHorizontalSpacing(GLint spacing) {
+            horizontal_spacing_ = spacing;
+        }
 
-		GLint getHorizontalSpacing() const {
-			return horizontal_spacing_;
-		}
+        GLint getHorizontalSpacing() const {
+            return horizontal_spacing_;
+        }
 
-		void setOutlineColor(const glm::vec3 &color) {
-			outline_color_ = glm::vec3(
-				glm::clamp(color.r, 0.0f, 1.0f),
-				glm::clamp(color.g, 0.0f, 1.0f),
-				glm::clamp(color.b, 0.0f, 1.0f));
-		}
+        void setOutlineColor(const glm::vec3 &color) {
+            outline_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f), glm::clamp(color.b, 0.0f, 1.0f));
+        }
 
-		glm::vec3 getOutlineColor() const {
-			return outline_color_;
-		}
+        glm::vec3 getOutlineColor() const {
+            return outline_color_;
+        }
 
-		void setOutlineSize(GLushort size) {
-			outline_size_ = size;
-		}
+        void setOutlineSize(GLushort size) {
+            outline_size_ = size;
+        }
 
-		GLushort getOutlineSize() const {
-			return outline_size_;
-		}
+        GLushort getOutlineSize() const {
+            return outline_size_;
+        }
 
-		void setFontColor(const glm::vec3 &color) {
-			font_color_ = glm::vec3(
-				glm::clamp(color.r, 0.0f, 1.0f),
-				glm::clamp(color.g, 0.0f, 1.0f),
-				glm::clamp(color.b, 0.0f, 1.0f));
-		}
+        void setFontColor(const glm::vec3 &color) {
+            font_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f),
+                glm::clamp(color.g, 0.0f, 1.0f), glm::clamp(color.b, 0.0f, 1.0f));
+        }
 
-		glm::vec3 getFontColor() const {
-			return font_color_;
-		}
+        glm::vec3 getFontColor() const {
+            return font_color_;
+        }
 
-		void setFontSize(GLuint font_size) {
-			font_size_ = font_size;
-		}
+        void setFontSize(GLuint font_size) {
+            font_size_ = font_size;
+        }
 
-		GLuint getFontSize() const {
-			return font_size_;
-		}
+        GLuint getFontSize() const {
+            return font_size_;
+        }
 
-		void setFont(std::string font) {
-            if (font != "") {
-                std::ifstream file(font);
+        void setFont(std::string font_path) {
+            if (font_path != "") {
+                std::ifstream file(font_path);
                 if (!file.good()) {
-                    throw Exception("Text::setFont()", "File does not exist.");
+                    throw Exception("Text::setFont()", PUFFIN_MSG_FILE_CANNOT_OPEN(font_path));
                 }
             }
 
-			font_ = font;
-		}
+            font_ = font_path;
+        }
 
-		std::string getFont() const {
-			return font_;
-		}
+        std::string getFont() const {
+            return font_;
+        }
 
-		void setText(std::wstring text) {
-			text_ = text;
-		}
+        void setText(std::wstring text) {
+            text_ = text;
+        }
 
-		std::wstring getText() const {
-			return text_;
-		}
+        std::wstring getText() const {
+            return text_;
+        }
 
-	private:
-		std::wstring text_{L""};
-		std::string font_{""};
+    private:
+        std::wstring text_{L""};
+        std::string font_{""};
 
-		glm::ivec2 position_{0, 0};
-		GLint vertical_spacing_{0};
-		GLint horizontal_spacing_{0};
+        glm::ivec2 position_{0, 0};
+        GLint vertical_spacing_{0};
+        GLint horizontal_spacing_{0};
 
-		GLuint font_size_{16};
-		glm::vec3 font_color_{1.0f, 1.0f, 1.0f};
+        GLuint font_size_{16};
+        glm::vec3 font_color_{1.0f, 1.0f, 1.0f};
 
-		GLushort outline_size_{0};
-		glm::vec3 outline_color_{0.0f, 0.0f, 0.0f};
-	};
+        GLushort outline_size_{0};
+        glm::vec3 outline_color_{0.0f, 0.0f, 0.0f};
+    };
 
-	using TextPtr = std::shared_ptr<Text>;
+    using TextPtr = std::shared_ptr<Text>;
 } // namespace puffin
 
 #endif // PUFFIN_TEXT_HPP

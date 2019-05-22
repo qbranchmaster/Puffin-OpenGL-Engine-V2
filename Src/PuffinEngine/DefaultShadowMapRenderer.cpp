@@ -8,15 +8,14 @@
 using namespace puffin;
 
 DefaultShadowMapRenderer::DefaultShadowMapRenderer(
-    RenderSettingsPtr render_settings, RenderersSharedDataPtr shared_data,
+    RenderSettingsPtr render_settings,
     CameraPtr camera) {
-    if (!render_settings || !shared_data || !camera) {
+    if (!render_settings || !camera) {
         throw Exception("DefaultShadowMapRenderer::DefaultShadowMapRenderer()",
             "Not initialized object.");
     }
 
     render_settings_ = render_settings;
-    shared_data_ = shared_data;
     camera_ = camera;
 
     camera_frustum_.reset(new CameraFrustum());
@@ -25,7 +24,7 @@ DefaultShadowMapRenderer::DefaultShadowMapRenderer(
 }
 
 void DefaultShadowMapRenderer::loadShaders() {
-    directional_light_shader_program_.reset(new ShaderProgram());
+    directional_light_shader_program_.reset(new ShaderProgram("shadow_map_shader_program"));
     directional_light_shader_program_->loadShaders(
         "Data/Shaders/DepthMapDirectionalLight.vert",
         "Data/Shaders/DepthMapDirectionalLight.frag");
@@ -41,7 +40,7 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
     directional_light_shadow_map_frame_bufer_->disableDrawBuffer();
     directional_light_shadow_map_frame_bufer_->disableReadBuffer();
 
-    shared_data_->shadow_map_texture =
+    output_data_.shadow_map_texture =
         directional_light_shadow_map_frame_bufer_->getDepthTextureBuffer();
 }
 
@@ -70,13 +69,20 @@ glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix() {
     return (projection_matrix * dir_light_view_matrix);
 }
 
-void DefaultShadowMapRenderer::render(MeshPtr mesh) {
-    if (!mesh) {
+void DefaultShadowMapRenderer::render(ScenePtr scene) {
+    if (!scene) {
         logError("DefaultShadowMapRenderer::render()", "Null input.");
         return;
     }
 
-    renderDirectionalLightShadowMap(mesh);
+    for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
+        MeshPtr mesh = scene->getMesh(i);
+        if (!mesh) {
+            continue;
+        }
+
+        renderDirectionalLightShadowMap(mesh);
+    }
 }
 
 void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
@@ -88,7 +94,7 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
         createDirectionalLightFrameBuffer();
     }
 
-    shared_data_->dir_light_space_matrix =
+    output_data_.dir_light_space_matrix =
         calculateDirectionalLightSpaceMatrix();
 
     DepthTest::instance().enable(true);
@@ -97,17 +103,16 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
     AlphaBlend::instance().enable(false);
 
     directional_light_shadow_map_frame_bufer_->bind(
-        FrameBufferBindType::NORMAL);
+        FrameBufferBindType::Normal);
 
     auto size = render_settings_->lighting()->
         getDirectionalLightShadowMapSize();
     FrameBuffer::setViewportSize(size, size);
-    FrameBuffer::clear(FrameBufferClearType::ONLY_DEPTH);
+    FrameBuffer::clear(FrameBufferClearType::OnlyDepth);
 
     directional_light_shader_program_->activate();
     directional_light_shader_program_->setUniform(
-        "matrices.light_space_matrix", shared_data_->
-        dir_light_space_matrix);
+        "matrices.light_space_matrix", output_data_.dir_light_space_matrix);
     directional_light_shader_program_->setUniform("matrices.model_matrix",
         mesh->getModelMatrix());
 

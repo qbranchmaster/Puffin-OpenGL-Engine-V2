@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_RENDERER_HPP
 #define PUFFIN_RENDERER_HPP
@@ -15,8 +15,7 @@
 #include <memory>
 
 namespace puffin {
-    class Renderer {
-    };
+    class Renderer {};
 
     using RendererPtr = std::shared_ptr<Renderer>;
 } // namespace puffin

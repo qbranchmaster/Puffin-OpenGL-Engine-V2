@@ -22,22 +22,20 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
     createScreenMesh();
 
     bloom_frame_buffer_[0].reset(new FrameBuffer(
-        Configuration::instance().getFrameWidth(),
-        Configuration::instance().getFrameHeight()));
+        InitConfig::instance().getFrameWidth(), InitConfig::instance().getFrameHeight()));
     bloom_frame_buffer_[0]->addTextureBuffer(0, false, true);
 
     bloom_frame_buffer_[1].reset(new FrameBuffer(
-        Configuration::instance().getFrameWidth(),
-        Configuration::instance().getFrameHeight()));
+        InitConfig::instance().getFrameWidth(), InitConfig::instance().getFrameHeight()));
     bloom_frame_buffer_[1]->addTextureBuffer(0, false, true);
 }
 
 void DefaultPostprocessRenderer::loadShaders() {
-    default_shader_program_.reset(new ShaderProgram());
+    default_shader_program_.reset(new ShaderProgram("postprocess_shader_program"));
     default_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
         "Data/Shaders/Postprocess.frag");
 
-    bloom_shader_program_.reset(new ShaderProgram());
+    bloom_shader_program_.reset(new ShaderProgram("bloom_shader_program"));
     bloom_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
         "Data/Shaders/PostprocessGlowBloom.frag");
 }
@@ -51,10 +49,8 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
         render_settings_->postprocess()->getTintColor());
     default_shader_program_->setUniform("color.screen_texture", 0);
     default_shader_program_->setUniform("color.depth_texture", 1);
-    default_shader_program_->setUniform("color.gamma",
-        render_settings_->getGamma());
-    default_shader_program_->setUniform("color.exposure",
-        render_settings_->getExposure());
+    default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
+    default_shader_program_->setUniform("color.exposure", render_settings_->postprocess()->getExposure());
     default_shader_program_->setUniform("color.glow_bloom_enabled",
         render_settings_->postprocess()->isGlowBloomEnabled());
     default_shader_program_->setUniform("color.dof_enabled",
@@ -121,7 +117,7 @@ void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
     Texture::setTextureSlot(0);
 
     for (GLushort i = 0; i < amount; i++) {
-        bloom_frame_buffer_[horizontal ? 1 : 0]->bind(FrameBufferBindType::NORMAL);
+        bloom_frame_buffer_[horizontal ? 1 : 0]->bind(FrameBufferBindType::Normal);
         bloom_shader_program_->setUniform("horizontal", horizontal);
         if (first) {
             frame_buffer->getTextureBuffer(1)->bind();
@@ -147,9 +143,9 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     }
 
     FrameBuffer::unbindAll();
-    FrameBuffer::setViewportSize(Configuration::instance().getFrameWidth(),
-        Configuration::instance().getFrameHeight());
-    FrameBuffer::clear(FrameBufferClearType::DEPTH_AND_COLOR,
+    FrameBuffer::setViewportSize(
+        InitConfig::instance().getFrameWidth(), InitConfig::instance().getFrameHeight());
+    FrameBuffer::clear(FrameBufferClearType::DepthAndColor,
         glm::vec3(0.0f, 0.0f, 0.0f));
 
     default_shader_program_->activate();

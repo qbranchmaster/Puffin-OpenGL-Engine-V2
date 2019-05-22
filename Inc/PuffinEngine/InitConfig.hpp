@@ -1,27 +1,27 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
-#ifndef PUFFIN_CONFIGURATION_HPP
-#define PUFFIN_CONFIGURATION_HPP
+#ifndef PUFFIN_INIT_CONFIG_HPP
+#define PUFFIN_INIT_CONFIG_HPP
 
 #ifdef WIN32 // Prevents APIENTRY redefinition
 #include <Windows.h>
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <map>
 #include <utility>
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/System.hpp"
 
 namespace puffin {
-    class Configuration {
+    class InitConfig {
     public:
-        static Configuration& instance() {
-            static Configuration singleton;
+        static InitConfig &instance() {
+            static InitConfig singleton;
             return singleton;
         }
 
@@ -36,8 +36,7 @@ namespace puffin {
         }
 
         GLfloat getFrameAspect() const {
-            return static_cast<GLfloat>(frame_width_) /
-                static_cast<GLfloat>(frame_height_);
+            return static_cast<GLfloat>(frame_width_) / static_cast<GLfloat>(frame_height_);
         }
 
         void setMsaaSamples(GLushort samples);
@@ -64,10 +63,28 @@ namespace puffin {
             return monitor_index_;
         }
 
+        void setWaterReflectionResolution(GLuint width, GLuint height) {
+            water_reflection_width_ = width;
+            water_reflection_height_ = height;
+        }
+
+        std::pair<GLuint, GLuint> getWaterReflectionResolution() const {
+            return std::make_pair(water_reflection_width_, water_reflection_height_);
+        }
+
+        void setWaterRefractionResolution(GLuint width, GLuint height) {
+            water_refraction_width_ = width;
+            water_refraction_height_ = height;
+        }
+
+        std::pair<GLuint, GLuint> getWaterRefractionResolution() const {
+            return std::make_pair(water_refraction_width_, water_refraction_height_);
+        }
+
     private:
-        Configuration() {}
-        Configuration(const Configuration &) = delete;
-        void operator=(const Configuration &) = delete;
+        InitConfig() {}
+        InitConfig(const InitConfig &) = delete;
+        void operator=(const InitConfig &) = delete;
 
         GLuint frame_width_{640};
         GLuint frame_height_{480};
@@ -75,8 +92,13 @@ namespace puffin {
         GLboolean fullscreen_{false};
         GLushort monitor_index_{0};
 
+        GLuint water_reflection_width_{640};
+        GLuint water_reflection_height_{320};
+        GLuint water_refraction_width_{1280};
+        GLuint water_refraction_height_{720};
+
         std::pair<GLushort, GLushort> gl_version_{4, 0};
     };
 } // namespace puffin
 
-#endif // PUFFIN_CONFIGURATION_HPP
+#endif // PUFFIN_INIT_CONFIG_HPP

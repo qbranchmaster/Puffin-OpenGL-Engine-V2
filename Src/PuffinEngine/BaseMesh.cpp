@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/BaseMesh.hpp"
 
@@ -13,14 +13,14 @@ BaseMesh::BaseMesh() {
 }
 
 BaseMesh::~BaseMesh() {
-    freeVertexBuffers();
+    deleteVertexBuffers();
 
     if (handle_) {
         glDeleteVertexArrays(1, &handle_);
     }
 }
 
-void BaseMesh::freeVertexBuffers() {
+void BaseMesh::deleteVertexBuffers() {
     for (auto &buffer : data_buffers_) {
         if (buffer.second != 0) {
             glDeleteBuffers(1, &buffer.second);
@@ -75,8 +75,8 @@ void BaseMesh::freeVertexData() {
     v_indices_.clear();
 }
 
-void BaseMesh::setMeshData(std::vector<GLfloat> data, GLuint index, GLuint vertex_size,
-    GLboolean dynamic_draw) {
+void BaseMesh::setMeshData(
+    const std::vector<GLfloat> &data, GLuint index, GLuint vertex_size, GLboolean dynamic_draw) {
     bind();
 
     if (data_buffers_[index] == 0) {
@@ -91,7 +91,7 @@ void BaseMesh::setMeshData(std::vector<GLfloat> data, GLuint index, GLuint verte
     glEnableVertexAttribArray(index);
 }
 
-void BaseMesh::setMeshIndices(std::vector<GLuint> data) {
+void BaseMesh::setMeshIndices(const std::vector<GLuint> &data) {
     bind();
 
     if (indices_buffer_ == 0) {
@@ -99,8 +99,8 @@ void BaseMesh::setMeshIndices(std::vector<GLuint> data) {
     }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(GLuint), data.data(),
-        GL_STATIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(GLuint), data.data(), GL_STATIC_DRAW);
 }
 
 MeshEntityPtr BaseMesh::addEntity() {

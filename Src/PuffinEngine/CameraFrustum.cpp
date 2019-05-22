@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/CameraFrustum.hpp"
 
@@ -16,8 +16,8 @@ void CameraFrustum::setCameraVectors(const glm::vec3 &direction, const glm::vec3
     camera_position_ = position;
 }
 
-void CameraFrustum::setCameraParameters(GLfloat near_distance, GLfloat far_distance,
-    GLfloat aspect, GLfloat fov) {
+void CameraFrustum::setCameraParameters(
+    GLfloat near_distance, GLfloat far_distance, GLfloat aspect, GLfloat fov) {
     if (aspect <= 0.0f || fov <= 0.0f) {
         logError("CameraFrustum::setCameraParameters()", PUFFIN_MSG_INVALID_VALUE);
         return;
@@ -50,7 +50,7 @@ void CameraFrustum::calculateFrustumPoints() {
     frustum_points_[7] = calculatePointPosition(near_bottom, -right_vector_, near_width_);
 }
 
-void CameraFrustum::recalculateToFrame(const glm::mat4 & frame) {
+void CameraFrustum::recalculateToFrame(const glm::mat4 &frame) {
     for (auto &point : frustum_points_) {
         point = glm::vec3(frame * glm::vec4(point, 1.0f));
     }
@@ -64,8 +64,8 @@ void CameraFrustum::calculatePlanesSizes() {
     far_height_ = far_width_ / aspect_;
 }
 
-glm::vec3 CameraFrustum::calculatePointPosition(const glm::vec3 &start,
-    const glm::vec3 &direction, GLfloat width) {
+glm::vec3 CameraFrustum::calculatePointPosition(
+    const glm::vec3 &start, const glm::vec3 &direction, GLfloat width) {
     glm::vec3 point = start + direction * (width / 2.0f);
     return point;
 }
@@ -84,6 +84,6 @@ void CameraFrustum::calculateBoundingBoxSize() {
         max_box_.z = glm::max(max_box_.z, frustum_points_[i].z);
     }
 
-    center_ = glm::vec3((min_box_.x + max_box_.x) / 2.0f,
-        (min_box_.y + max_box_.y) / 2.0f, (min_box_.z + max_box_.z) / 2.0f);
+    center_ = glm::vec3((min_box_.x + max_box_.x) / 2.0f, (min_box_.y + max_box_.y) / 2.0f,
+        (min_box_.z + max_box_.z) / 2.0f);
 }

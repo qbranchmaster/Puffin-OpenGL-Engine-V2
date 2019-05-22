@@ -1,16 +1,15 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/Camera.hpp"
 
 using namespace puffin;
 
 Camera::Camera() {
-    aspect_ = static_cast<GLfloat>(Configuration::instance().getFrameWidth())
-        / static_cast<GLfloat>(Configuration::instance().getFrameHeight());
+    aspect_ = InitConfig::instance().getFrameAspect();
 
     calculateRotationMatrix();
     calculateViewVectors();
@@ -107,14 +106,14 @@ void Camera::setProjection(GLfloat fov, GLfloat aspect, GLfloat near_plane, GLfl
 void Camera::calculateProjectionMatrix() {
     projection_matrix_ = glm::perspective(fov_, aspect_, near_plane_, far_plane_);
 
-    //projection_matrix_inverted_ = glm::inverse(projection_matrix_);
+    // projection_matrix_inverted_ = glm::inverse(projection_matrix_);
 }
 
 void Camera::calculateViewMatrix() {
     view_matrix_ = glm::lookAt(position_, position_ + direction_, up_);
 
-    // This is also correct calculation of view matrix.
-    //view_matrix_ = rotation_matrix_ * glm::translate(glm::mat4(1.0f), -position_);
+    // This is also correct calculation of view matrix
+    // view_matrix_ = rotation_matrix_ * glm::translate(glm::mat4(1.0f), -position_);
 
     view_matrix_static_ = glm::mat4(glm::mat3(view_matrix_));
     view_matrix_inverted_ = glm::inverse(view_matrix_);
@@ -129,8 +128,8 @@ void Camera::calculateViewVectors() {
 void Camera::calculateRotationMatrix() {
     rotation_matrix_ = glm::mat4(1.0f);
     rotation_matrix_ = glm::rotate(rotation_matrix_, vertical_angle_, glm::vec3(1.0f, 0.0f, 0.0f));
-    rotation_matrix_ = glm::rotate(rotation_matrix_, horizontal_angle_,
-        glm::vec3(0.0f, 1.0f, 0.0f));
+    rotation_matrix_ =
+        glm::rotate(rotation_matrix_, horizontal_angle_, glm::vec3(0.0f, 1.0f, 0.0f));
 
     rotation_matrix_inverted_ = glm::inverse(rotation_matrix_);
 }

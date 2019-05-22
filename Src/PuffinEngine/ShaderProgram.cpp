@@ -1,14 +1,18 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/ShaderProgram.hpp"
 
 using namespace puffin;
 
-puffin::ShaderProgram::ShaderProgram() {
+puffin::ShaderProgram::ShaderProgram(std::string name) {
+    if (!name.empty()) {
+        name_ = name;
+    }
+
     handle_vs_ = glCreateShader(GL_VERTEX_SHADER);
     handle_fs_ = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -72,14 +76,14 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
     }
 
     if (linkProgram()) {
-        logError("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_ERROR);
+        logError("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_ERROR(name_));
         logInfo("ShaderProgram::loadShaders()",
-            PUFFIN_MSG_SHADER_LINK_MESSAGE(getProgramLinkMessage()));
+            PUFFIN_MSG_SHADER_LINK_MESSAGE(name_, getProgramLinkMessage()));
         return;
     }
 
     fetchUniforms();
-    logInfo("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_SUCCESS);
+    logInfo("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_SUCCESS(name_));
 }
 
 GLint ShaderProgram::loadShaderCode(std::string file_path, std::string &shader_code) {
@@ -123,7 +127,7 @@ std::string ShaderProgram::getShaderCompileMessage(GLuint shader_handle) {
     glGetShaderiv(shader_handle, GL_INFO_LOG_LENGTH, &log_size);
 
     std::string compile_msg;
-    // There are some errors in shader, so log is not empty.
+    // There are some errors in shader, so log is not empty
     if (log_size > 1) {
         GLchar *log_text = new GLchar[log_size];
         glGetShaderInfoLog(shader_handle, log_size, nullptr, log_text);
@@ -193,9 +197,9 @@ void ShaderProgram::fetchUniforms() {
         name_buffer.clear();
         name_buffer.resize(values[0]);
 
-        glGetProgramResourceName(handle_, GL_UNIFORM, i, name_buffer.size(), nullptr,
-            &name_buffer[0]);
-        std::string uniform_name((GLchar *) & name_buffer[0], name_buffer.size() - 1);
+        glGetProgramResourceName(
+            handle_, GL_UNIFORM, i, name_buffer.size(), nullptr, &name_buffer[0]);
+        std::string uniform_name((GLchar *)&name_buffer[0], name_buffer.size() - 1);
 
         GLint location = glGetUniformLocation(handle_, uniform_name.c_str());
         uniforms_[uniform_name] = location;

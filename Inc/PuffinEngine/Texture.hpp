@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_TEXTURE_HPP
 #define PUFFIN_TEXTURE_HPP
@@ -22,8 +23,9 @@
 #include <string>
 #include <utility>
 
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     enum class TextureType {
@@ -35,16 +37,16 @@ namespace puffin {
     };
 
     enum class TextureFilter {
-        NEAREST,
-        BILINEAR,
-        BILINEAR_WITH_MIPMAPS,
-        TRILINEAR,
+        Nearest,
+        Bilinear,
+        BilinearWithMipmaps,
+        Trilinear,
     };
 
     enum class TextureWrap {
-        REPEAT,
-        CLAMP_TO_EDGE,
-        CLAMP_TO_BORDER,
+        Repeat,
+        ClampToEdge,
+        ClampToBorder,
     };
 
     class Texture {
@@ -52,8 +54,7 @@ namespace puffin {
         Texture();
         ~Texture();
 
-        static void setDefaultTextureFilter(TextureType type,
-            TextureFilter filter);
+        static void setDefaultTextureFilter(TextureType type, TextureFilter filter);
         static void setTextureSlot(GLushort slot_index);
         static void unbindTextureType(TextureType type);
         static void setPixelAlignment(GLushort aligment);
@@ -63,13 +64,12 @@ namespace puffin {
         GLboolean loadTextureCube(std::array<std::string, 6> paths);
 
         void bind() const {
-            if (!handle_) {
-                logError("Texture::bind()", "Cannot bind null texture.");
+            if (type_ == TextureType::None || type_ == TextureType::RawImage) {
+                logError("Texture::bind()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
                 return;
             }
 
-            if (type_ == TextureType::None || type_ == TextureType::RawImage) {
-                logError("Texture::bind()", "Cannot bind this texture type.");
+            if (StateMachine::instance().bound_texture_ == handle_) {
                 return;
             }
 
@@ -84,6 +84,8 @@ namespace puffin {
                 glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
                 break;
             }
+
+            StateMachine::instance().bound_texture_ = handle_;
         }
 
         GLushort getChannelsCount() const {
@@ -102,7 +104,7 @@ namespace puffin {
             return type_;
         }
 
-        GLubyte* getRawData() const {
+        GLubyte *getRawData() const {
             return img_handle_.accessPixels();
         }
 
@@ -111,13 +113,13 @@ namespace puffin {
         void flipVertical();
         void flipHorizontal();
 
-        GLFWimage toGlfwImage() const;
+        GLFWimage toGlfwImage();
 
         void setTextureFilter(TextureFilter filter);
         void setTextureWrap(TextureWrap wrap_mode);
         void setTextureBorderColor(const glm::vec4 &color);
-        void setTexture2DData(GLuint width, GLuint height, GLushort channels,
-            void *data, GLboolean generate_mipmaps = true);
+        void setTexture2DData(GLuint width, GLuint height, GLushort channels, void *data,
+            GLboolean generate_mipmaps = true);
 
         GLuint getHandle() const {
             return handle_;

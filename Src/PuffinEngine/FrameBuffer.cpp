@@ -1,15 +1,12 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/FrameBuffer.hpp"
 
 using namespace puffin;
-
-GLuint FrameBuffer::bound_frame_buffer_ = 0;
-GLuint FrameBuffer::bound_frame_buffer_write_ = 0;
-GLuint FrameBuffer::bound_frame_buffer_read_ = 0;
 
 FrameBuffer::FrameBuffer(GLuint width, GLuint height) {
     glGenFramebuffers(1, &handle_);
@@ -22,27 +19,25 @@ FrameBuffer::~FrameBuffer() {
     glDeleteFramebuffers(1, &handle_);
 }
 
-void FrameBuffer::setClearColor(const glm::vec3 & color) {
-    clear_color_ = glm::vec3(
-        glm::clamp(color.r, 0.0f, 1.0f),
-        glm::clamp(color.g, 0.0f, 1.0f),
+void FrameBuffer::setClearColor(const glm::vec3 &color) {
+    clear_color_ = glm::vec3(glm::clamp(color.r, 0.0f, 1.0f), glm::clamp(color.g, 0.0f, 1.0f),
         glm::clamp(color.b, 0.0f, 1.0f));
 }
 
-void FrameBuffer::copyFrameBuffer(FrameBufferPtr target,
-    GLushort attachment_index, GLboolean copy_depth) {
+void FrameBuffer::copyFrameBuffer(
+    FrameBufferPtr target, GLushort attachment_index, GLboolean copy_depth) {
     if (!target) {
-        logError("FrameBuffer::copyFrameBuffer()", "Null input.");
+        logError("FrameBuffer::copyFrameBuffer()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
     if (attachment_index >= texture_buffers_.size()) {
-        logError("FrameBuffer::copyFrameBuffer()", "Invalid value.");
+        logError("FrameBuffer::copyFrameBuffer()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
-    bind(FrameBufferBindType::ONLY_READ);
-    target->bind(FrameBufferBindType::ONLY_WRITE);
+    bind(FrameBufferBindType::OnlyRead);
+    target->bind(FrameBufferBindType::OnlyWrite);
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     glDrawBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -52,8 +47,7 @@ void FrameBuffer::copyFrameBuffer(FrameBufferPtr target,
         copy_bits |= GL_DEPTH_BUFFER_BIT;
     }
 
-    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, copy_bits,
-        GL_NEAREST);
+    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, copy_bits, GL_NEAREST);
 
     target->unbind();
 }
@@ -65,13 +59,13 @@ void FrameBuffer::addRenderBuffer(GLboolean multisample) {
 
     render_buffer_.reset(new RenderBuffer(width_, height_, multisample));
 
-    bind(FrameBufferBindType::NORMAL);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, render_buffer_->getHandle());
+    bind(FrameBufferBindType::Normal);
+    glFramebufferRenderbuffer(
+        GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer_->getHandle());
 }
 
 GLboolean FrameBuffer::isComplete() {
-    bind(FrameBufferBindType::NORMAL);
+    bind(FrameBufferBindType::Normal);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         return false;
@@ -80,20 +74,16 @@ GLboolean FrameBuffer::isComplete() {
     return true;
 }
 
-void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
-    GLboolean float_buffer) {
-    if (index < texture_buffers_.size() &&
-        texture_buffers_[index] != nullptr) {
+void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample, GLboolean float_buffer) {
+    if (index < texture_buffers_.size() && texture_buffers_[index] != nullptr) {
         return;
     }
 
-    TextureBufferPtr buffer(new TextureBuffer(width_, height_, multisample,
-        float_buffer));
+    TextureBufferPtr buffer(new TextureBuffer(width_, height_, multisample, float_buffer));
 
-    bind(FrameBufferBindType::NORMAL);
+    bind(FrameBufferBindType::Normal);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-        multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
-        buffer->getHandle(), 0);
+        multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, buffer->getHandle(), 0);
 
     texture_buffers_.push_back(buffer);
 
@@ -105,43 +95,40 @@ void FrameBuffer::addTextureBuffer(GLushort index, GLboolean multisample,
     glDrawBuffers(texture_buffers_.size(), attachments.data());
 }
 
-void FrameBuffer::addDepthTextureBuffer(GLboolean multisample,
-    GLboolean float_buffer) {
+void FrameBuffer::addDepthTextureBuffer(GLboolean multisample, GLboolean float_buffer) {
     if (depth_texture_buffer_) {
         return;
     }
 
-    depth_texture_buffer_.reset(new DepthTextureBuffer(width_, height_,
-        multisample, float_buffer));
+    depth_texture_buffer_.reset(new DepthTextureBuffer(width_, height_, multisample, float_buffer));
 
-    bind(FrameBufferBindType::NORMAL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, multisample ?
-        GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D,
-        depth_texture_buffer_->getHandle(), 0);
+    bind(FrameBufferBindType::Normal);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+        multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, depth_texture_buffer_->getHandle(),
+        0);
 }
 
 void FrameBuffer::disableDrawBuffer() {
-    bind(FrameBufferBindType::NORMAL);
+    bind(FrameBufferBindType::Normal);
     glDrawBuffer(GL_NONE);
 }
 
 void FrameBuffer::disableReadBuffer() {
-    bind(FrameBufferBindType::NORMAL);
+    bind(FrameBufferBindType::Normal);
     glReadBuffer(GL_NONE);
 }
 
-void FrameBuffer::clear(FrameBufferClearType clear_type,
-    const glm::vec3 &color) {
+void FrameBuffer::clear(FrameBufferClearType clear_type, const glm::vec3 &color) {
     glClearColor(color.r, color.g, color.b, 1.0f);
 
     switch (clear_type) {
-    case FrameBufferClearType::ONLY_COLOR:
+    case FrameBufferClearType::OnlyColor:
         glClear(GL_COLOR_BUFFER_BIT);
         break;
-    case FrameBufferClearType::ONLY_DEPTH:
+    case FrameBufferClearType::OnlyDepth:
         glClear(GL_DEPTH_BUFFER_BIT);
         break;
-    case FrameBufferClearType::DEPTH_AND_COLOR:
+    case FrameBufferClearType::DepthAndColor:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         break;
     }
@@ -149,7 +136,7 @@ void FrameBuffer::clear(FrameBufferClearType clear_type,
 
 void FrameBuffer::setViewportSize(GLuint width, GLuint height) {
     if (width == 0 || height == 0) {
-        logError("FrameBuffer::setViewportSize()", "Invalid value.");
+        logError("FrameBuffer::setViewportSize()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
@@ -158,10 +145,9 @@ void FrameBuffer::setViewportSize(GLuint width, GLuint height) {
 
 void FrameBuffer::setViewportSize(FrameBufferPtr frame_buffer) {
     if (!frame_buffer) {
-        logError("FrameBuffer::setViewportSize()", "Null input.");
+        logError("FrameBuffer::setViewportSize()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
-    FrameBuffer::setViewportSize(frame_buffer->getWidth(),
-        frame_buffer->getHeight());
+    FrameBuffer::setViewportSize(frame_buffer->getWidth(), frame_buffer->getHeight());
 }

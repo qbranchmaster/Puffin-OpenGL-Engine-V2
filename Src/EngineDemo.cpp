@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0 Demo
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1 Demo
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "EngineDemo.hpp"
 
@@ -12,23 +12,25 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    Configuration::instance().setFrameResolution(1280, 720);
-    Configuration::instance().setMsaaSamples(2);
-    Configuration::instance().setOpenGLVersion(4, 0);
-    Configuration::instance().enableFullscreen(false);
-    Configuration::instance().setTargetMonitorIndex(0);
+    InitConfig::instance().setFrameResolution(1280, 720);
+    InitConfig::instance().setMsaaSamples(2);
+    InitConfig::instance().setOpenGLVersion(4, 0);
+    InitConfig::instance().enableFullscreen(false);
+    InitConfig::instance().setTargetMonitorIndex(0);
 
     initialize();
-    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
+    createDefaultRenderers();
+
+    Texture::setDefaultTextureFilter(TextureType::Texture2D, TextureFilter::Trilinear);
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
 
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
-    camera()->setProjection(1.05f, Configuration::instance().getFrameAspect(), 0.1f, 15.0f);
+    camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);
     camera()->setFov(0.85f);
 
-    Texture::setDefaultTextureFilter(TextureType::Texture2D, TextureFilter::TRILINEAR);
+    masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
 
     renderSettings()->postprocess()->setEffect(PostprocessEffect::None);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
@@ -36,24 +38,17 @@ EngineDemo::EngineDemo() : Core() {
 
     renderSettings()->lighting()->enable(true);
     renderSettings()->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
-
     renderSettings()->lighting()->enableShadowMapping(true);
     renderSettings()->lighting()->setDirectionalLightShadowMapSize(1024);
     renderSettings()->lighting()->setShadowDistance(20.0f);
-
     renderSettings()->lighting()->directionalLight()->enable(true);
     renderSettings()->lighting()->enableBlinnPhong(true);
-    renderSettings()->lighting()->directionalLight()->setDirection(
-        glm::vec3(0.5f, -0.5f, -0.5f));
-    renderSettings()->lighting()->directionalLight()->setAmbientColor(
-        glm::vec3(0.1f, 0.1f, 0.1f));
-    renderSettings()->lighting()->directionalLight()->setDiffuseColor(
-        glm::vec3(0.8f, 0.8f, 0.8f));
-    renderSettings()->lighting()->directionalLight()->setSpecularColor(
-        glm::vec3(5.5f, 5.5f, 5.5f));
+    renderSettings()->lighting()->directionalLight()->setDirection(glm::vec3(0.5f, -0.5f, -0.5f));
+    renderSettings()->lighting()->directionalLight()->setAmbientColor(glm::vec3(0.1f, 0.1f, 0.1f));
+    renderSettings()->lighting()->directionalLight()->setDiffuseColor(glm::vec3(0.8f, 0.8f, 0.8f));
+    renderSettings()->lighting()->directionalLight()->setSpecularColor(glm::vec3(5.5f, 5.5f, 5.5f));
 
     createScene();
-    createDefaultRenderers();
 
     fps_caption_timer_.reset(new Timer(std::bind(&EngineDemo::updateWindowCaption, this)));
     fps_caption_timer_->start(1000);
@@ -71,13 +66,9 @@ void EngineDemo::createScene() {
     skybox_.reset(new Skybox());
 
     skybox_texture_.reset(new Texture());
-    skybox_texture_->loadTextureCube({
-        "Demo/Skybox/right.jpg",
-        "Demo/Skybox/left.jpg",
-        "Demo/Skybox/up.jpg",
-        "Demo/Skybox/down.jpg",
-        "Demo/Skybox/back.jpg",
-        "Demo/Skybox/front.jpg"});
+    skybox_texture_->loadTextureCube(
+        {"Demo/Skybox/right.jpg", "Demo/Skybox/left.jpg", "Demo/Skybox/up.jpg",
+            "Demo/Skybox/down.jpg", "Demo/Skybox/back.jpg", "Demo/Skybox/front.jpg"});
 
     skybox_->setTexture(skybox_texture_);
 
@@ -94,7 +85,7 @@ void EngineDemo::createScene() {
     text_demo_->setOutlineSize(2);
     text_demo_->setHorizontalSpacing(2);
     text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");
-    //scene_->addText(text_demo_);
+    // scene_->addText(text_demo_);
 
     water_tile_.reset(new WaterTile());
     water_tile_->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
@@ -132,8 +123,8 @@ ScenePtr EngineDemo::render() {
 }
 
 void EngineDemo::updateWindowCaption() {
-    window()->setCaption("Puffin Engine Demo [FPS: " + std::to_string(
-        Time::instance().getFpsRate()) + "]");
+    window()->setCaption(
+        "Puffin Engine Demo [FPS: " + std::to_string(Time::instance().getFpsRate()) + "]");
 }
 
 void EngineDemo::rotateSkybox() {
@@ -183,7 +174,7 @@ void EngineDemo::rotateCamera() {
 
         camera()->rotate((GLfloat)(y_diff * mouse_speed), (GLfloat)(x_diff * mouse_speed));
 
-        // Clamp vertical angle from 0 to 90 degrees.
+        // Clamp vertical angle from 0 to 90 degrees
         GLfloat v_angle = camera()->getVerticalAngle();
         if (v_angle > glm::half_pi<GLfloat>()) {
             v_angle = glm::half_pi<GLfloat>();

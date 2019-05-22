@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_MESH_ENTITY_HPP
 #define PUFFIN_MESH_ENTITY_HPP
@@ -57,7 +58,7 @@ namespace puffin {
 
         void setMaterial(MaterialPtr material) {
             if (!material) {
-                logError("MeshEntity::setMaterial()", "Null input.");
+                logError("MeshEntity::setMaterial()", PUFFIN_MSG_NULL_OBJECT);
                 return;
             }
 
@@ -90,7 +91,8 @@ namespace puffin {
         GLuint indices_count_{0};
         GLuint vertices_count_{0};
         glm::mat4 model_matrix_{1.0f};
-        MaterialPtr material_;
+
+        MaterialPtr material_{nullptr};
 
         std::string name_;
     };

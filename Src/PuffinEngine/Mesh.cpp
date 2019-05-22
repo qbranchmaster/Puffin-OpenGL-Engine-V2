@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/Mesh.hpp"
 
@@ -122,7 +122,7 @@ void Mesh::loadMeshEntities(const aiScene *scene) {
     loadMaterials(scene);
 }
 
-void Mesh::loadMaterials(const aiScene * scene) {
+void Mesh::loadMaterials(const aiScene *scene) {
     if (!scene->HasMaterials()) {
         return;
     }
@@ -200,8 +200,8 @@ void Mesh::loadMaterials(const aiScene * scene) {
 
         aiColor3D transparency;
         if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency) == AI_SUCCESS) {
-            mesh_material->setTransparency(glm::vec3(transparency.r, transparency.g,
-                transparency.b));
+            mesh_material->setTransparency(
+                glm::vec3(transparency.r, transparency.g, transparency.b));
         }
 
         materials_.push_back(mesh_material);
@@ -215,12 +215,12 @@ void Mesh::loadFromFile(std::string path) {
     }
 
     Assimp::Importer mesh_importer;
-    const aiScene *scene = mesh_importer.ReadFile(path.c_str(),
-        aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
+    const aiScene *scene = mesh_importer.ReadFile(
+        path.c_str(), aiProcessPreset_TargetRealtime_Fast | aiProcess_FlipUVs);
 
     if (!scene) {
-        logError("Mesh::loadFromFile()", "Importer message: " +
-            std::string(mesh_importer.GetErrorString()) + ".");
+        logError("Mesh::loadFromFile()",
+            "Importer message: " + std::string(mesh_importer.GetErrorString()) + ".");
         logError("Mesh::loadFromFile()", PUFFIN_MSG_FILE_CANNOT_OPEN(path));
         return;
     }
@@ -228,7 +228,7 @@ void Mesh::loadFromFile(std::string path) {
     path_ = path;
 
     // Zero object state
-    freeVertexBuffers();
+    deleteVertexBuffers();
     entities_.clear();
     vertices_count_ = 0;
     indices_count_ = 0;
@@ -260,8 +260,7 @@ void Mesh::loadFromFile(std::string path) {
     logInfo("Mesh::loadFromFile()", PUFFIN_MSG_FILE_LOADED(path_));
 }
 
-std::string Mesh::processTexturePath(std::string model_file_path,
-    const aiString & texture_path) {
+std::string Mesh::processTexturePath(std::string model_file_path, const aiString &texture_path) {
     std::size_t slash_pos = model_file_path.find_last_of("/\\");
     std::string path = model_file_path.substr(0, slash_pos);
     std::string name = texture_path.C_Str();

@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0 Demo
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1 Demo
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "EngineDemo.hpp"
 

@@ -1,14 +1,15 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/Skybox.hpp"
 
 using namespace puffin;
 
 Skybox::Skybox() {
+    // clang-format off
     std::vector<GLfloat> data = {
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -52,6 +53,7 @@ Skybox::Skybox() {
         -1.0f, -1.0f,  1.0f,
          1.0f, -1.0f,  1.0f
     };
+    // clang-format on
 
     bind();
     setMeshData(data, 0, 3);

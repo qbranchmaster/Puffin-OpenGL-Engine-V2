@@ -20,7 +20,7 @@ DefaultSkyboxRenderer::DefaultSkyboxRenderer(RenderSettingsPtr render_settings, 
 }
 
 void DefaultSkyboxRenderer::loadShaders() {
-    default_shader_program_.reset(new ShaderProgram());
+    default_shader_program_.reset(new ShaderProgram("skybox_shader_program"));
     default_shader_program_->loadShaders("Data/Shaders/Skybox.vert", "Data/Shaders/Skybox.frag");
 }
 
@@ -41,7 +41,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
 
     // Prepare rendering process
     FrameBuffer::setViewportSize(frame_buffer);
-    frame_buffer->bind(FrameBufferBindType::NORMAL);
+    frame_buffer->bind(FrameBufferBindType::Normal);
 
     AlphaBlend::instance().enable(false);
     DepthTest::instance().enable(true);
@@ -92,7 +92,7 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
     default_shader_program_->setUniform("color.cube_texture", 0);
     default_shader_program_->setUniform("color.light_color", render_settings_->lighting()->
         getSkyboxLightColor());
-    default_shader_program_->setUniform("color.gamma", render_settings_->getGamma());
+    default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
     default_shader_program_->setUniform("color.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());
 }

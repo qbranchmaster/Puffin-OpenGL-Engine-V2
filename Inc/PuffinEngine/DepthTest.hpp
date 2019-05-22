@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEPTH_TEST_HPP
 #define PUFFIN_DEPTH_TEST_HPP
@@ -60,8 +60,8 @@ namespace puffin {
         void operator=(const DepthTest &) = delete;
 
         /**
-        * Reads initial state.
-        */
+         * Reads initial state.
+         */
         void fetchState() {
             glGetBooleanv(GL_DEPTH_TEST, &enabled_);
             glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask_enabled_);

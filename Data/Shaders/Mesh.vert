@@ -49,6 +49,8 @@ out VS_OUT {
 uniform Matrices matrices;
 uniform Lighting lighting;
 
+uniform vec4 clipping_plane;
+
 void main() {
     vs_out.texture_coord_MODEL = texture_coord;
     vs_out.normal_vector_VIEW = vec3(matrices.view_matrix *
@@ -82,6 +84,9 @@ void main() {
     vs_out.view_position_TANGENT = tbn_matrix * camera_pos_WORLD;
     vs_out.directional_light_direction_TANGENT = normalize(tbn_matrix *
         lighting.directional_light.direction);
+
+	// Find vertex distance from the plane
+	gl_ClipDistance[0] = dot(vec4(vs_out.position_WORLD, 1.0f), clipping_plane);
 
     gl_Position = matrices.projection_matrix * matrices.view_matrix *
         matrices.model_matrix * vec4(position, 1.0f);

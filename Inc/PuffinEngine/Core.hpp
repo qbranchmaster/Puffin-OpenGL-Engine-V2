@@ -1,13 +1,12 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_CORE_HPP
 #define PUFFIN_CORE_HPP
 
-#include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/DefaultFontRenderer.hpp"
 #include "PuffinEngine/DefaultGuiRenderer.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
@@ -15,11 +14,8 @@
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/DefaultWaterRenderer.hpp"
-#include "PuffinEngine/DepthTest.hpp"
-#include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
-#include "PuffinEngine/RenderersSharedData.hpp"
 #include "PuffinEngine/System.hpp"
 
 namespace puffin {
@@ -59,7 +55,6 @@ namespace puffin {
         WindowPtr window_{nullptr};
 
         MasterRendererPtr master_renderer_{nullptr};
-        RenderersSharedDataPtr renderers_shared_data_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};
 
         DefaultFontRendererPtr default_font_renderer_{nullptr};

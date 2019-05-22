@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_BASE_MESH_HPP
 #define PUFFIN_BASE_MESH_HPP
@@ -40,9 +40,16 @@ namespace puffin {
             StateMachine::instance().bound_mesh_ = handle_;
         }
 
-        void setMeshData(std::vector<GLfloat> data, GLuint index, GLuint vertex_size,
+        GLuint getHandle() const {
+            return handle_;
+        }
+
+        void freeVertexData();
+
+        void setMeshData(const std::vector<GLfloat> &data, GLuint index, GLuint vertex_size,
             GLboolean dynamic_draw = false);
-        void setMeshIndices(std::vector<GLuint> data);
+        void setMeshIndices(const std::vector<GLuint> &data);
+
         MeshEntityPtr addEntity();
         MeshEntityPtr getEntity(GLuint index) const;
 
@@ -96,8 +103,7 @@ namespace puffin {
         }
 
     protected:
-        void freeVertexBuffers();
-        void freeVertexData();
+        void deleteVertexBuffers();
 
         GLuint handle_{0};
         GLuint indices_buffer_{0};

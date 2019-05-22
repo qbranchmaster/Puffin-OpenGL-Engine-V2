@@ -17,7 +17,7 @@
 #include <string>
 
 #include "PuffinEngine/AlphaBlend.hpp"
-#include "PuffinEngine/Configuration.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/FontRenderer.hpp"

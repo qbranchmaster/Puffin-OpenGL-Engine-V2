@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/Texture.hpp"
 
@@ -9,10 +10,9 @@ using namespace puffin;
 
 // Initialize default texture filter
 std::map<TextureType, TextureFilter> Texture::default_texture_filter_ = {
-    {TextureType::Texture2D, TextureFilter::BILINEAR},
-    {TextureType::Texture2DMultisample, TextureFilter::BILINEAR},
-    {TextureType::TextureCube, TextureFilter::BILINEAR}
-};
+    {TextureType::Texture2D, TextureFilter::Bilinear},
+    {TextureType::Texture2DMultisample, TextureFilter::Bilinear},
+    {TextureType::TextureCube, TextureFilter::Bilinear}};
 
 GLushort Texture::active_slot_ = 0;
 
@@ -34,28 +34,27 @@ void Texture::setDefaultTextureFilter(TextureType type, TextureFilter filter) {
     case TextureType::Texture2D:
     case TextureType::Texture2DMultisample:
         switch (filter) {
-        case TextureFilter::NEAREST:
-        case TextureFilter::BILINEAR:
-        case TextureFilter::BILINEAR_WITH_MIPMAPS:
-        case TextureFilter::TRILINEAR:
+        case TextureFilter::Nearest:
+        case TextureFilter::Bilinear:
+        case TextureFilter::BilinearWithMipmaps:
+        case TextureFilter::Trilinear:
             default_texture_filter_[type] = filter;
             break;
         }
         break;
     case TextureType::TextureCube:
         switch (filter) {
-        case TextureFilter::NEAREST:
-        case TextureFilter::BILINEAR:
+        case TextureFilter::Nearest:
+        case TextureFilter::Bilinear:
             default_texture_filter_[type] = filter;
             break;
         default:
-            logError("Texture::setDefaultTextureFilter()",
-                "Invalid filter type.");
+            logError("Texture::setDefaultTextureFilter()", PUFFIN_MSG_TEXTURE_INVALID_FILTER);
             break;
         }
         break;
     default:
-        logError("Texture::setDefaultTextureFilter()", "Invalid texture type.");
+        logError("Texture::setDefaultTextureFilter()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         break;
     }
 }
@@ -69,7 +68,7 @@ void Texture::setTextureSlot(GLushort slot_index) {
 
 void Texture::setPixelAlignment(GLushort aligment) {
     if (aligment != 1 && aligment != 2 && aligment != 4 && aligment != 8) {
-        logError("Texture::setPixelAlignment()", "Invalid value.");
+        logError("Texture::setPixelAlignment()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
@@ -78,7 +77,7 @@ void Texture::setPixelAlignment(GLushort aligment) {
 
 void Texture::unbindTextureType(TextureType type) {
     if (type == TextureType::None || type == TextureType::RawImage) {
-        logError("Texture::unbindTextureType()", "Invalid texture type.");
+        logError("Texture::unbindTextureType()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         return;
     }
 
@@ -93,16 +92,18 @@ void Texture::unbindTextureType(TextureType type) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         break;
     }
+
+    StateMachine::instance().bound_texture_ = 0;
 }
 
 GLboolean Texture::loadImage(std::string path) {
     if (path.empty()) {
-        logError("Texture::loadImage()", "Invalid input.");
+        logError("Texture::loadImage()", PUFFIN_MSG_FILE_EMPTY_PATH);
         return false;
     }
 
     if (!img_handle_.load(path.c_str())) {
-        logError("Texture::loadImage()", "Loading image [" + path + "] error.");
+        logError("Texture::loadImage()", PUFFIN_MSG_FILE_CANNOT_OPEN(path));
         return false;
     }
 
@@ -111,7 +112,7 @@ GLboolean Texture::loadImage(std::string path) {
     height_ = img_handle_.getHeight();
     fetchChannelsCount();
 
-    logInfo("Texture::loadImage()", "Image [" + path_ + "] loaded.");
+    logInfo("Texture::loadImage()", PUFFIN_MSG_FILE_LOADED(path));
     return true;
 }
 
@@ -133,18 +134,16 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     type_ = TextureType::Texture2D;
 
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, (channels_ == 4) ? GL_RGBA : GL_RGB,
-        width_, height_, 0, (channels_ == 4) ? GL_BGRA : GL_BGR,
-        GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+    glTexImage2D(GL_TEXTURE_2D, 0, (channels_ == 4) ? GL_RGBA : GL_RGB, width_, height_, 0,
+        (channels_ == 4) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, img_handle_.accessPixels());
     setTextureFilter(default_texture_filter_[TextureType::Texture2D]);
-    setTextureWrap(TextureWrap::REPEAT);
+    setTextureWrap(TextureWrap::Repeat);
     flipVertical();
 
     if (auto_free) {
         freeImage();
     }
 
-    logInfo("Texture::loadTexture2D()", "Texture 2D [" + path + "] loaded.");
     return true;
 }
 
@@ -157,16 +156,13 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
             return false;
         }
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_,
-            height_, 0, GL_BGR, GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_, height_, 0, GL_BGR,
+            GL_UNSIGNED_BYTE, img_handle_.accessPixels());
         freeImage();
-
-        logInfo("Texture::loadTextureCube()", "Texture [" + paths[i] +
-            "] loaded.");
     }
 
     setTextureFilter(default_texture_filter_[TextureType::TextureCube]);
-    setTextureWrap(TextureWrap::CLAMP_TO_EDGE);
+    setTextureWrap(TextureWrap::ClampToEdge);
 
     return true;
 }
@@ -191,12 +187,8 @@ void Texture::generateMipmap() {
 void Texture::setTextureBorderColor(const glm::vec4 &color) {
     bind();
 
-    GLfloat border_color[] = {
-        glm::clamp(color.r, 0.0f, 1.0f),
-        glm::clamp(color.g, 0.0f, 1.0f),
-        glm::clamp(color.b, 0.0f, 1.0f),
-        glm::clamp(color.a, 0.0f, 1.0f)
-    };
+    GLfloat border_color[] = {glm::clamp(color.r, 0.0f, 1.0f), glm::clamp(color.g, 0.0f, 1.0f),
+        glm::clamp(color.b, 0.0f, 1.0f), glm::clamp(color.a, 0.0f, 1.0f)};
 
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 }
@@ -207,42 +199,34 @@ void Texture::setTextureWrap(TextureWrap wrap_mode) {
     switch (type_) {
     case TextureType::Texture2D:
         switch (wrap_mode) {
-        case TextureWrap::REPEAT:
+        case TextureWrap::Repeat:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             break;
-        case TextureWrap::CLAMP_TO_BORDER:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                GL_CLAMP_TO_BORDER);
+        case TextureWrap::ClampToBorder:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
             break;
-        case TextureWrap::CLAMP_TO_EDGE:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                GL_CLAMP_TO_EDGE);
+        case TextureWrap::ClampToEdge:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             break;
         }
         break;
     case TextureType::TextureCube:
         switch (wrap_mode) {
-        case TextureWrap::CLAMP_TO_EDGE:
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
-                GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
-                GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
-                GL_CLAMP_TO_EDGE);
+        case TextureWrap::ClampToEdge:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             break;
         default:
-            logError("Texture::setTextureWrap()",
-                "Not supported texture wrap.");
+            logError("Texture::setTextureWrap()", PUFFIN_MSG_TEXTURE_INVALID_WRAP);
             break;
         }
         break;
     default:
-        logError("Texture::setTextureWrap()", "Invalid texture type.");
+        logError("Texture::setTextureWrap()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         break;
     }
 }
@@ -253,39 +237,34 @@ void Texture::setTextureFilter(TextureFilter filter) {
     switch (type_) {
     case TextureType::Texture2D:
         switch (filter) {
-        case TextureFilter::NEAREST:
+        case TextureFilter::Nearest:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             break;
-        case TextureFilter::BILINEAR:
+        case TextureFilter::Bilinear:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
-        case TextureFilter::BILINEAR_WITH_MIPMAPS:
+        case TextureFilter::BilinearWithMipmaps:
             generateMipmap();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                GL_LINEAR_MIPMAP_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
-        case TextureFilter::TRILINEAR:
+        case TextureFilter::Trilinear:
             generateMipmap();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
         }
         break;
     case TextureType::TextureCube:
         switch (filter) {
-        case TextureFilter::BILINEAR:
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,
-                GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
-                GL_LINEAR);
+        case TextureFilter::Bilinear:
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             break;
         default:
-            logError("Texture::setTextureFilter()",
-                "Not supported texture filter.");
+            logError("Texture::setTextureFilter()", PUFFIN_MSG_TEXTURE_INVALID_FILTER);
             break;
         }
         break;
@@ -293,15 +272,14 @@ void Texture::setTextureFilter(TextureFilter filter) {
         // TODO: FIll it.
         break;
     default:
-        logError("Texture::setTextureFilter()", "Invalid texture type.");
+        logError("Texture::setTextureFilter()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         break;
     }
 }
 
-GLFWimage Texture::toGlfwImage() const {
+GLFWimage Texture::toGlfwImage() {
     if (!img_handle_.accessPixels()) {
-        logError("Texture::toGlfwImage()",
-            "Cannot perform this operation on empty image.");
+        logError("Texture::toGlfwImage()", PUFFIN_MSG_NULL_OBJECT);
         return GLFWimage{};
     }
 
@@ -312,10 +290,10 @@ GLFWimage Texture::toGlfwImage() const {
     return img;
 }
 
-void Texture::setTexture2DData(GLuint width, GLuint height, GLushort channels,
-    void *data, GLboolean generate_mipmaps) {
+void Texture::setTexture2DData(
+    GLuint width, GLuint height, GLushort channels, void *data, GLboolean generate_mipmaps) {
     if (channels == 0 || channels > 4) {
-        logError("Texture::setTexture2DData()", "Invalid input.");
+        logError("Texture::setTexture2DData()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
@@ -344,16 +322,15 @@ void Texture::setTexture2DData(GLuint width, GLuint height, GLushort channels,
     }
 
     if (type_ == TextureType::Texture2D) {
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width_, height_, 0,
-            format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, internal_format, width_, height_, 0, format, GL_UNSIGNED_BYTE, data);
     }
     else if (type_ == TextureType::Texture2DMultisample) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-            Configuration::instance().getMsaaSamples(), GL_RGB, width_,
-            height_, GL_TRUE);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, InitConfig::instance().getMsaaSamples(),
+            GL_RGB, width_, height_, GL_TRUE);
     }
 
-    // After setting new texture data there is a need to regenerate mipmaps.
+    // After setting new texture data there is a need to regenerate mipmaps
     if (generate_mipmaps) {
         generateMipmap();
     }
@@ -361,15 +338,12 @@ void Texture::setTexture2DData(GLuint width, GLuint height, GLushort channels,
 
 void Texture::swapRedBlue() {
     if (!img_handle_.accessPixels()) {
-        logError("Texture::swapRedBlue()",
-            "Cannot perform this operation on empty image.");
+        logError("Texture::swapRedBlue()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
-    if (channels_ < 3 || !(type_ == TextureType::Texture2D ||
-        type_ == TextureType::RawImage)) {
-        logError("Texture::swapRedBlue()",
-            "Cannot perform this operation on this image.");
+    if (channels_ < 3 || !(type_ == TextureType::Texture2D || type_ == TextureType::RawImage)) {
+        logError("Texture::swapRedBlue()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         return;
     }
 
@@ -381,49 +355,45 @@ void Texture::swapRedBlue() {
     }
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
-            getChannelsCount(), img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(), getChannelsCount(),
+            img_handle_.accessPixels());
     }
 }
 
 void Texture::flipVertical() {
     if (!img_handle_.accessPixels()) {
-        logError("Texture::flipVertical()",
-            "Cannot perform this operation on empty image.");
+        logError("Texture::flipVertical()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
     if (!(type_ == TextureType::Texture2D || type_ == TextureType::RawImage)) {
-        logError("Texture::flipVertical()",
-            "Cannot perform this operation on this image.");
+        logError("Texture::flipVertical()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         return;
     }
 
     img_handle_.flipVertical();
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
-            getChannelsCount(), img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(), getChannelsCount(),
+            img_handle_.accessPixels());
     }
 }
 
 void Texture::flipHorizontal() {
     if (!img_handle_.accessPixels()) {
-        logError("Texture::flipHorizontal()",
-            "Cannot perform this operation on empty image.");
+        logError("Texture::flipHorizontal()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
     if (!(type_ == TextureType::Texture2D || type_ == TextureType::RawImage)) {
-        logError("Texture::flipHorizontal()",
-            "Cannot perform this operation on this image.");
+        logError("Texture::flipHorizontal()", PUFFIN_MSG_TEXTURE_INVALID_TYPE);
         return;
     }
 
     img_handle_.flipHorizontal();
 
     if (type_ == TextureType::Texture2D) {
-        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(),
-            getChannelsCount(), img_handle_.accessPixels());
+        setTexture2DData(img_handle_.getWidth(), img_handle_.getHeight(), getChannelsCount(),
+            img_handle_.accessPixels());
     }
 }

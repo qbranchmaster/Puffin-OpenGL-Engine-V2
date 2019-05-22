@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_CAMERA_FRUSTUM_HPP
 #define PUFFIN_CAMERA_FRUSTUM_HPP
@@ -26,8 +26,8 @@ namespace puffin {
     public:
         void setCameraVectors(const glm::vec3 &direction, const glm::vec3 &right,
             const glm::vec3 &up, const glm::vec3 &position);
-        void setCameraParameters(GLfloat near_distance, GLfloat far_distance, GLfloat aspect,
-            GLfloat fov);
+        void setCameraParameters(
+            GLfloat near_distance, GLfloat far_distance, GLfloat aspect, GLfloat fov);
 
         void calculateFrustumPoints();
         void recalculateToFrame(const glm::mat4 &frame);
@@ -43,8 +43,8 @@ namespace puffin {
 
     private:
         void calculatePlanesSizes();
-        glm::vec3 calculatePointPosition(const glm::vec3 & start, const glm::vec3 & direction,
-            GLfloat width);
+        glm::vec3 calculatePointPosition(
+            const glm::vec3 &start, const glm::vec3 &direction, GLfloat width);
 
         GLfloat near_plane_{1.0f};
         GLfloat far_plane_{10.0f};
@@ -65,7 +65,7 @@ namespace puffin {
         glm::vec3 max_box_{0.0f, 0.0f, 0.0f};
         glm::vec3 center_{0.0f, 0.0f, 0.0f};
 
-        std::array<glm::vec3, 8> frustum_points_;
+        std::array<glm::vec3, 8> frustum_points_{};
     };
 
     using CameraFrustumPtr = std::shared_ptr<CameraFrustum>;
