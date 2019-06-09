@@ -8,6 +8,7 @@
 #define PUFFIN_WATER_TILE_HPP
 
 #include "PuffinEngine/BaseMesh.hpp"
+#include "PuffinEngine/Time.hpp"
 
 namespace puffin {
     class WaterTile : public BaseMesh {
@@ -76,12 +77,53 @@ namespace puffin {
             return shininess_;
         }
 
+        void updateWaveMovementFactor() {
+            move_factor_ += (wave_speed_ * static_cast<GLfloat>(Time::instance().getDelta()));
+            if (move_factor_ >= 1.0f) {
+                move_factor_ = 0.0f;
+            }
+        }
+
+        GLfloat getWaveMovementFactor() const {
+            return move_factor_;
+        }
+
+        void setAmbientFactor(GLfloat factor) {
+            if (factor < 0.0f) {
+                logError("WaterTile::setAmbientFactor()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            ambient_factor_ = factor;
+        }
+
+        GLfloat getAmbientFactor() const {
+            return ambient_factor_;
+        }
+
+        void setSpecularFactor(GLfloat factor) {
+            if (factor < 0.0f) {
+                logError("WaterTile::setSpecularFactor()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            specular_factor_ = factor;
+        }
+
+        GLfloat getSpecularFactor() const {
+            return specular_factor_;
+        }
+
     private:
         glm::vec3 water_color_{0.0f, 0.3f, 0.5f};
         GLuint shininess_{10};
+        GLfloat ambient_factor_{0.8f};
+        GLfloat specular_factor_{1.0f};
 
-        GLfloat wave_strength_{0.04f};
+        GLfloat wave_strength_{0.02f};
         GLfloat wave_speed_{0.01f};
+
+        GLfloat move_factor_{0.0f};
     };
 
     using WaterTilePtr = std::shared_ptr<WaterTile>;

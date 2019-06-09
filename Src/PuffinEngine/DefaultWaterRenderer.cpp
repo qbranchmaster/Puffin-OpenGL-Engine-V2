@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/DefaultWaterRenderer.hpp"
 
@@ -19,6 +19,14 @@ DefaultWaterRenderer::DefaultWaterRenderer(RenderSettingsPtr render_settings, Ca
     mesh_renderer_ = mesh_renderer;
     skybox_renderer_ = skybox_renderer;
 
+    dudv_map_path_ = "Data/Textures/WaterDuDv.png";
+    dudv_map_.reset(new Texture());
+    dudv_map_->loadTexture2D(dudv_map_path_);
+
+    normal_map_path_ = "Data/Textures/WaterNormalMap.png";
+    normal_map_.reset(new Texture());
+    normal_map_->loadTexture2D(normal_map_path_);
+
     loadShaders();
     createFrameBuffers();
 }
@@ -31,12 +39,13 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
 
     for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
         auto water_tile = scene->getWaterTile(i);
+        water_tile->updateWaveMovementFactor();
 
         renderToReflectionFrameBuffer(water_tile, scene);
         renderToRefractionFrameBuffer(water_tile, scene);
 
-        FrameBuffer::setViewportSize(frame_buffer);
         frame_buffer->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(frame_buffer);
 
         DepthTest::instance().enable(true);
         DepthTest::instance().enableDepthMask(true);
@@ -45,8 +54,27 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
 
         default_shader_program_->activate();
         setShadersUniforms(water_tile);
+
+        Texture::setTextureSlot(0);
+        reflection_frame_buffer_->getTextureBuffer(0)->bind();
+        Texture::setTextureSlot(1);
+        refraction_frame_buffer_->getTextureBuffer(0)->bind();
+        Texture::setTextureSlot(2);
+        dudv_map_->bind();
+        Texture::setTextureSlot(3);
+        normal_map_->bind();
+
         drawWaterTile(water_tile);
     }
+}
+
+void DefaultWaterRenderer::setTextureTiling(GLushort tiling) {
+    if (tiling <= 0) {
+        logError("DefaultWaterRenderer::setTextureTiling()", PUFFIN_MSG_INVALID_VALUE);
+        return;
+    }
+
+    texture_tiling_ = tiling;
 }
 
 void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene) {
@@ -55,6 +83,8 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     }
 
     reflection_frame_buffer_->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(
+        reflection_frame_buffer_->getWidth(), reflection_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
 
     render_settings_->lighting()->enableShadowMapping(false);
@@ -63,7 +93,6 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
 
     auto camera_pos = camera_->getPosition();
     GLfloat offset = 2.0f * (camera_pos.y - water_level);
-
     glm::vec3 new_camera_pos(camera_pos.x, camera_pos.y - offset, camera_pos.z);
     camera_->setPosition(new_camera_pos);
     camera_->flipPitch();
@@ -71,7 +100,7 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     skybox_renderer_->render(reflection_frame_buffer_, scene);
 
     mesh_renderer_->enableClippingPlane(true);
-    mesh_renderer_->setClippingPlane(glm::vec4(0.0f, 1.0f, 0.0f, water_level));
+    mesh_renderer_->setClippingPlane(glm::vec4(0.0f, 1.0f, 0.0f, -water_level));
     mesh_renderer_->render(reflection_frame_buffer_, scene);
     mesh_renderer_->enableClippingPlane(false);
 
@@ -83,7 +112,27 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
 }
 
 void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene) {
+    if (!water_tile || !scene) {
+        return;
+    }
 
+    refraction_frame_buffer_->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(
+        refraction_frame_buffer_->getWidth(), refraction_frame_buffer_->getHeight());
+    FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
+
+    render_settings_->lighting()->enableShadowMapping(false);
+
+    auto water_level = water_tile->getPosition().y;
+
+    skybox_renderer_->render(refraction_frame_buffer_, scene);
+
+    mesh_renderer_->enableClippingPlane(true);
+    mesh_renderer_->setClippingPlane(glm::vec4(0.0f, -1.0f, 0.0f, water_level));
+    mesh_renderer_->render(refraction_frame_buffer_, scene);
+    mesh_renderer_->enableClippingPlane(false);
+
+    render_settings_->lighting()->enableShadowMapping(true);
 }
 
 void DefaultWaterRenderer::loadShaders() {
@@ -93,9 +142,44 @@ void DefaultWaterRenderer::loadShaders() {
 
 void DefaultWaterRenderer::setShadersUniforms(WaterTilePtr water_tile) {
     default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
-    default_shader_program_->setUniform("matrices.projection_matrix",
-        camera_->getProjectionMatrix());
+    default_shader_program_->setUniform(
+        "matrices.projection_matrix", camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix", water_tile->getModelMatrix());
+
+    default_shader_program_->setUniform("reflection_texture", 0);
+    default_shader_program_->setUniform("refraction_texture", 1);
+    default_shader_program_->setUniform("dudv_map", 2);
+    default_shader_program_->setUniform("normal_map", 3);
+
+    default_shader_program_->setUniform("water_tile.wave_strength", water_tile->getWaveStrength());
+    default_shader_program_->setUniform(
+        "water_tile.move_factor", water_tile->getWaveMovementFactor());
+    default_shader_program_->setUniform("water_tile.water_color", water_tile->getWaterColor());
+    default_shader_program_->setUniform("water_tile.shininess", water_tile->getShininess());
+    default_shader_program_->setUniform(
+        "water_tile.ambient_factor", water_tile->getAmbientFactor());
+    default_shader_program_->setUniform(
+        "water_tile.specular_factor", water_tile->getSpecularFactor());
+
+    auto lighting = render_settings_->lighting();
+    default_shader_program_->setUniform(
+        "directional_light.enabled", lighting->directionalLight()->isEnabled());
+    default_shader_program_->setUniform(
+        "directional_light.direction", lighting->directionalLight()->getDirection());
+    default_shader_program_->setUniform(
+        "directional_light.ambient_color", lighting->directionalLight()->getAmbientColor());
+    default_shader_program_->setUniform(
+        "directional_light.diffuse_color", lighting->directionalLight()->getDiffuseColor());
+    default_shader_program_->setUniform(
+        "directional_light.specular_color", lighting->directionalLight()->getSpecularColor());
+
+    // default_shader_program_->setUniform(
+    //    "postprocess.gamma", render_settings_->postprocess()->getGamma());
+    default_shader_program_->setUniform("postprocess.bloom_threshold_color",
+        render_settings_->postprocess()->getGlowBloomThresholdColor());
+
+    default_shader_program_->setUniform("camera_position", camera_->getPosition());
+    default_shader_program_->setUniform("texture_tiling", texture_tiling_);
 }
 
 void DefaultWaterRenderer::createFrameBuffers() {

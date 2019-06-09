@@ -40,8 +40,8 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     }
 
     // Prepare rendering process
-    FrameBuffer::setViewportSize(frame_buffer);
     frame_buffer->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(frame_buffer);
 
     AlphaBlend::instance().enable(false);
     DepthTest::instance().enable(true);

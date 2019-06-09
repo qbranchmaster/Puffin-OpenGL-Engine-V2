@@ -217,11 +217,13 @@ void MasterRenderer::clearDefaultFrameBuffer() {
     DepthTest::instance().enableDepthMask(true);
 
     default_frame_buffer_->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(default_frame_buffer_);
     FrameBuffer::clear(
         FrameBufferClearType::DepthAndColor, default_frame_buffer_->getClearColor());
     default_frame_buffer_->unbind();
 
     default_frame_buffer_multisample_->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(default_frame_buffer_multisample_);
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
     default_frame_buffer_multisample_->unbind();
 }

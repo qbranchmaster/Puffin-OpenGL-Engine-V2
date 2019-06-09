@@ -199,8 +199,8 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
-    FrameBuffer::setViewportSize(frame_buffer);
     frame_buffer->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(frame_buffer);
 
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);

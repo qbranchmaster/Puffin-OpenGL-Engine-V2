@@ -105,9 +105,7 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(MeshPtr mesh) {
     directional_light_shadow_map_frame_bufer_->bind(
         FrameBufferBindType::Normal);
 
-    auto size = render_settings_->lighting()->
-        getDirectionalLightShadowMapSize();
-    FrameBuffer::setViewportSize(size, size);
+    FrameBuffer::setViewportSize(directional_light_shadow_map_frame_bufer_);
     FrameBuffer::clear(FrameBufferClearType::OnlyDepth);
 
     directional_light_shader_program_->activate();

@@ -1,18 +1,19 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEFAULT_WATER_RENDERER_HPP
 #define PUFFIN_DEFAULT_WATER_RENDERER_HPP
 
 #include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/WaterRenderer.hpp"
 
 namespace puffin {
@@ -23,13 +24,16 @@ namespace puffin {
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
+        void setTextureTiling(GLushort tiling);
+
     private:
         void loadShaders();
         void setShadersUniforms(WaterTilePtr water_tile);
+
         void createFrameBuffers();
-        void drawWaterTile(WaterTilePtr water_tile);
         void renderToReflectionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene);
         void renderToRefractionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene);
+        void drawWaterTile(WaterTilePtr water_tile);
 
         CameraPtr camera_{nullptr};
         DefaultMeshRendererPtr mesh_renderer_{nullptr};
@@ -39,6 +43,12 @@ namespace puffin {
 
         FrameBufferPtr reflection_frame_buffer_{nullptr};
         FrameBufferPtr refraction_frame_buffer_{nullptr};
+
+        std::string dudv_map_path_;
+        TexturePtr dudv_map_{nullptr};
+        std::string normal_map_path_;
+        TexturePtr normal_map_{nullptr};
+        GLushort texture_tiling_{1};
     };
 
     using DefaultWaterRendererPtr = std::shared_ptr<DefaultWaterRenderer>;

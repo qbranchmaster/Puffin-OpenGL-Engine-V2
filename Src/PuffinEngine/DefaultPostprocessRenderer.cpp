@@ -116,8 +116,16 @@ void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
     bloom_shader_program_->activate();
     Texture::setTextureSlot(0);
 
+    // Clear framebuffers
+    for (GLushort i = 0; i < 2; i++) {
+        bloom_frame_buffer_[i]->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(bloom_frame_buffer_[i]);
+        FrameBuffer::clear(FrameBufferClearType::OnlyColor);
+    }
+
     for (GLushort i = 0; i < amount; i++) {
         bloom_frame_buffer_[horizontal ? 1 : 0]->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(bloom_frame_buffer_[horizontal ? 1 : 0]);
         bloom_shader_program_->setUniform("horizontal", horizontal);
         if (first) {
             frame_buffer->getTextureBuffer(1)->bind();
