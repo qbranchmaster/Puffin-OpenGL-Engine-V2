@@ -87,6 +87,7 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
         reflection_frame_buffer_->getWidth(), reflection_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
 
+    GLboolean shadow_map_state = render_settings_->lighting()->isShadowMappingEnabled();
     render_settings_->lighting()->enableShadowMapping(false);
 
     auto water_level = water_tile->getPosition().y;
@@ -104,7 +105,7 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->render(reflection_frame_buffer_, scene);
     mesh_renderer_->enableClippingPlane(false);
 
-    render_settings_->lighting()->enableShadowMapping(true);
+    render_settings_->lighting()->enableShadowMapping(shadow_map_state);
 
     // Restore previous camera position and orientation
     camera_->setPosition(camera_pos);
@@ -121,6 +122,7 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
         refraction_frame_buffer_->getWidth(), refraction_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
 
+    GLboolean shadow_map_state = render_settings_->lighting()->isShadowMappingEnabled();
     render_settings_->lighting()->enableShadowMapping(false);
 
     auto water_level = water_tile->getPosition().y;
@@ -132,7 +134,7 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->render(refraction_frame_buffer_, scene);
     mesh_renderer_->enableClippingPlane(false);
 
-    render_settings_->lighting()->enableShadowMapping(true);
+    render_settings_->lighting()->enableShadowMapping(shadow_map_state);
 }
 
 void DefaultWaterRenderer::loadShaders() {
