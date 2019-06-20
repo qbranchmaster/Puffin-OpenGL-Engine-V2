@@ -50,6 +50,7 @@ namespace puffin {
         void renderPostprocessDialog();
         void renderLightingDialog();
         void renderShadowMappingDialog();
+        void renderFogDialog();
 
         void renderWaterRendererDialog(ScenePtr scene);
 
@@ -58,6 +59,7 @@ namespace puffin {
         bool render_postprocess_dialog_{false};
         bool render_lighting_dialog_{false};
         bool render_shadow_map_dialog_{false};
+        bool render_fog_dialog_{false};
 
         bool render_water_renderer_dialog_{false};
 

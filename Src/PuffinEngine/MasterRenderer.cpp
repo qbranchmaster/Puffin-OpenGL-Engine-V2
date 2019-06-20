@@ -194,12 +194,12 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         shadow_map_renderer_->render(scene);
     }
 
-    if (mesh_renderer_) {
-        mesh_renderer_->render(default_frame_buffer_multisample_, scene);
-    }
-
     if (water_renderer_) {
         water_renderer_->render(default_frame_buffer_multisample_, scene);
+    }
+
+    if (mesh_renderer_) {
+        mesh_renderer_->render(default_frame_buffer_multisample_, scene);
     }
 }
 

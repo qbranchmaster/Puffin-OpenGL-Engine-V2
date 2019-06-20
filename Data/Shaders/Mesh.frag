@@ -56,6 +56,12 @@ struct Matrices {
     mat4 dir_light_matrix;
 };
 
+struct Fog {
+    bool enabled;
+    vec3 color;
+    float density;
+};
+
 struct Other {
     float gamma;
     vec3 bloom_threshold_color;
@@ -89,6 +95,16 @@ uniform Material material;
 uniform Lighting lighting;
 uniform Other other;
 uniform ShadowMapping shadow_mapping;
+uniform Fog fog;
+
+vec3 calcFog(vec3 input_color) {
+    float distance = length(fs_in.position_VIEW);
+
+    float fog_power = 1.0f - exp(-fog.density * distance);
+    fog_power = clamp(fog_power, 0.0f, 1.0f);
+    vec3 result = mix(input_color, fog.color, fog_power);
+    return result;
+}
 
 float calculateShadow(vec4 frag_pos) {
     if (!shadow_mapping.enabled) {
@@ -302,6 +318,10 @@ void main() {
     tr_value = clamp(tr_value, 0.0f, 1.0f);
 
     frag_color = vec4(result_color, tr_value);
+
+	if (fog.enabled) {
+        frag_color.rgb = calcFog(frag_color.rgb);
+	}
 
     float brightness = dot(frag_color.rgb, other.bloom_threshold_color);
     if (brightness > 1.0f) {

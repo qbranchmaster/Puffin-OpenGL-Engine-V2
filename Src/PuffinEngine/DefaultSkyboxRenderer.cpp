@@ -95,4 +95,13 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
     default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
     default_shader_program_->setUniform("color.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());
+
+    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
+    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
+    default_shader_program_->setUniform(
+        "fog.density", render_settings_->fog()->getSkyboxFogOverallDensity());
+    default_shader_program_->setUniform(
+        "fog.transition_power", render_settings_->fog()->getSkyboxFogTransitionPower());
+    default_shader_program_->setUniform(
+        "fog.height", render_settings_->fog()->getSkyboxFogHeight());
 }

@@ -71,6 +71,10 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
             static_cast<GLint>(render_settings_->lighting()->getShadowMappingPcfSamplesCount()));
     }
+
+    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
+    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
+    default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
 }
 
 void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {

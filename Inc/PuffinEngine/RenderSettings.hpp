@@ -7,6 +7,7 @@
 #ifndef PUFFIN_RENDER_SETTINGS_HPP
 #define PUFFIN_RENDER_SETTINGS_HPP
 
+#include "PuffinEngine/Fog.hpp"
 #include "PuffinEngine/Lighting.hpp"
 #include "PuffinEngine/Postprocess.hpp"
 
@@ -14,8 +15,13 @@ namespace puffin {
     class RenderSettings {
     public:
         RenderSettings() {
+            fog_.reset(new Fog());
             lighting_.reset(new Lighting());
             postprocess_.reset(new Postprocess());
+        }
+
+        FogPtr fog() const {
+            return fog_;
         }
 
         LightingPtr lighting() const {
@@ -27,6 +33,7 @@ namespace puffin {
         }
 
     private:
+        FogPtr fog_{nullptr};
         LightingPtr lighting_{nullptr};
         PostprocessPtr postprocess_{nullptr};
     };

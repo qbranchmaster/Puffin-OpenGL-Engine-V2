@@ -31,6 +31,12 @@ struct Postprocess {
     vec3 bloom_threshold_color;
 };
 
+struct Fog {
+    bool enabled;
+    vec3 color;
+    float density;
+};
+
 in VS_OUT {
 	vec3 directional_light_direction_VIEW;
 	vec3 position_VIEW;
@@ -43,11 +49,21 @@ uniform Matrices matrices;
 uniform WaterTile water_tile;
 uniform DirectionalLight directional_light;
 uniform Postprocess postprocess;
+uniform Fog fog;
 
 uniform sampler2D reflection_texture;
 uniform sampler2D refraction_texture;
 uniform sampler2D dudv_map;
 uniform sampler2D normal_map;
+
+vec3 calcFog(vec3 input_color) {
+    float distance = length(fs_in.position_VIEW);
+
+    float fog_power = 1.0f - exp(-fog.density * distance);
+    fog_power = clamp(fog_power, 0.0f, 1.0f);
+    vec3 result = mix(input_color, fog.color, fog_power);
+    return result;
+}
 
 vec3 calcDirectionalLight(vec3 input_color, vec3 normal_vector) {
 	if (!directional_light.enabled) {
@@ -124,6 +140,10 @@ void main() {
 
 	// Output color
 	frag_color = vec4(result_lighting, 1.0f);
+
+	if (fog.enabled) {
+		frag_color.rgb = calcFog(frag_color.rgb);
+	}
 
 	float brightness = dot(frag_color.rgb, postprocess.bloom_threshold_color);
     if (brightness > 1.0f) {

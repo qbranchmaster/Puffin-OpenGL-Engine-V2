@@ -44,6 +44,7 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderPostprocessDialog();
     renderLightingDialog();
     renderShadowMappingDialog();
+    renderFogDialog();
 
     renderWaterRendererDialog(scene);
 
@@ -125,6 +126,7 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::MenuItem("Lighting", NULL, &render_lighting_dialog_);
             ImGui::MenuItem("Shadow mapping", NULL, &render_shadow_map_dialog_);
             ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
+            ImGui::MenuItem("Fog", NULL, &render_fog_dialog_);
             ImGui::Separator();
             ImGui::MenuItem("Water renderer", NULL, &render_water_renderer_dialog_);
 
@@ -181,7 +183,7 @@ void DefaultGuiRenderer::renderCameraDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_Always);
 
     if (!ImGui::Begin("Camera", &render_camera_dialog_, window_flags)) {
         ImGui::End();
@@ -222,7 +224,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_Always);
 
     if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_, window_flags)) {
         ImGui::End();
@@ -309,7 +311,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 195), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(485, 220), ImGuiCond_Always);
 
     if (!ImGui::Begin("Lighting", &render_lighting_dialog_, window_flags)) {
         ImGui::End();
@@ -353,6 +355,12 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::SliderFloat("Emission factor", &emission_factor, 0.0f, 30.0f);
     render_settings_->lighting()->setEmissionFactor(emission_factor);
 
+    glm::vec3 skybox_light_color = render_settings_->lighting()->getSkyboxLightColor();
+    float sb_light[] = {skybox_light_color.r, skybox_light_color.g, skybox_light_color.b};
+    ImGui::ColorEdit3("Skybox lighting color", sb_light);
+    render_settings_->lighting()->setSkyboxLightingColor(
+        glm::vec3(sb_light[0], sb_light[1], sb_light[2]));
+
     ImGui::End();
 }
 
@@ -363,7 +371,7 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_Always);
 
     if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_, window_flags)) {
         ImGui::End();
@@ -394,6 +402,50 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     ImGui::End();
 }
 
+void DefaultGuiRenderer::renderFogDialog() {
+    if (!render_fog_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    //window_flags |= ImGuiWindowFlags_NoResize;
+
+    ImGui::SetNextWindowSize(ImVec2(296, 200), ImGuiCond_Always);
+
+    if (!ImGui::Begin("Fog", &render_fog_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    bool enabled = render_settings_->fog()->isEnabled();
+    ImGui::Checkbox("Enabled", &enabled);
+    render_settings_->fog()->enable(enabled);
+
+    glm::vec3 fog_color = render_settings_->fog()->getColor();
+    float color[] = {fog_color.r, fog_color.g, fog_color.b};
+    ImGui::ColorEdit3("Color", color);
+    render_settings_->fog()->setColor(glm::vec3(color[0], color[1], color[2]));
+
+    float density = render_settings_->fog()->getDensity();
+    ImGui::SliderFloat("Density", &density, 0.0f, 1.0f);
+    render_settings_->fog()->setDensity(density);
+
+    ImGui::Text("Skybox fog");
+
+    float sb_density = render_settings_->fog()->getSkyboxFogOverallDensity();
+    ImGui::SliderFloat("Density##SkyboxDensity", &sb_density, 0.0f, 1.0f);
+
+    float transition = render_settings_->fog()->getSkyboxFogTransitionPower();
+    ImGui::SliderFloat("Transition", &transition, 0.0f, 100.0f);
+
+    float height = render_settings_->fog()->getSkyboxFogHeight();
+    ImGui::SliderFloat("Height", &height, 0.0f, 1.0f);
+
+    render_settings_->fog()->setSkyboxFog(sb_density, transition, height);
+
+    ImGui::End();
+}
+
 void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
     if (!render_water_renderer_dialog_ || !scene) {
         return;
@@ -401,7 +453,7 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_Always);
 
     if (!ImGui::Begin("Water renderer", &render_water_renderer_dialog_, window_flags)) {
         ImGui::End();

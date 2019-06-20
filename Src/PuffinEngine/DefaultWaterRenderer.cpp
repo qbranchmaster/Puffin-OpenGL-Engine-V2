@@ -186,6 +186,10 @@ void DefaultWaterRenderer::setShadersUniforms(WaterTilePtr water_tile) {
 
     default_shader_program_->setUniform("camera_position", camera_->getPosition());
     default_shader_program_->setUniform("texture_tiling", texture_tiling_);
+
+    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
+    default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
+    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
 }
 
 void DefaultWaterRenderer::createFrameBuffers() {
