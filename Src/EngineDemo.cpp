@@ -87,7 +87,7 @@ void EngineDemo::createScene() {
     text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");
     // scene_->addText(text_demo_);
 
-    water_tile_.reset(new WaterTile());
+    water_tile_.reset(new WaterTile("main_water_tile"));
     water_tile_->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
     water_tile_->setScale(glm::vec3(5.0f, 5.0f, 5.0f));
     scene_->addWaterTile(water_tile_);

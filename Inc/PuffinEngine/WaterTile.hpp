@@ -13,7 +13,7 @@
 namespace puffin {
     class WaterTile : public BaseMesh {
     public:
-        WaterTile() {
+        WaterTile(std::string name = "") : BaseMesh(name) {
             // clang-format off
             std::vector<GLfloat> positions = {
                 -1.0f, 0.0f, -1.0f,

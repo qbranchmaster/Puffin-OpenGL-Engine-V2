@@ -8,11 +8,12 @@
 #define PUFFIN_GUI_RENDERER_HPP
 
 #include "PuffinEngine/Renderer.hpp"
+#include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
     class GuiRenderer : public Renderer {
     public:
-        virtual void render() = 0;
+        virtual void render(ScenePtr scene) = 0;
     };
 
     using GuiRendererPtr = std::shared_ptr<GuiRenderer>;

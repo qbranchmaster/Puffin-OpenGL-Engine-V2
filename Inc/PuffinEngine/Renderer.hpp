@@ -15,7 +15,19 @@
 #include <memory>
 
 namespace puffin {
-    class Renderer {};
+    class Renderer {
+    public:
+        void enable(GLboolean state) {
+            enabled_ = state;
+        }
+
+        GLboolean isEnabled() const {
+            return enabled_;
+        }
+
+    protected:
+        GLboolean enabled_{true};
+    };
 
     using RendererPtr = std::shared_ptr<Renderer>;
 } // namespace puffin

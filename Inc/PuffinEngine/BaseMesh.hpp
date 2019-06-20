@@ -28,8 +28,12 @@
 namespace puffin {
     class BaseMesh {
     public:
-        BaseMesh();
+        BaseMesh(std::string name = "");
         ~BaseMesh();
+
+        std::string getName() const {
+            return name_;
+        }
 
         void bind() const {
             if (StateMachine::instance().bound_mesh_ == handle_) {
@@ -108,6 +112,8 @@ namespace puffin {
         GLuint handle_{0};
         GLuint indices_buffer_{0};
         std::map<GLuint, GLuint> data_buffers_;
+
+        std::string name_;
 
         std::vector<MeshEntityPtr> entities_;
 

@@ -86,7 +86,7 @@ void MasterRenderer::start() {
         }
 
         if (gui_renderer_) {
-            gui_renderer_->render();
+            gui_renderer_->render(rendered_scene);
         }
 
         target_window_->swapBuffers();

@@ -37,6 +37,10 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
+    if (!enabled_) {
+        return;
+    }
+
     for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
         auto water_tile = scene->getWaterTile(i);
         water_tile->updateWaveMovementFactor();

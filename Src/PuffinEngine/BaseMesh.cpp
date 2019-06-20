@@ -8,8 +8,10 @@
 
 using namespace puffin;
 
-BaseMesh::BaseMesh() {
+BaseMesh::BaseMesh(std::string name) {
     glGenVertexArrays(1, &handle_);
+
+    name_ = name;
 }
 
 BaseMesh::~BaseMesh() {

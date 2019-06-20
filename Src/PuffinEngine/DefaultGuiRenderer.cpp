@@ -1,19 +1,17 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/DefaultGuiRenderer.hpp"
 
 using namespace puffin;
 
-DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
-    WindowPtr window,
+DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window,
     CameraPtr camera, MasterRendererPtr master_renderer) {
-    if (!window || !render_settings || !camera ||
-        !master_renderer) {
-        throw Exception("ConfigGuiRenderer::ConfigGuiRenderer()",
-            "Not initialized object.");
+    if (!window || !render_settings || !camera || !master_renderer) {
+        throw Exception("DefaultGuiRenderer::DefaultGuiRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     render_settings_ = render_settings;
@@ -31,7 +29,7 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings,
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-void DefaultGuiRenderer::render() {
+void DefaultGuiRenderer::render(ScenePtr scene) {
     if (!enabled_) {
         return;
     }
@@ -47,14 +45,16 @@ void DefaultGuiRenderer::render() {
     renderLightingDialog();
     renderShadowMappingDialog();
 
-    //ImGui::ShowDemoWindow();
+    renderWaterRendererDialog(scene);
+
+    // ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 GLboolean DefaultGuiRenderer::isCapturingMouse() const {
-    return ImGui::GetIO().WantCaptureMouse;
+    return static_cast<GLboolean>(ImGui::GetIO().WantCaptureMouse);
 }
 
 void DefaultGuiRenderer::setupImGui() {
@@ -94,8 +94,8 @@ void DefaultGuiRenderer::setupImGui() {
     style.AntiAliasedLines = true;
     style.AntiAliasedFill = true;
 
-    //ImGui::StyleColorsLight();
-    //ImGui::StyleColorsClassic();
+    // ImGui::StyleColorsLight();
+    // ImGui::StyleColorsClassic();
     ImGui::StyleColorsDark();
 }
 
@@ -103,15 +103,12 @@ void DefaultGuiRenderer::renderMainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Load scene")) {
-
             }
 
             if (ImGui::MenuItem("Save scene")) {
-
             }
 
             if (ImGui::MenuItem("Reset scene")) {
-
             }
 
             ImGui::Separator();
@@ -128,6 +125,8 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::MenuItem("Lighting", NULL, &render_lighting_dialog_);
             ImGui::MenuItem("Shadow mapping", NULL, &render_shadow_map_dialog_);
             ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
+            ImGui::Separator();
+            ImGui::MenuItem("Water renderer", NULL, &render_water_renderer_dialog_);
 
             ImGui::EndMenu();
         }
@@ -153,8 +152,7 @@ void DefaultGuiRenderer::renderAboutDialog() {
 
     ImGui::SetNextWindowSize(ImVec2(496, 110), ImGuiCond_Always);
 
-    if (!ImGui::Begin("About Puffin Engine", &render_about_dialog_,
-        window_flags)) {
+    if (!ImGui::Begin("About Puffin Engine", &render_about_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
@@ -165,10 +163,12 @@ void DefaultGuiRenderer::renderAboutDialog() {
     ImGui::Text("Contact:  sebastian.tabaka@outlook.com");
     ImGui::Text("Repo URL:");
     ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
-        "https://github.com/qbranchmaster/Puffin-OpenGL-Engine-V2");
+    std::string url = "https://github.com/qbranchmaster/Puffin-OpenGL-Engine-V2";
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), url.c_str());
     if (ImGui::IsItemClicked()) {
-        // TODO: Open URL
+#ifdef WIN32
+        ShellExecute(0, 0, url.c_str(), 0, 0, SW_SHOW);
+#endif // WIN32
     }
 
     ImGui::End();
@@ -180,6 +180,7 @@ void DefaultGuiRenderer::renderCameraDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
     ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Camera", &render_camera_dialog_, window_flags)) {
@@ -192,14 +193,13 @@ void DefaultGuiRenderer::renderCameraDialog() {
     ImGui::DragFloat3("Position", cam_pos, 0.01f);
     camera_->setPosition(glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
-    float rot_tab[] = {camera_->getHorizontalAngle(),
-        camera_->getVerticalAngle()};
+    float rot_tab[] = {camera_->getHorizontalAngle(), camera_->getVerticalAngle()};
     ImGui::DragFloat2("Rotation", rot_tab, 0.01f);
     camera_->setRotation(rot_tab[0], rot_tab[1]);
 
     glm::vec3 dir = camera_->getDirectionVector();
-    std::string dir_str = "Direction: [" + std::to_string(dir.x) + ", " +
-        std::to_string(dir.y) + ", " + std::to_string(dir.z) + "]";
+    std::string dir_str = "Direction: [" + std::to_string(dir.x) + ", " + std::to_string(dir.y) +
+        ", " + std::to_string(dir.z) + "]";
     ImGui::Text(dir_str.c_str());
 
     float near_plane = camera_->getNearPlane();
@@ -221,18 +221,18 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
     ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_,
-        window_flags)) {
+    if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
     PostprocessEffect current = render_settings_->postprocess()->getEffect();
     GLuint selected_index = static_cast<GLuint>(current);
-    const char *postprocess_types[] = {"None", "Negative", "Grayscale",
-        "Sharpen", "Blur", "Edge", "Tint"};
+    const char *postprocess_types[] = {
+        "None", "Negative", "Grayscale", "Sharpen", "Blur", "Edge", "Tint"};
     static const char *current_item = postprocess_types[selected_index];
 
     if (ImGui::BeginCombo("Type", current_item)) {
@@ -240,29 +240,24 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
             bool is_selected = current_item == postprocess_types[i];
             if (ImGui::Selectable(postprocess_types[i], is_selected)) {
                 current_item = postprocess_types[i];
-                render_settings_->postprocess()->setEffect(
-                    static_cast<PostprocessEffect>(i));
+                render_settings_->postprocess()->setEffect(static_cast<PostprocessEffect>(i));
             }
         }
 
         ImGui::EndCombo();
     }
 
-    if (render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::Tint) {
+    if (render_settings_->postprocess()->getEffect() == PostprocessEffect::Tint) {
         glm::vec3 color = render_settings_->postprocess()->getTintColor();
         float tint_color[] = {color.r, color.g, color.b, 1.0f};
         ImGui::ColorEdit3("Tint color", tint_color);
-        render_settings_->postprocess()->setTintColor(glm::vec3(tint_color[0],
-            tint_color[1], tint_color[2]));
+        render_settings_->postprocess()->setTintColor(
+            glm::vec3(tint_color[0], tint_color[1], tint_color[2]));
     }
 
-    if (render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::Blur ||
-        render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::Edge ||
-        render_settings_->postprocess()->getEffect() ==
-        PostprocessEffect::Sharpen) {
+    if (render_settings_->postprocess()->getEffect() == PostprocessEffect::Blur ||
+        render_settings_->postprocess()->getEffect() == PostprocessEffect::Edge ||
+        render_settings_->postprocess()->getEffect() == PostprocessEffect::Sharpen) {
         float k_size = render_settings_->postprocess()->getKernelSize();
         ImGui::SliderFloat("Kernel size", &k_size, 1.0f, 500.0f);
         render_settings_->postprocess()->setKernelSize(k_size);
@@ -281,13 +276,11 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     render_settings_->postprocess()->enableGlowBloom(enable_bloom);
 
     if (enable_bloom) {
-        glm::vec3 bloom_thresh = render_settings_->postprocess()->
-            getGlowBloomThresholdColor();
-        float thresh_color[] = {bloom_thresh.r, bloom_thresh.g,
-            bloom_thresh.b};
+        glm::vec3 bloom_thresh = render_settings_->postprocess()->getGlowBloomThresholdColor();
+        float thresh_color[] = {bloom_thresh.r, bloom_thresh.g, bloom_thresh.b};
         ImGui::ColorEdit3("Threshold color", thresh_color);
-        render_settings_->postprocess()->setGlowBloomThresholdColor(glm::vec3(
-            thresh_color[0], thresh_color[1], thresh_color[2]));
+        render_settings_->postprocess()->setGlowBloomThresholdColor(
+            glm::vec3(thresh_color[0], thresh_color[1], thresh_color[2]));
     }
 
     bool dof_enabled = render_settings_->postprocess()->isDepthOfFieldEnabled();
@@ -301,8 +294,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         float focus = render_settings_->postprocess()->getFocusDistance();
         ImGui::SliderFloat("Distance", &focus, 0.0f, 1.0f);
         render_settings_->postprocess()->setFocusDistance(focus);
-        float max_blur = render_settings_->postprocess()->
-            getDepthOfFieldMaxBlur();
+        float max_blur = render_settings_->postprocess()->getDepthOfFieldMaxBlur();
         ImGui::SliderFloat("Max blur", &max_blur, 0.0f, 1.0f);
         render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
     }
@@ -316,10 +308,10 @@ void DefaultGuiRenderer::renderLightingDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
     ImGui::SetNextWindowSize(ImVec2(390, 195), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Lighting", &render_lighting_dialog_,
-        window_flags)) {
+    if (!ImGui::Begin("Lighting", &render_lighting_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
@@ -329,34 +321,30 @@ void DefaultGuiRenderer::renderLightingDialog() {
     render_settings_->lighting()->enable(enabled);
 
     ImGui::Text("Directional light");
-    glm::vec3 dir_light_direction = render_settings_->lighting()->
-        directionalLight()->getDirection();
-    float direction[3] = {dir_light_direction.x, dir_light_direction.y,
-        dir_light_direction.z};
+    glm::vec3 dir_light_direction =
+        render_settings_->lighting()->directionalLight()->getDirection();
+    float direction[3] = {dir_light_direction.x, dir_light_direction.y, dir_light_direction.z};
     ImGui::DragFloat3("Direction", direction, 0.1f);
     render_settings_->lighting()->directionalLight()->setDirection(
         glm::vec3(direction[0], direction[1], direction[2]));
 
-    glm::vec3 ambient_dir_color = render_settings_->lighting()->
-        directionalLight()->getAmbientColor();
-    float amb_dir_color[] = {ambient_dir_color.r, ambient_dir_color.g,
-        ambient_dir_color.b};
+    glm::vec3 ambient_dir_color =
+        render_settings_->lighting()->directionalLight()->getAmbientColor();
+    float amb_dir_color[] = {ambient_dir_color.r, ambient_dir_color.g, ambient_dir_color.b};
     ImGui::ColorEdit3("Ambient color", amb_dir_color);
     render_settings_->lighting()->directionalLight()->setAmbientColor(
         glm::vec3(amb_dir_color[0], amb_dir_color[1], amb_dir_color[2]));
 
-    glm::vec3 diffuse_dir_color = render_settings_->lighting()->
-        directionalLight()->getDiffuseColor();
-    float diff_dir_color[] = {diffuse_dir_color.r, diffuse_dir_color.g,
-        diffuse_dir_color.b};
+    glm::vec3 diffuse_dir_color =
+        render_settings_->lighting()->directionalLight()->getDiffuseColor();
+    float diff_dir_color[] = {diffuse_dir_color.r, diffuse_dir_color.g, diffuse_dir_color.b};
     ImGui::ColorEdit3("Diffuse color", diff_dir_color);
     render_settings_->lighting()->directionalLight()->setDiffuseColor(
         glm::vec3(diff_dir_color[0], diff_dir_color[1], diff_dir_color[2]));
 
-    glm::vec3 specular_dir_color = render_settings_->lighting()->
-        directionalLight()->getSpecularColor();
-    float spec_dir_color[] = {specular_dir_color.r, specular_dir_color.g,
-        specular_dir_color.b};
+    glm::vec3 specular_dir_color =
+        render_settings_->lighting()->directionalLight()->getSpecularColor();
+    float spec_dir_color[] = {specular_dir_color.r, specular_dir_color.g, specular_dir_color.b};
     ImGui::ColorEdit3("Specular color", spec_dir_color);
     render_settings_->lighting()->directionalLight()->setSpecularColor(
         glm::vec3(spec_dir_color[0], spec_dir_color[1], spec_dir_color[2]));
@@ -374,16 +362,15 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
     ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_,
-        window_flags)) {
+    if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-    bool shadow_mapping_enabled = render_settings_->lighting()->
-        isShadowMappingEnabled();
+    bool shadow_mapping_enabled = render_settings_->lighting()->isShadowMappingEnabled();
     ImGui::Checkbox("Enabled", &shadow_mapping_enabled);
     render_settings_->lighting()->enableShadowMapping(shadow_mapping_enabled);
 
@@ -391,18 +378,100 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     ImGui::SliderFloat("Shadow distance", &shadow_distance, 1.0f, 100.0f);
     render_settings_->lighting()->setShadowDistance(shadow_distance);
 
-    int shadow_pcf_samples = render_settings_->lighting()->
-        getShadowMappingPcfSamplesCount();
+    int shadow_pcf_samples = render_settings_->lighting()->getShadowMappingPcfSamplesCount();
     ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 10);
-    render_settings_->lighting()->setShadowMappingPcfsamplesCount(
-        shadow_pcf_samples);
+    render_settings_->lighting()->setShadowMappingPcfsamplesCount(shadow_pcf_samples);
 
     ImGui::Text("Shadow map");
-    /*DepthTextureBufferPtr shadow_map_texture =
-        renderers_shared_data_->shadow_map_texture;
-    ImTextureID texture_handle = (void*)(shadow_map_texture->getHandle());
-    ImGui::Image(texture_handle, ImVec2(shadow_map_texture->getWidth() / 4.0f,
-        shadow_map_texture->getHeight() / 4.0f));*/
+
+    DefaultShadowMapRendererPtr sm_renderer =
+        std::static_pointer_cast<DefaultShadowMapRenderer>(master_renderer_->shadowMapRenderer());
+    DepthTextureBufferPtr shadow_map_texture = sm_renderer->getOutputData().shadow_map_texture;
+    ImTextureID texture_handle = (void *)(shadow_map_texture->getHandle());
+    ImGui::Image(texture_handle,
+        ImVec2(shadow_map_texture->getWidth() / 4.0f, shadow_map_texture->getHeight() / 4.0f));
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
+    if (!render_water_renderer_dialog_ || !scene) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Water renderer", &render_water_renderer_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    bool water_renderer_enabled = master_renderer_->waterRenderer()->isEnabled();
+    ImGui::Checkbox("Enabled", &water_renderer_enabled);
+    master_renderer_->waterRenderer()->enable(water_renderer_enabled);
+
+    DefaultWaterRendererPtr water_renderer =
+        std::static_pointer_cast<DefaultWaterRenderer>(master_renderer_->waterRenderer());
+
+    int texture_tiling = water_renderer->getTextureTiling();
+    ImGui::SliderInt("Texture tiling", &texture_tiling, 1, 10);
+    water_renderer->setTextureTiling(texture_tiling);
+
+    ImGui::Text("Object render parameters");
+
+    std::vector<WaterTilePtr> water_tiles;
+    for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
+        water_tiles.push_back(scene->getWaterTile(i));
+    }
+
+    static WaterTilePtr selected_obj = nullptr;
+    static std::string current_item = "";
+
+    if (ImGui::BeginCombo("Water tile", current_item.c_str())) {
+        if (water_tiles.size() != 0) {
+            for (unsigned int i = 0; i < water_tiles.size(); i++) {
+                bool is_selected = current_item == water_tiles[i]->getName();
+                if (ImGui::Selectable(water_tiles[i]->getName().c_str(), is_selected)) {
+                    current_item = water_tiles[i]->getName();
+                    selected_obj = water_tiles[i];
+                }
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
+    if (selected_obj) {
+        glm::vec3 water_color = selected_obj->getWaterColor();
+        float color[] = {water_color.r, water_color.g, water_color.b};
+        ImGui::ColorEdit3("Color", color);
+        selected_obj->setWaterColor(glm::vec3(color[0], color[1], color[2]));
+
+        float wave_strength = selected_obj->getWaveStrength();
+        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
+        selected_obj->setWaveStrength(wave_strength);
+
+        float wave_speed = selected_obj->getWaveSpeed();
+        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
+        selected_obj->setWaveSpeed(wave_speed);
+
+        int shininess = selected_obj->getShininess();
+        ImGui::SliderInt("Shininess", &shininess, 1, 100);
+        selected_obj->setShininess(shininess);
+
+        float ambient_factor = selected_obj->getAmbientFactor();
+        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
+        selected_obj->setAmbientFactor(ambient_factor);
+
+        float specular_factor = selected_obj->getSpecularFactor();
+        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
+        selected_obj->setSpecularFactor(specular_factor);
+    }
+    else {
+        ImGui::Text("No object selected");
+    }
 
     ImGui::End();
 }

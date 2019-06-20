@@ -26,6 +26,10 @@ namespace puffin {
 
         void setTextureTiling(GLushort tiling);
 
+        GLushort getTextureTiling() const {
+            return texture_tiling_;
+        }
+
     private:
         void loadShaders();
         void setShadersUniforms(WaterTilePtr water_tile);
