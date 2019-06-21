@@ -13,7 +13,7 @@
 namespace puffin {
     class Skybox : public BaseMesh {
     public:
-        Skybox();
+        Skybox(std::string name = "");
 
         void setTexture(TexturePtr texture);
 

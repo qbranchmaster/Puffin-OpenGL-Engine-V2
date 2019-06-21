@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 
@@ -24,28 +24,26 @@ DefaultMeshRenderer::DefaultMeshRenderer(RenderSettingsPtr render_settings, Came
 void DefaultMeshRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram("mesh_shader_program"));
     default_shader_program_->loadShaders("Data/Shaders/Mesh.vert", "Data/Shaders/Mesh.frag");
+
+    wireframe_shader_program_.reset(new ShaderProgram("wireframe_shader_program"));
+    wireframe_shader_program_->loadShaders(
+        "Data/Shaders/Wireframe.vert", "Data/Shaders/Wireframe.frag");
 }
 
-void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
-    if (!mesh) {
-        logError("DefaultMeshRenderer::setShadersUniforms()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
+void DefaultMeshRenderer::setDefaultShaderUniforms() {
     default_shader_program_->setUniform("clipping_plane", clipping_plane_);
 
     default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
-    default_shader_program_->setUniform("matrices.projection_matrix",
-        camera_->getProjectionMatrix());
-    default_shader_program_->setUniform("matrices.normal_matrix", mesh->getNormalMatrix());
+    default_shader_program_->setUniform(
+        "matrices.projection_matrix", camera_->getProjectionMatrix());
 
     // Lighting
     auto lighting = render_settings_->lighting();
     default_shader_program_->setUniform("lighting.enabled", lighting->isEnabled());
-    default_shader_program_->setUniform("lighting.directional_light.enabled",
-        lighting->directionalLight()->isEnabled());
-    default_shader_program_->setUniform("lighting.directional_light.direction",
-        lighting->directionalLight()->getDirection());
+    default_shader_program_->setUniform(
+        "lighting.directional_light.enabled", lighting->directionalLight()->isEnabled());
+    default_shader_program_->setUniform(
+        "lighting.directional_light.direction", lighting->directionalLight()->getDirection());
     default_shader_program_->setUniform("lighting.directional_light.ambient_color",
         lighting->directionalLight()->getAmbientColor());
     default_shader_program_->setUniform("lighting.directional_light.diffuse_color",
@@ -60,8 +58,8 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
         render_settings_->postprocess()->getGlowBloomThresholdColor());
 
     // Shadow mapping
-    default_shader_program_->setUniform("shadow_mapping.enabled",
-        render_settings_->lighting()->isShadowMappingEnabled());
+    default_shader_program_->setUniform(
+        "shadow_mapping.enabled", render_settings_->lighting()->isShadowMappingEnabled());
     if (render_settings_->lighting()->isShadowMappingEnabled()) {
         default_shader_program_->setUniform("shadow_mapping.shadow_map_texture", 6);
         default_shader_program_->setUniform("matrices.dir_light_matrix",
@@ -77,11 +75,15 @@ void DefaultMeshRenderer::setShadersUniforms(MeshPtr mesh) {
     default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
 }
 
-void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
-    if (!entity) {
-        logError("DefaultMeshRenderer::setMeshEntityShadersUniforms()", PUFFIN_MSG_NULL_OBJECT);
+void DefaultMeshRenderer::setDefaultShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity) {
+    if (!mesh || !entity) {
+        logError("DefaultMeshRenderer::setDefaultShaderMeshUniforms()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
+
+    auto model_matrix = mesh->getModelMatrix() * entity->getModelMatrix();
+    default_shader_program_->setUniform("matrices.model_matrix", model_matrix);
+    default_shader_program_->setUniform("matrices.normal_matrix", mesh->getNormalMatrix());
 
     auto material = entity->getMaterial();
     if (!material) {
@@ -120,9 +122,9 @@ void DefaultMeshRenderer::setMeshEntityShadersUniforms(MeshEntityPtr entity) {
     default_shader_program_->setUniform("material.transparency", material->getTransparency());
 }
 
-void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
+void DefaultMeshRenderer::renderMeshEntity(MeshPtr mesh, GLuint entity_index) {
     if (!mesh) {
-        logError("DefaultMeshRenderer::drawMesh()", PUFFIN_MSG_NULL_OBJECT);
+        logError("DefaultMeshRenderer::renderMeshEntity()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
@@ -130,10 +132,7 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
 
     auto entity = mesh->getEntity(entity_index);
     if (entity) {
-        setMeshEntityShadersUniforms(entity);
-
-        auto model_matrix = mesh->getModelMatrix() * entity->getModelMatrix();
-        default_shader_program_->setUniform("matrices.model_matrix", model_matrix);
+        setDefaultShaderMeshUniforms(mesh, entity);
 
         auto material = entity->getMaterial();
         if (material) {
@@ -192,14 +191,23 @@ void DefaultMeshRenderer::drawMesh(MeshPtr mesh, GLuint entity_index) {
             }
         }
 
-        glDrawElements(GL_TRIANGLES, entity->getIndicesCount(), GL_UNSIGNED_INT,
-            reinterpret_cast<void*>((entity->getStartingVertexIndex() * sizeof(GLuint))));
+        drawMeshEntity(entity);
     }
 }
 
-void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
+void DefaultMeshRenderer::drawMeshEntity(MeshEntityPtr entity) {
+    if (!entity) {
+        logError("DefaultMeshRenderer::drawMeshEntity()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    glDrawElements(GL_TRIANGLES, entity->getIndicesCount(), GL_UNSIGNED_INT,
+        reinterpret_cast<void *>((entity->getStartingVertexIndex() * sizeof(GLuint))));
+}
+
+void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene) {
     if (!frame_buffer || !scene) {
-        logError("DefaultMeshRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
+        logError("DefaultMeshRenderer::renderNormal()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
@@ -209,8 +217,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);
     FaceCull::instance().enable(true);
-
-    default_shader_program_->activate();
+    AlphaBlend::instance().enable(false);
 
     if (clipping_plane_enabled_) {
         glEnable(GL_CLIP_DISTANCE0);
@@ -221,10 +228,11 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
     }
 
+    default_shader_program_->activate();
+    setDefaultShaderUniforms();
+
     for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
         auto mesh = scene->getMesh(i);
-
-        setShadersUniforms(mesh);
 
         // First pass - skip transparent entities
         std::vector<GLuint> skipped_en;
@@ -237,18 +245,18 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
                 continue;
             }
 
-            drawMesh(mesh, i);
+            renderMeshEntity(mesh, i);
         }
 
         // Second pass - draw transparent entities
-        // TODO: Sort them in order.
+        // TODO: Sort them in order
 
         AlphaBlend::instance().enable(true);
         AlphaBlend::instance().setBlendFunction(BlendFunction::Normal);
 
         for (const auto &i : skipped_en) {
             auto entity = mesh->getEntity(i);
-            drawMesh(mesh, i);
+            renderMeshEntity(mesh, i);
         }
 
         AlphaBlend::instance().enable(false);
@@ -256,5 +264,85 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
 
     if (clipping_plane_enabled_) {
         glDisable(GL_CLIP_DISTANCE0);
+    }
+}
+
+void DefaultMeshRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr scene) {
+    if (!frame_buffer || !scene) {
+        logError("DefaultMeshRenderer::renderWireframe()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    frame_buffer->bind(FrameBufferBindType::Normal);
+    FrameBuffer::setViewportSize(frame_buffer);
+
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(true);
+    FaceCull::instance().enable(true);
+    AlphaBlend::instance().enable(false);
+
+    wireframe_shader_program_->activate();
+    setWireframeShaderUniforms();
+
+    for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
+        auto mesh = scene->getMesh(i);
+
+        if (!mesh) {
+            continue;
+        }
+
+        mesh->bind();
+
+        for (GLuint i = 0; i < mesh->getEntitiesCount(); i++) {
+            auto entity = mesh->getEntity(i);
+
+            setWireframeShaderMeshUniforms(mesh, entity);
+
+            render_settings_->wireframe()->enable(true);
+            drawMeshEntity(entity);
+            render_settings_->wireframe()->enable(false);
+        }
+    }
+}
+
+void DefaultMeshRenderer::setWireframeShaderUniforms() {
+    wireframe_shader_program_->setUniform(
+        "wireframe_color", render_settings_->wireframe()->getColor());
+    wireframe_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+    wireframe_shader_program_->setUniform(
+        "matrices.projection_matrix", camera_->getProjectionMatrix());
+}
+
+void DefaultMeshRenderer::setWireframeShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity) {
+    if (!mesh || !entity) {
+        logError("DefaultMeshRenderer::setWireframeShaderMeshUniforms()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    auto model_matrix = mesh->getModelMatrix() * entity->getModelMatrix();
+    wireframe_shader_program_->setUniform("matrices.model_matrix", model_matrix);
+}
+
+void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
+    if (!frame_buffer || !scene) {
+        logError("DefaultMeshRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    if (!enabled_) {
+        return;
+    }
+
+    switch (render_settings_->wireframe()->getMode()) {
+    case WireframeMode::None:
+        renderNormal(frame_buffer, scene);
+        break;
+    case WireframeMode::Overlay:
+        renderNormal(frame_buffer, scene);
+        renderWireframe(frame_buffer, scene);
+        break;
+    case WireframeMode::Full:
+        renderWireframe(frame_buffer, scene);
+        break;
     }
 }

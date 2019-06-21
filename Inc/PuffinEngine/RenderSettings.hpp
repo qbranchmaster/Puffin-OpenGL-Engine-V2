@@ -10,6 +10,7 @@
 #include "PuffinEngine/Fog.hpp"
 #include "PuffinEngine/Lighting.hpp"
 #include "PuffinEngine/Postprocess.hpp"
+#include "PuffinEngine/Wireframe.hpp"
 
 namespace puffin {
     class RenderSettings {
@@ -18,6 +19,7 @@ namespace puffin {
             fog_.reset(new Fog());
             lighting_.reset(new Lighting());
             postprocess_.reset(new Postprocess());
+            wireframe_.reset(new Wireframe());
         }
 
         FogPtr fog() const {
@@ -32,10 +34,15 @@ namespace puffin {
             return postprocess_;
         }
 
+        WireframePtr wireframe() const {
+            return wireframe_;
+        }
+
     private:
         FogPtr fog_{nullptr};
         LightingPtr lighting_{nullptr};
         PostprocessPtr postprocess_{nullptr};
+        WireframePtr wireframe_{nullptr};
     };
 
     using RenderSettingsPtr = std::shared_ptr<RenderSettings>;

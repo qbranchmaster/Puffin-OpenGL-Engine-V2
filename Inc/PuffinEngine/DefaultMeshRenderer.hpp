@@ -1,20 +1,20 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEFAULT_MESH_RENDERER_HPP
 #define PUFFIN_DEFAULT_MESH_RENDERER_HPP
 
 #include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
-#include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 
 namespace puffin {
     class DefaultMeshRenderer : public MeshRenderer {
@@ -40,9 +40,15 @@ namespace puffin {
 
     private:
         void loadShaders();
-        void setShadersUniforms(MeshPtr mesh);
-        void setMeshEntityShadersUniforms(MeshEntityPtr entity);
-        void drawMesh(MeshPtr mesh, GLuint entity_index);
+        void setDefaultShaderUniforms();
+        void setDefaultShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity);
+        void setWireframeShaderUniforms();
+        void setWireframeShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity);
+        void renderMeshEntity(MeshPtr mesh, GLuint entity_index);
+        void drawMeshEntity(MeshEntityPtr entity);
+
+        void renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene);
+        void renderWireframe(FrameBufferPtr frame_buffer, ScenePtr scene);
 
         GLboolean clipping_plane_enabled_{false};
         glm::vec4 clipping_plane_{0.0f, -1.0f, 0.0f, 1.0f};
@@ -50,6 +56,7 @@ namespace puffin {
         CameraPtr camera_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
+        ShaderProgramPtr wireframe_shader_program_{nullptr};
 
         DefaultShadowMapRendererPtr shadow_map_renderer_{nullptr};
     };

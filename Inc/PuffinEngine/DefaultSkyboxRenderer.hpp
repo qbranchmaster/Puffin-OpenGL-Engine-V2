@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEFAULT_SKYBOX_RENDERER_HPP
 #define PUFFIN_DEFAULT_SKYBOX_RENDERER_HPP
@@ -24,7 +24,7 @@ namespace puffin {
 
     private:
         void loadShaders();
-        void setShadersUniforms(SkyboxPtr skybox);
+        void setDefaultShaderUniforms(SkyboxPtr skybox);
         void drawSkybox(SkyboxPtr skybox);
 
         CameraPtr camera_{nullptr};

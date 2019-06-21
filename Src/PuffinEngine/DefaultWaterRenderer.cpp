@@ -41,34 +41,17 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
-    for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
-        auto water_tile = scene->getWaterTile(i);
-        water_tile->updateWaveMovementFactor();
-
-        renderToReflectionFrameBuffer(water_tile, scene);
-        renderToRefractionFrameBuffer(water_tile, scene);
-
-        frame_buffer->bind(FrameBufferBindType::Normal);
-        FrameBuffer::setViewportSize(frame_buffer);
-
-        DepthTest::instance().enable(true);
-        DepthTest::instance().enableDepthMask(true);
-        FaceCull::instance().enable(true);
-        AlphaBlend::instance().enable(false);
-
-        default_shader_program_->activate();
-        setShadersUniforms(water_tile);
-
-        Texture::setTextureSlot(0);
-        reflection_frame_buffer_->getTextureBuffer(0)->bind();
-        Texture::setTextureSlot(1);
-        refraction_frame_buffer_->getTextureBuffer(0)->bind();
-        Texture::setTextureSlot(2);
-        dudv_map_->bind();
-        Texture::setTextureSlot(3);
-        normal_map_->bind();
-
-        drawWaterTile(water_tile);
+    switch (render_settings_->wireframe()->getMode()) {
+    case WireframeMode::None:
+        renderNormal(frame_buffer, scene);
+        break;
+    case WireframeMode::Overlay:
+        renderNormal(frame_buffer, scene);
+        renderWireframe(frame_buffer, scene);
+        break;
+    case WireframeMode::Full:
+        renderWireframe(frame_buffer, scene);
+        break;
     }
 }
 
@@ -90,6 +73,14 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     FrameBuffer::setViewportSize(
         reflection_frame_buffer_->getWidth(), reflection_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
+
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(true);
+    FaceCull::instance().enable(true);
+    AlphaBlend::instance().enable(false);
+
+    auto wireframe_mode = render_settings_->wireframe()->getMode();
+    render_settings_->wireframe()->setMode(WireframeMode::None);
 
     GLboolean shadow_map_state = render_settings_->lighting()->isShadowMappingEnabled();
     render_settings_->lighting()->enableShadowMapping(false);
@@ -114,6 +105,8 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     // Restore previous camera position and orientation
     camera_->setPosition(camera_pos);
     camera_->flipPitch();
+
+    render_settings_->wireframe()->setMode(wireframe_mode);
 }
 
 void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene) {
@@ -125,6 +118,14 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
     FrameBuffer::setViewportSize(
         refraction_frame_buffer_->getWidth(), refraction_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
+
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(true);
+    FaceCull::instance().enable(true);
+    AlphaBlend::instance().enable(false);
+
+    auto wireframe_mode = render_settings_->wireframe()->getMode();
+    render_settings_->wireframe()->setMode(WireframeMode::None);
 
     GLboolean shadow_map_state = render_settings_->lighting()->isShadowMappingEnabled();
     render_settings_->lighting()->enableShadowMapping(false);
@@ -139,14 +140,20 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->enableClippingPlane(false);
 
     render_settings_->lighting()->enableShadowMapping(shadow_map_state);
+
+    render_settings_->wireframe()->setMode(wireframe_mode);
 }
 
 void DefaultWaterRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram("water_shader_program"));
     default_shader_program_->loadShaders("Data/Shaders/Water.vert", "Data/Shaders/Water.frag");
+
+    wireframe_shader_program_.reset(new ShaderProgram("wireframe_shader_program"));
+    wireframe_shader_program_->loadShaders(
+        "Data/Shaders/Wireframe.vert", "Data/Shaders/Wireframe.frag");
 }
 
-void DefaultWaterRenderer::setShadersUniforms(WaterTilePtr water_tile) {
+void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile) {
     default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
     default_shader_program_->setUniform(
         "matrices.projection_matrix", camera_->getProjectionMatrix());
@@ -190,6 +197,81 @@ void DefaultWaterRenderer::setShadersUniforms(WaterTilePtr water_tile) {
     default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
     default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
     default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
+}
+
+void DefaultWaterRenderer::setWireframeShaderUniforms(WaterTilePtr water_tile) {
+    wireframe_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+    wireframe_shader_program_->setUniform(
+        "matrices.projection_matrix", camera_->getProjectionMatrix());
+    wireframe_shader_program_->setUniform("matrices.model_matrix", water_tile->getModelMatrix());
+
+    wireframe_shader_program_->setUniform(
+        "wireframe_color", render_settings_->wireframe()->getColor());
+}
+
+void DefaultWaterRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene) {
+    if (!frame_buffer || !scene) {
+        logError("DefaultWaterRenderer::renderNormal()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
+        auto water_tile = scene->getWaterTile(i);
+        water_tile->updateWaveMovementFactor();
+
+        renderToReflectionFrameBuffer(water_tile, scene);
+        renderToRefractionFrameBuffer(water_tile, scene);
+
+        frame_buffer->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(frame_buffer);
+
+        DepthTest::instance().enable(true);
+        DepthTest::instance().enableDepthMask(true);
+        FaceCull::instance().enable(true);
+        AlphaBlend::instance().enable(false);
+
+        default_shader_program_->activate();
+        setDefaultShaderUniforms(water_tile);
+
+        Texture::setTextureSlot(0);
+        reflection_frame_buffer_->getTextureBuffer(0)->bind();
+        Texture::setTextureSlot(1);
+        refraction_frame_buffer_->getTextureBuffer(0)->bind();
+        Texture::setTextureSlot(2);
+        dudv_map_->bind();
+        Texture::setTextureSlot(3);
+        normal_map_->bind();
+
+        drawWaterTile(water_tile);
+    }
+}
+
+void DefaultWaterRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr scene) {
+    if (!frame_buffer || !scene) {
+        logError("DefaultWaterRenderer::renderWireframe()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
+        auto water_tile = scene->getWaterTile(i);
+
+        frame_buffer->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(frame_buffer);
+
+        DepthTest::instance().enable(true);
+        DepthTest::instance().enableDepthMask(true);
+        FaceCull::instance().enable(true);
+        AlphaBlend::instance().enable(false);
+
+        wireframe_shader_program_->activate();
+        setWireframeShaderUniforms(water_tile);
+
+        render_settings_->wireframe()->enable(true);
+
+        drawWaterTile(water_tile);
+
+        render_settings_->wireframe()->enable(false);
+    }
 }
 
 void DefaultWaterRenderer::createFrameBuffers() {

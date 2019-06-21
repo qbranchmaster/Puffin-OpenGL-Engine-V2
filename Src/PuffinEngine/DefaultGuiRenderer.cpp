@@ -47,6 +47,8 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderFogDialog();
 
     renderWaterRendererDialog(scene);
+    renderSkyboxRendererDialog(scene);
+    renderMeshRendererDialog(scene);
 
     // ImGui::ShowDemoWindow();
 
@@ -128,6 +130,8 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
             ImGui::MenuItem("Fog", NULL, &render_fog_dialog_);
             ImGui::Separator();
+            ImGui::MenuItem("Skybox renderer", NULL, &render_skybox_renderer_dialog_);
+            ImGui::MenuItem("Mesh renderer", NULL, &render_mesh_renderer_dialog_);
             ImGui::MenuItem("Water renderer", NULL, &render_water_renderer_dialog_);
 
             ImGui::EndMenu();
@@ -182,8 +186,8 @@ void DefaultGuiRenderer::renderCameraDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Camera", &render_camera_dialog_, window_flags)) {
         ImGui::End();
@@ -223,8 +227,8 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_, window_flags)) {
         ImGui::End();
@@ -301,6 +305,38 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
     }
 
+    ImGui::Text("Wire frame");
+
+    {
+        WireframeMode current = render_settings_->wireframe()->getMode();
+        GLuint selected_index = static_cast<GLuint>(current);
+        const char *modes_str[] = {"None", "Overlay", "Full"};
+        static const char *current_item = modes_str[selected_index];
+
+        if (ImGui::BeginCombo("Mode", current_item)) {
+            for (unsigned int i = 0; i < IM_ARRAYSIZE(modes_str); i++) {
+                bool is_selected = (current_item == modes_str[i]);
+                if (ImGui::Selectable(modes_str[i], is_selected)) {
+                    current_item = modes_str[i];
+                    render_settings_->wireframe()->setMode(static_cast<WireframeMode>(i));
+                }
+            }
+
+            ImGui::EndCombo();
+        }
+
+        if (current != WireframeMode::None) {
+            glm::vec3 wireframe_color = render_settings_->wireframe()->getColor();
+            float color[] = {wireframe_color.r, wireframe_color.g, wireframe_color.b};
+            ImGui::ColorEdit3("Color", color);
+            render_settings_->wireframe()->setColor(glm::vec3(color[0], color[1], color[2]));
+
+            int width = render_settings_->wireframe()->getLineWidth();
+            ImGui::SliderInt("Line width", &width, 1, 15);
+            render_settings_->wireframe()->setLineWidth(width);
+        }
+    }
+
     ImGui::End();
 }
 
@@ -310,8 +346,8 @@ void DefaultGuiRenderer::renderLightingDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(485, 220), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(485, 220), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Lighting", &render_lighting_dialog_, window_flags)) {
         ImGui::End();
@@ -370,8 +406,8 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_, window_flags)) {
         ImGui::End();
@@ -408,9 +444,8 @@ void DefaultGuiRenderer::renderFogDialog() {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    //window_flags |= ImGuiWindowFlags_NoResize;
-
-    ImGui::SetNextWindowSize(ImVec2(296, 200), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(296, 200), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Fog", &render_fog_dialog_, window_flags)) {
         ImGui::End();
@@ -452,8 +487,8 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
     }
 
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_Always);
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Water renderer", &render_water_renderer_dialog_, window_flags)) {
         ImGui::End();
@@ -471,7 +506,7 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
     ImGui::SliderInt("Texture tiling", &texture_tiling, 1, 10);
     water_renderer->setTextureTiling(texture_tiling);
 
-    ImGui::Text("Object render parameters");
+    ImGui::Text("Water render parameters");
 
     std::vector<WaterTilePtr> water_tiles;
     for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
@@ -522,8 +557,67 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
         selected_obj->setSpecularFactor(specular_factor);
     }
     else {
-        ImGui::Text("No object selected");
+        ImGui::Text("No water object selected");
     }
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderSkyboxRendererDialog(ScenePtr scene) {
+    if (!render_skybox_renderer_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(280, 135), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Skybox renderer", &render_skybox_renderer_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    bool skybox_renderer_enabled = master_renderer_->skyboxRenderer()->isEnabled();
+    ImGui::Checkbox("Enabled", &skybox_renderer_enabled);
+    master_renderer_->skyboxRenderer()->enable(skybox_renderer_enabled);
+
+    DefaultSkyboxRendererPtr skybox_renderer =
+        std::static_pointer_cast<DefaultSkyboxRenderer>(master_renderer_->skyboxRenderer());
+
+    ImGui::Text("Skybox render parameters");
+
+    SkyboxPtr skybox = scene->getSkybox();
+    if (!skybox) {
+        ImGui::Text("No skybox in scene");
+    }
+    else {
+        ImGui::Text(std::string("Name: " + skybox->getName()).c_str());
+        ImGui::Text("No configuration is available yet");
+    }
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderMeshRendererDialog(ScenePtr scene) {
+    if (!render_mesh_renderer_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(280, 135), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Mesh renderer", &render_mesh_renderer_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    bool mesh_renderer_enabled = master_renderer_->meshRenderer()->isEnabled();
+    ImGui::Checkbox("Enabled", &mesh_renderer_enabled);
+    master_renderer_->meshRenderer()->enable(mesh_renderer_enabled);
+
+    DefaultMeshRendererPtr mesh_renderer =
+        std::static_pointer_cast<DefaultMeshRenderer>(master_renderer_->meshRenderer());
 
     ImGui::End();
 }

@@ -8,7 +8,7 @@
 
 using namespace puffin;
 
-Skybox::Skybox() {
+Skybox::Skybox(std::string name) : BaseMesh(name) {
     // clang-format off
     std::vector<GLfloat> data = {
         -1.0f,  1.0f, -1.0f,

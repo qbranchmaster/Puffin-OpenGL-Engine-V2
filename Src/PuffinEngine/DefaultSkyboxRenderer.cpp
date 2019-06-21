@@ -1,8 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-* Contact: sebastian.tabaka@outlook.com
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 
@@ -39,6 +39,10 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
         return;
     }
 
+    if (!enabled_) {
+        return;
+    }
+
     // Prepare rendering process
     frame_buffer->bind(FrameBufferBindType::Normal);
     FrameBuffer::setViewportSize(frame_buffer);
@@ -56,7 +60,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     }
 
     default_shader_program_->activate();
-    setShadersUniforms(skybox);
+    setDefaultShaderUniforms(skybox);
 
     Texture::setTextureSlot(0);
     auto texture = skybox->getTexture();
@@ -70,7 +74,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     drawSkybox(skybox);
 }
 
-void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
+void DefaultSkyboxRenderer::setDefaultShaderUniforms(SkyboxPtr skybox) {
     if (!skybox) {
         logError("DefaultSkyboxRenderer::setShadersUniforms()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -82,16 +86,16 @@ void DefaultSkyboxRenderer::setShadersUniforms(SkyboxPtr skybox) {
     camera_->setProjection(camera_->getFov(), camera_->getAspect(), 0.5f, 2.5f);
 
     default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrixStatic());
-    default_shader_program_->setUniform("matrices.projection_matrix",
-        camera_->getProjectionMatrix());
+    default_shader_program_->setUniform(
+        "matrices.projection_matrix", camera_->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix", skybox->getModelMatrix());
 
     // Restore previous near and far plane values
     camera_->setProjection(camera_->getFov(), camera_->getAspect(), near_plane, far_plane);
 
     default_shader_program_->setUniform("color.cube_texture", 0);
-    default_shader_program_->setUniform("color.light_color", render_settings_->lighting()->
-        getSkyboxLightColor());
+    default_shader_program_->setUniform(
+        "color.light_color", render_settings_->lighting()->getSkyboxLightColor());
     default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
     default_shader_program_->setUniform("color.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());

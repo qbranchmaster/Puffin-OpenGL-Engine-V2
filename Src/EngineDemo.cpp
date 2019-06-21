@@ -63,7 +63,7 @@ EngineDemo::EngineDemo() : Core() {
 
 void EngineDemo::createScene() {
     scene_.reset(new Scene());
-    skybox_.reset(new Skybox());
+    skybox_.reset(new Skybox("clear_sky"));
 
     skybox_texture_.reset(new Texture());
     skybox_texture_->loadTextureCube(
@@ -72,7 +72,7 @@ void EngineDemo::createScene() {
 
     skybox_->setTexture(skybox_texture_);
 
-    test_mesh_.reset(new Mesh());
+    test_mesh_.reset(new Mesh("car_scene"));
     test_mesh_->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
     test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 

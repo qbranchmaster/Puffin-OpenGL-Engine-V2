@@ -20,7 +20,9 @@
 #include "examples/imgui_impl_opengl3.h"
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
+#include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/DefaultWaterRenderer.hpp"
 #include "PuffinEngine/GuiRenderer.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
@@ -53,6 +55,8 @@ namespace puffin {
         void renderFogDialog();
 
         void renderWaterRendererDialog(ScenePtr scene);
+        void renderSkyboxRendererDialog(ScenePtr scene);
+        void renderMeshRendererDialog(ScenePtr scene);
 
         bool render_about_dialog_{false};
         bool render_camera_dialog_{false};
@@ -62,6 +66,8 @@ namespace puffin {
         bool render_fog_dialog_{false};
 
         bool render_water_renderer_dialog_{false};
+        bool render_skybox_renderer_dialog_{false};
+        bool render_mesh_renderer_dialog_{false};
 
         GLboolean enabled_{true};
 

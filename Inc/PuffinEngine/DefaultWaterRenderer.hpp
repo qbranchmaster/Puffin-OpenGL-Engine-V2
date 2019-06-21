@@ -32,7 +32,11 @@ namespace puffin {
 
     private:
         void loadShaders();
-        void setShadersUniforms(WaterTilePtr water_tile);
+        void setDefaultShaderUniforms(WaterTilePtr water_tile);
+        void setWireframeShaderUniforms(WaterTilePtr water_tile);
+
+        void renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene);
+        void renderWireframe(FrameBufferPtr frame_buffer, ScenePtr scene);
 
         void createFrameBuffers();
         void renderToReflectionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene);
@@ -44,6 +48,7 @@ namespace puffin {
         DefaultSkyboxRendererPtr skybox_renderer_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
+        ShaderProgramPtr wireframe_shader_program_{nullptr};
 
         FrameBufferPtr reflection_frame_buffer_{nullptr};
         FrameBufferPtr refraction_frame_buffer_{nullptr};

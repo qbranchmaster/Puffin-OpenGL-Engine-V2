@@ -16,6 +16,8 @@
 namespace puffin {
     class Mesh : public BaseMesh {
     public:
+        Mesh(std::string name = "") : BaseMesh(name) {}
+
         void loadFromFile(std::string path);
 
         std::string getPath() const {
