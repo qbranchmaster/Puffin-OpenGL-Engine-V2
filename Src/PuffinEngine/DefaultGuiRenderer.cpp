@@ -45,6 +45,7 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderLightingDialog();
     renderShadowMappingDialog();
     renderFogDialog();
+    renderCaptureDialog();
 
     renderWaterRendererDialog(scene);
     renderSkyboxRendererDialog(scene);
@@ -133,6 +134,8 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::MenuItem("Skybox renderer", NULL, &render_skybox_renderer_dialog_);
             ImGui::MenuItem("Mesh renderer", NULL, &render_mesh_renderer_dialog_);
             ImGui::MenuItem("Water renderer", NULL, &render_water_renderer_dialog_);
+            ImGui::Separator();
+            ImGui::MenuItem("Capture", NULL, &render_capture_dialog_);
 
             ImGui::EndMenu();
         }
@@ -479,6 +482,35 @@ void DefaultGuiRenderer::renderFogDialog() {
     render_settings_->fog()->setSkyboxFog(sb_density, transition, height);
 
     ImGui::End();
+}
+
+void DefaultGuiRenderer::renderCaptureDialog() {
+    if (!render_capture_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(400, 105), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Capture", &render_capture_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+	static std::string file_name = "screen_capture";
+    ImGuiInputTextFlags flags = 0;
+    flags |= ImGuiInputTextFlags_CharsNoBlank;
+    ImGui::InputText("File name (*.png)", &file_name, flags);
+
+	static bool add_timestamp = true;
+    ImGui::Checkbox("Add timestamp", &add_timestamp);
+
+	if (ImGui::Button("Save capture")) {
+        master_renderer_->captureScreen(file_name, add_timestamp);
+	}
+
+	ImGui::End();
 }
 
 void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {

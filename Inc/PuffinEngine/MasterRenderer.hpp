@@ -51,6 +51,7 @@ namespace puffin {
         void assignWaterRenderer(WaterRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
+        void captureScreen(std::string file_name, GLboolean add_timestamp);
 
         void addTimer(TimerPtr timer);
 
@@ -87,6 +88,7 @@ namespace puffin {
         void clearDefaultFrameBuffer();
 
         void checkGlErrors();
+        void saveFrameToFile();
 
         GLboolean rendering_enabled_{false};
         std::function<ScenePtr()> rendering_function_{nullptr};
@@ -98,6 +100,10 @@ namespace puffin {
         WindowPtr target_window_{nullptr};
 
         std::vector<TimerPtr> timers_;
+
+		GLboolean capture_screen_flag_{false};
+        GLboolean capture_add_timestamp_{false};
+        std::string capture_file_name_;
 
         GuiRendererPtr gui_renderer_{nullptr};
         MeshRendererPtr mesh_renderer_{nullptr};

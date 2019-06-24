@@ -13,6 +13,7 @@
 #include <GL/glew.h>
 
 #include <chrono>
+#include <ctime>
 
 namespace puffin {
     class Time {
@@ -32,6 +33,24 @@ namespace puffin {
             return delta_;
         }
 
+        std::string getTimeStampNowStr(char separator = ':') {
+            time_t actual_time = 0;
+            std::time(&actual_time);
+            tm time_info = {};
+#ifdef UNIX
+            localtime_r(&actual_time, &time_info);
+#else
+            localtime_s(&time_info, &actual_time);
+#endif // UNIX
+            constexpr GLshort buffer_size = 32;
+            GLchar time_buffer[buffer_size];
+            std::string time_format =
+                "%H" + std::string(&separator) + "%M" + std::string(&separator) + "%S";
+            std::strftime(time_buffer, buffer_size, time_format.c_str(), &time_info);
+
+            return std::string(time_buffer);
+        }
+
     private:
         Time() {}
         Time(const Time &) = delete;
@@ -44,7 +63,9 @@ namespace puffin {
         void endDeltaMeasure() {
             delta_t1_ = std::chrono::system_clock::now();
             delta_ = static_cast<GLdouble>(std::chrono::duration_cast<std::chrono::microseconds>(
-                         delta_t1_ - delta_t0_).count()) / 1000000.0;
+                         delta_t1_ - delta_t0_)
+                                               .count()) /
+                1000000.0;
         }
 
         void update() {

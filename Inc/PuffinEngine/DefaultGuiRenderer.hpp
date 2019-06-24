@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "imgui.h" // Must be before 'examples'
+#include "misc/cpp/imgui_stdlib.h"
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
@@ -53,6 +54,7 @@ namespace puffin {
         void renderLightingDialog();
         void renderShadowMappingDialog();
         void renderFogDialog();
+        void renderCaptureDialog();
 
         void renderWaterRendererDialog(ScenePtr scene);
         void renderSkyboxRendererDialog(ScenePtr scene);
@@ -64,6 +66,7 @@ namespace puffin {
         bool render_lighting_dialog_{false};
         bool render_shadow_map_dialog_{false};
         bool render_fog_dialog_{false};
+        bool render_capture_dialog_{false};
 
         bool render_water_renderer_dialog_{false};
         bool render_skybox_renderer_dialog_{false};

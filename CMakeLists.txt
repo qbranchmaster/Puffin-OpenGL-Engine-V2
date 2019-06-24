@@ -44,7 +44,8 @@ file(GLOB IMGUI_LIB "External/imgui/*.h"
                     "External/imgui/examples/imgui_impl_glfw.h"
                     "External/imgui/examples/imgui_impl_glfw.cpp"
                     "External/imgui/examples/imgui_impl_opengl3.h"
-                    "External/imgui/examples/imgui_impl_opengl3.cpp")
+                    "External/imgui/examples/imgui_impl_opengl3.cpp"
+					"External/imgui/misc/cpp/imgui_stdlib.cpp")
 
 set(IMGUI_INC_PATH "External/imgui")
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)

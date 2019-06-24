@@ -85,6 +85,10 @@ void MasterRenderer::start() {
             }
         }
 
+        if (capture_screen_flag_) {
+            saveFrameToFile();
+        }
+
         if (gui_renderer_) {
             gui_renderer_->render(rendered_scene);
         }
@@ -203,6 +207,17 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 }
 
+void MasterRenderer::captureScreen(std::string file_name, GLboolean add_timestamp) {
+    if (file_name.empty()) {
+        logError("MasterRenderer::captureScreen()", PUFFIN_MSG_INVALID_VALUE);
+        return;
+    }
+
+    capture_screen_flag_ = true;
+    capture_file_name_ = file_name;
+    capture_add_timestamp_ = add_timestamp;
+}
+
 void MasterRenderer::addTimer(TimerPtr timer) {
     if (!timer) {
         logError("MasterRenderer::addTimer()", PUFFIN_MSG_NULL_OBJECT);
@@ -218,8 +233,7 @@ void MasterRenderer::clearDefaultFrameBuffer() {
 
     default_frame_buffer_->bind(FrameBufferBindType::Normal);
     FrameBuffer::setViewportSize(default_frame_buffer_);
-    FrameBuffer::clear(
-        FrameBufferClearType::DepthAndColor, default_frame_buffer_->getClearColor());
+    FrameBuffer::clear(FrameBufferClearType::DepthAndColor, default_frame_buffer_->getClearColor());
     default_frame_buffer_->unbind();
 
     default_frame_buffer_multisample_->bind(FrameBufferBindType::Normal);
@@ -234,4 +248,27 @@ void MasterRenderer::checkGlErrors() {
         throw Exception("MasterRenderer::checkGlErrors()",
             "OpenGL error occured [Error code = " + std::to_string(error) + "].");
     }
+}
+
+void MasterRenderer::saveFrameToFile() {
+    auto width = InitConfig::instance().getFrameWidth();
+    auto height = InitConfig::instance().getFrameHeight();
+
+    GLubyte *buffer = new GLubyte[width * height * 3];
+    glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, buffer);
+
+    FIBITMAP *bitmap = FreeImage_ConvertFromRawBits(
+        buffer, width, height, 3 * width, 24, 0xFF0000, 0x00FF00, 0x0000FF, false);
+
+    std::string file_name = capture_file_name_ +
+        (capture_add_timestamp_ ? ("_" + Time::instance().getTimeStampNowStr('_')) : "") + ".png";
+    if (!FreeImage_Save(FIF_PNG, bitmap, file_name.c_str())) {
+        logError("MasterRenderer::saveFrameToFile()",
+            "Cannot save screen capture to file: " + file_name);
+    }
+
+    logInfo("MasterRenderer::saveFrameToFile()", "Screen capture saved to file: " + file_name);
+
+    delete[] buffer;
+    capture_screen_flag_ = false;
 }

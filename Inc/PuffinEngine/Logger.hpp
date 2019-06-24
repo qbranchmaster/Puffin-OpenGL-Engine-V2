@@ -12,13 +12,13 @@
 #endif // WIN32
 #include <GL/glew.h>
 
-#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
 
 #include "PuffinEngine/Exception.hpp"
 #include "PuffinEngine/PredefinedMsgs.hpp"
+#include "PuffinEngine/Time.hpp"
 
 namespace puffin {
     enum class MessageType {
@@ -52,7 +52,6 @@ namespace puffin {
         void operator=(const Logger &) = delete;
 
         std::string getHeader();
-        std::string getTimeStampNow();
 
         GLboolean enabled_{false};
         GLboolean console_enabled_{false};

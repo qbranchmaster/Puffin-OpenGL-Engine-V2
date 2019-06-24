@@ -50,22 +50,6 @@ std::string Logger::getHeader() {
     return std::string(separator + "\n" + header + "\n" + separator + "\n");
 }
 
-std::string Logger::getTimeStampNow() {
-    time_t actual_time = 0;
-    std::time(&actual_time);
-    tm time_info = {};
-#ifdef UNIX
-    localtime_r(&actual_time, &time_info);
-#else
-    localtime_s(&time_info, &actual_time);
-#endif // UNIX
-    constexpr GLshort buffer_size = 32;
-    GLchar time_buffer[buffer_size];
-    std::strftime(time_buffer, buffer_size, "%H:%M:%S", &time_info);
-
-    return std::string(time_buffer);
-}
-
 void Logger::log(std::string source, std::string message, MessageType type) {
     if (!enabled_) {
         return;
@@ -82,7 +66,7 @@ void Logger::log(std::string source, std::string message, MessageType type) {
     std::string time;
     if (add_timestamp_) {
         time = std::string(8, ' ');
-        std::string stamp_str = getTimeStampNow();
+        std::string stamp_str = Time::instance().getTimeStampNowStr();
         time.replace(0, stamp_str.size(), stamp_str);
         time += " | ";
     }
