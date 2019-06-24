@@ -94,6 +94,10 @@ void EngineDemo::createScene() {
 }
 
 void EngineDemo::pollKeyboard() {
+    if (gui_renderer_->isCapturingKeyboard()) {
+        return;
+	}
+
     if (input()->keyPressed(Key::Escape, false)) {
         stop();
     }

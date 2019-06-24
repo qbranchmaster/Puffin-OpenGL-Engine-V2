@@ -61,6 +61,10 @@ GLboolean DefaultGuiRenderer::isCapturingMouse() const {
     return static_cast<GLboolean>(ImGui::GetIO().WantCaptureMouse);
 }
 
+GLboolean DefaultGuiRenderer::isCapturingKeyboard() const {
+    return static_cast<GLboolean>(ImGui::GetIO().WantCaptureKeyboard);
+}
+
 void DefaultGuiRenderer::setupImGui() {
     ImGuiIO &io = ImGui::GetIO();
 

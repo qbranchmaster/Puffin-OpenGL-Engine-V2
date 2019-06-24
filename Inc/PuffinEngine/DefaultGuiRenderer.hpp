@@ -43,6 +43,7 @@ namespace puffin {
         }
 
         GLboolean isCapturingMouse() const;
+        GLboolean isCapturingKeyboard() const;
 
     private:
         void setupImGui();
