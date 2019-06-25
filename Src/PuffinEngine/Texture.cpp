@@ -107,7 +107,6 @@ GLboolean Texture::loadImage(std::string path) {
         return false;
     }
 
-    path_ = path;
     width_ = img_handle_.getWidth();
     height_ = img_handle_.getHeight();
     fetchChannelsCount();
@@ -122,6 +121,7 @@ GLboolean Texture::loadImageRaw(std::string path) {
     }
 
     type_ = TextureType::RawImage;
+    path_ = path;
 
     return true;
 }
@@ -132,6 +132,7 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
     }
 
     type_ = TextureType::Texture2D;
+    path_ = path;
 
     bind();
     glTexImage2D(GL_TEXTURE_2D, 0, (channels_ == 4) ? GL_RGBA : GL_RGB, width_, height_, 0,
@@ -149,6 +150,8 @@ GLboolean Texture::loadTexture2D(std::string path, GLboolean auto_free) {
 
 GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
     type_ = TextureType::TextureCube;
+    cubemap_path_ = paths;
+
     bind();
 
     for (GLushort i = 0; i < 6; i++) {

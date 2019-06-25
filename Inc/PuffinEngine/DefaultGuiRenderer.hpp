@@ -61,12 +61,16 @@ namespace puffin {
         void renderFogDialog();
         void renderCaptureDialog();
 
-        void renderWaterRendererDialog(ScenePtr scene);
-        void renderSkyboxRendererDialog(ScenePtr scene);
-        void renderMeshRendererDialog(ScenePtr scene);
+        void renderWaterRendererDialog();
+        void renderSkyboxRendererDialog();
+        void renderMeshRendererDialog();
 
-        void renderSaveSceneDialog(ScenePtr scene);
-        void renderLoadSceneDialog(ScenePtr scene);
+        void renderSaveSceneDialog();
+        void renderLoadSceneDialog();
+
+        void renderAddSkyboxDialog();
+        void renderAddMeshDialog();
+        void renderAddWaterTileDialog();
 
         bool render_about_dialog_{false};
         bool render_camera_dialog_{false};
@@ -82,6 +86,10 @@ namespace puffin {
         bool render_skybox_renderer_dialog_{false};
         bool render_mesh_renderer_dialog_{false};
 
+        bool render_add_skybox_dialog_{false};
+        bool render_add_mesh_dialog_{false};
+        bool render_add_water_tile_dialog_{false};
+
         GLboolean enabled_{true};
 
         CameraPtr camera_{nullptr};
@@ -89,6 +97,7 @@ namespace puffin {
         RenderSettingsPtr render_settings_{nullptr};
         WindowPtr target_window_{nullptr};
 
+        ScenePtr current_scene_{nullptr};
         SceneLoaderPtr scene_loader_{nullptr};
     };
 

@@ -18,6 +18,13 @@
 namespace puffin {
     class Scene {
     public:
+        void reset() {
+            meshes_.clear();
+            textes_.clear();
+            water_tiles_.clear();
+            active_skybox_ = nullptr;
+        }
+
         void addMesh(MeshPtr mesh) {
             if (!mesh) {
                 logError("Scene::addMesh()", PUFFIN_MSG_NULL_OBJECT);

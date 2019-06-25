@@ -96,6 +96,10 @@ namespace puffin {
             return path_;
         }
 
+		std::array<std::string, 6> getCubemapPath() const {
+            return cubemap_path_;
+		}
+
         std::pair<GLuint, GLuint> getSize() const {
             return std::make_pair(width_, height_);
         }
@@ -135,6 +139,8 @@ namespace puffin {
         TextureType type_{TextureType::None};
 
         std::string path_;
+        std::array<std::string, 6> cubemap_path_;
+
         GLuint width_{0};
         GLuint height_{0};
         GLushort channels_{0};

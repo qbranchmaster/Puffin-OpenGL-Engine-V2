@@ -41,6 +41,8 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
         return;
     }
 
+    current_scene_ = scene;
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -54,12 +56,16 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderFogDialog();
     renderCaptureDialog();
 
-    renderWaterRendererDialog(scene);
-    renderSkyboxRendererDialog(scene);
-    renderMeshRendererDialog(scene);
+    renderWaterRendererDialog();
+    renderSkyboxRendererDialog();
+    renderMeshRendererDialog();
 
-    renderSaveSceneDialog(scene);
-    renderLoadSceneDialog(scene);
+    renderSaveSceneDialog();
+    renderLoadSceneDialog();
+
+    renderAddSkyboxDialog();
+    renderAddMeshDialog();
+    renderAddWaterTileDialog();
 
     // ImGui::ShowDemoWindow();
 
@@ -193,6 +199,7 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::MenuItem("Save scene", NULL, &render_save_scene_dialog_);
 
             if (ImGui::MenuItem("Reset scene")) {
+                current_scene_->reset();
             }
 
             ImGui::Separator();
@@ -200,6 +207,14 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             if (ImGui::MenuItem("Quit")) {
                 master_renderer_->stop();
             }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Object")) {
+            ImGui::MenuItem("Add skybox", NULL, &render_add_skybox_dialog_);
+            ImGui::MenuItem("Add mesh", NULL, &render_add_mesh_dialog_);
+            ImGui::MenuItem("Add water tile", NULL, &render_add_water_tile_dialog_);
 
             ImGui::EndMenu();
         }
@@ -593,8 +608,8 @@ void DefaultGuiRenderer::renderCaptureDialog() {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
-    if (!render_water_renderer_dialog_ || !scene) {
+void DefaultGuiRenderer::renderWaterRendererDialog() {
+    if (!render_water_renderer_dialog_) {
         return;
     }
 
@@ -621,8 +636,8 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
     ImGui::Text("Water render parameters");
 
     std::vector<WaterTilePtr> water_tiles;
-    for (GLuint i = 0; i < scene->getWaterTilesCount(); i++) {
-        water_tiles.push_back(scene->getWaterTile(i));
+    for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
+        water_tiles.push_back(current_scene_->getWaterTile(i));
     }
 
     static WaterTilePtr selected_obj = nullptr;
@@ -675,7 +690,7 @@ void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderSkyboxRendererDialog(ScenePtr scene) {
+void DefaultGuiRenderer::renderSkyboxRendererDialog() {
     if (!render_skybox_renderer_dialog_) {
         return;
     }
@@ -698,7 +713,7 @@ void DefaultGuiRenderer::renderSkyboxRendererDialog(ScenePtr scene) {
 
     ImGui::Text("Skybox render parameters");
 
-    SkyboxPtr skybox = scene->getSkybox();
+    SkyboxPtr skybox = current_scene_->getSkybox();
     if (!skybox) {
         ImGui::Text("No skybox in scene");
     }
@@ -710,7 +725,7 @@ void DefaultGuiRenderer::renderSkyboxRendererDialog(ScenePtr scene) {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderMeshRendererDialog(ScenePtr scene) {
+void DefaultGuiRenderer::renderMeshRendererDialog() {
     if (!render_mesh_renderer_dialog_) {
         return;
     }
@@ -734,7 +749,7 @@ void DefaultGuiRenderer::renderMeshRendererDialog(ScenePtr scene) {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderSaveSceneDialog(ScenePtr scene) {
+void DefaultGuiRenderer::renderSaveSceneDialog() {
     if (!render_save_scene_dialog_) {
         return;
     }
@@ -756,13 +771,13 @@ void DefaultGuiRenderer::renderSaveSceneDialog(ScenePtr scene) {
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
     if (ImGui::Button("Save scene")) {
-        scene_loader_->saveScene(file_name, scene, camera_);
+        scene_loader_->saveScene(file_name, current_scene_, camera_, render_settings_);
     }
 
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderLoadSceneDialog(ScenePtr scene) {
+void DefaultGuiRenderer::renderLoadSceneDialog() {
     if (!render_load_scene_dialog_) {
         return;
     }
@@ -784,7 +799,99 @@ void DefaultGuiRenderer::renderLoadSceneDialog(ScenePtr scene) {
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
     if (ImGui::Button("Load scene")) {
-        scene_loader_->loadScene(file_name, scene, camera_);
+        scene_loader_->loadScene(file_name, current_scene_, camera_, render_settings_);
+    }
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderAddSkyboxDialog() {
+    if (!render_add_skybox_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Add skybox", &render_add_skybox_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    ImGuiInputTextFlags flags = 0;
+
+    static std::string name = "new_skybox";
+    ImGui::InputText("Name", &name, flags);
+
+    ImGui::Text("Texture file path");
+    static std::array<std::string, 6> textures;
+    ImGui::InputText("Right", &textures[0], flags);
+    ImGui::InputText("Left", &textures[1], flags);
+    ImGui::InputText("Up", &textures[2], flags);
+    ImGui::InputText("Down", &textures[3], flags);
+    ImGui::InputText("Back", &textures[4], flags);
+    ImGui::InputText("Front", &textures[5], flags);
+
+    if (ImGui::Button("Add")) {
+        SkyboxPtr skybox(new Skybox(name));
+        TexturePtr texture(new Texture());
+
+        texture->loadTextureCube(textures);
+        skybox->setTexture(texture);
+
+        current_scene_->setSkybox(skybox);
+    }
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderAddMeshDialog() {
+    if (!render_add_mesh_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Add mesh", &render_add_mesh_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+	ImGuiInputTextFlags flags = 0;
+
+	static std::string name = "new_mesh";
+    ImGui::InputText("Name", &name, flags);
+
+	static std::string path = "";
+    ImGui::InputText("Path", &path, flags);
+
+	if (ImGui::Button("Add")) {
+        MeshPtr mesh(new Mesh(name));
+        mesh->loadFromFile(path);
+
+		if (mesh) {
+            current_scene_->addMesh(mesh);
+        }
+	}
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderAddWaterTileDialog() {
+    if (!render_add_water_tile_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Add water tile", &render_add_water_tile_dialog_, window_flags)) {
+        ImGui::End();
+        return;
     }
 
     ImGui::End();

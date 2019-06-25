@@ -132,8 +132,13 @@ void EngineDemo::updateWindowCaption() {
 }
 
 void EngineDemo::rotateSkybox() {
+    auto skybox = scene_->getSkybox();
+    if (!skybox) {
+        return;
+	}
+
     static GLfloat rotation_angle = 0.0f;
-    skybox_->setRotationAngle(rotation_angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    skybox->setRotationAngle(rotation_angle, glm::vec3(0.0f, 1.0f, 0.0f));
     rotation_angle += 0.0005f;
 }
 

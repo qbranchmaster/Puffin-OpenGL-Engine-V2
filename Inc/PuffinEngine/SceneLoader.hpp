@@ -19,6 +19,7 @@
 
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
@@ -26,15 +27,32 @@ namespace puffin {
     public:
         SceneLoader();
 
-        void saveScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr);
-        void loadScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr);
+        void saveScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr,
+            RenderSettingsPtr render_settings = nullptr);
+        void loadScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr,
+            RenderSettingsPtr render_settings = nullptr);
 
     private:
         void saveCameraSettings(CameraPtr camera);
         void loadCameraSettings(CameraPtr camera);
 
+        void saveSkybox(ScenePtr scene);
+        void loadSkybox(ScenePtr scene);
+
+        void saveRenderSettings(RenderSettingsPtr render_settings);
+        void loadRenderSettings(RenderSettingsPtr render_settings);
+
         void saveVec3(const glm::vec3 &vec, std::string section, std::string key);
         glm::vec3 loadVec3(std::string section, std::string key);
+
+        void saveFloat(GLfloat value, std::string section, std::string key);
+        GLfloat loadFloat(std::string section, std::string key);
+
+        void saveInt(GLint value, std::string section, std::string key);
+        GLint loadInt(std::string section, std::string key);
+
+        void saveString(std::string value, std::string section, std::string key);
+        std::string loadString(std::string section, std::string key);
 
         CSimpleIniA ini_file_;
     };
