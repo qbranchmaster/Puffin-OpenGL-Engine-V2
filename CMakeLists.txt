@@ -52,6 +52,15 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
 
 source_group("External\\IMGUI" FILES ${IMGUI_LIB})
 
+# SimpleIni
+set(SIMPLEINI_LIB "External/simpleini/SimpleIni.h"
+                  "External/simpleini/ConvertUTF.h"
+			      "External/simpleini/ConvertUTF.c")
+
+set(SIMPLEINI_INC_PATH "External/simpleini")
+
+source_group("External\\SimpleIni" FILES ${SIMPLEINI_LIB})
+
 # Includes and libraries
 set(GLEW_INC_PATH "" CACHE PATH "GLEW include path")
 set(GLFW_INC_PATH "" CACHE PATH "GLFW include path")
@@ -70,6 +79,7 @@ if (MSVC)
     include_directories(include
                         "${CMAKE_SOURCE_DIR}/Inc"
                         ${IMGUI_INC_PATH}
+						${SIMPLEINI_INC_PATH}
                         ${GLEW_INC_PATH}
                         ${GLFW_INC_PATH}
                         ${GLM_INC_PATH}
@@ -84,7 +94,7 @@ endif (MSVC)
 
 # Build configuration
 add_executable(PuffinEngineV2 ${PUFFIN_ENGINE_INC} ${PUFFIN_ENGINE_SRC}
-               ${DEMO_SRC} ${DEMO_H} ${PUFFIN_SHADERS} ${IMGUI_LIB})
+               ${DEMO_SRC} ${DEMO_H} ${PUFFIN_SHADERS} ${IMGUI_LIB} ${SIMPLEINI_LIB})
 
 if (UNIX)
     # TODO

@@ -65,6 +65,16 @@ constexpr auto PUFFIN_MSG_FILE_LOADED(T file_path) {
     return "File [" + file_path + "] loaded.";
 }
 
+template<typename T>
+constexpr auto PUFFIN_MSG_FILE_SAVED(T file_path) {
+    return "File [" + file_path + "] saved.";
+}
+
+template<typename T>
+constexpr auto PUFFIN_MSG_FILE_SAVE_ERROR(T file_path) {
+    return "Error saving file [" + file_path + "].";
+}
+
 constexpr auto PUFFIN_MSG_TEXTURE_INVALID_TYPE = "Invalid texture type.";
 
 constexpr auto PUFFIN_MSG_TEXTURE_INVALID_FILTER = "Invalid texture filter.";

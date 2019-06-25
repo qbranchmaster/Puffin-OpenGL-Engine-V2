@@ -1,7 +1,6 @@
-[submodule "External/inih"]
-	path = External/inih
-	url = https://github.com/jtilly/inih.git
-
 [submodule "External/imgui"]
 	path = External/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "External/simpleini"]
+	path = External/simpleini
+	url = https://github.com/brofield/simpleini.git

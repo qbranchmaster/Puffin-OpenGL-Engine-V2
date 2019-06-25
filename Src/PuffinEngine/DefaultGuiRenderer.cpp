@@ -19,6 +19,8 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, Window
     camera_ = camera;
     master_renderer_ = master_renderer;
 
+    scene_loader_.reset(new SceneLoader());
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -30,6 +32,11 @@ DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, Window
 }
 
 void DefaultGuiRenderer::render(ScenePtr scene) {
+    if (!scene) {
+        logError("DefaultGuiRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
     if (!enabled_) {
         return;
     }
@@ -50,6 +57,9 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderWaterRendererDialog(scene);
     renderSkyboxRendererDialog(scene);
     renderMeshRendererDialog(scene);
+
+    renderSaveSceneDialog(scene);
+    renderLoadSceneDialog(scene);
 
     // ImGui::ShowDemoWindow();
 
@@ -104,17 +114,83 @@ void DefaultGuiRenderer::setupImGui() {
 
     // ImGui::StyleColorsLight();
     // ImGui::StyleColorsClassic();
-    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsDark();
+    setupCustomStyle();
+}
+
+void DefaultGuiRenderer::setupCustomStyle() {
+    auto &style = ImGui::GetStyle();
+
+    style.WindowPadding = ImVec2(15, 15);
+    style.WindowRounding = 10.0f;
+    style.FramePadding = ImVec2(5, 5);
+    style.FrameRounding = 12.0f; // Make all elements (checkboxes, etc) circles
+    style.ItemSpacing = ImVec2(12, 8);
+    style.ItemInnerSpacing = ImVec2(8, 6);
+    style.IndentSpacing = 25.0f;
+    style.ScrollbarSize = 15.0f;
+    style.ScrollbarRounding = 9.0f;
+    style.GrabMinSize = 20.0f; // Make grab a circle
+    style.GrabRounding = 12.0f;
+    style.PopupRounding = 7.f;
+    style.Alpha = 1.0;
+
+    ImVec4 *colors = style.Colors;
+    colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.32f, 0.32f, 0.32f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.98f);
+    colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.95f, 0.95f, 0.95f, 0.30f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.66f, 0.66f, 0.66f, 0.67f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 0.80f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.49f, 0.49f, 0.49f, 0.80f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(1.000f, 0.777f, 0.578f, 0.780f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(1.000f, 0.987f, 0.611f, 0.600f);
+    colors[ImGuiCol_Button] = ImVec4(1.00f, 0.77f, 0.00f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(1.00f, 1.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.84f, 0.97f, 0.01f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(1.00f, 1.00f, 1.00f, 0.31f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.80f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.78f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.80f, 0.80f, 0.80f, 0.56f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.67f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.95f);
+    colors[ImGuiCol_Tab] = ImVec4(1.00f, 0.54f, 0.01f, 0.71f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.96f, 0.73f, 0.09f, 0.90f);
+    colors[ImGuiCol_TabActive] = ImVec4(1.00f, 0.97f, 0.00f, 1.00f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.92f, 0.93f, 0.94f, 0.99f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.45f, 0.00f, 1.00f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.35f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 1.00f, 0.95f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.80f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
 }
 
 void DefaultGuiRenderer::renderMainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Load scene")) {
-            }
-
-            if (ImGui::MenuItem("Save scene")) {
-            }
+            ImGui::MenuItem("Load scene", NULL, &render_load_scene_dialog_);
+            ImGui::MenuItem("Save scene", NULL, &render_save_scene_dialog_);
 
             if (ImGui::MenuItem("Reset scene")) {
             }
@@ -495,26 +571,26 @@ void DefaultGuiRenderer::renderCaptureDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(400, 105), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(390, 105), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Capture", &render_capture_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-	static std::string file_name = "screen_capture";
+    static std::string file_name = "screen_capture";
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.png)", &file_name, flags);
 
-	static bool add_timestamp = true;
+    static bool add_timestamp = true;
     ImGui::Checkbox("Add timestamp", &add_timestamp);
 
-	if (ImGui::Button("Save capture")) {
+    if (ImGui::Button("Save capture")) {
         master_renderer_->captureScreen(file_name, add_timestamp);
-	}
+    }
 
-	ImGui::End();
+    ImGui::End();
 }
 
 void DefaultGuiRenderer::renderWaterRendererDialog(ScenePtr scene) {
@@ -654,6 +730,62 @@ void DefaultGuiRenderer::renderMeshRendererDialog(ScenePtr scene) {
 
     DefaultMeshRendererPtr mesh_renderer =
         std::static_pointer_cast<DefaultMeshRenderer>(master_renderer_->meshRenderer());
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderSaveSceneDialog(ScenePtr scene) {
+    if (!render_save_scene_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Save scene", &render_save_scene_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    // TODO: Add checkboxes to select scene parts to save
+
+    static std::string file_name = "new_scene";
+    ImGuiInputTextFlags flags = 0;
+    flags |= ImGuiInputTextFlags_CharsNoBlank;
+    ImGui::InputText("File name (*.psc)", &file_name, flags);
+
+    if (ImGui::Button("Save scene")) {
+        scene_loader_->saveScene(file_name, scene, camera_);
+    }
+
+    ImGui::End();
+}
+
+void DefaultGuiRenderer::renderLoadSceneDialog(ScenePtr scene) {
+    if (!render_load_scene_dialog_) {
+        return;
+    }
+
+    ImGuiWindowFlags window_flags = 0;
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Load scene", &render_load_scene_dialog_, window_flags)) {
+        ImGui::End();
+        return;
+    }
+
+    // TODO: Add recent files
+
+    static std::string file_name = "new_scene";
+    ImGuiInputTextFlags flags = 0;
+    flags |= ImGuiInputTextFlags_CharsNoBlank;
+    ImGui::InputText("File name (*.psc)", &file_name, flags);
+
+    if (ImGui::Button("Load scene")) {
+        scene_loader_->loadScene(file_name, scene, camera_);
+    }
 
     ImGui::End();
 }

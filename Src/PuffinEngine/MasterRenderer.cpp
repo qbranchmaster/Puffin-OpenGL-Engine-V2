@@ -263,11 +263,10 @@ void MasterRenderer::saveFrameToFile() {
     std::string file_name = capture_file_name_ +
         (capture_add_timestamp_ ? ("_" + Time::instance().getTimeStampNowStr('_')) : "") + ".png";
     if (!FreeImage_Save(FIF_PNG, bitmap, file_name.c_str())) {
-        logError("MasterRenderer::saveFrameToFile()",
-            "Cannot save screen capture to file: " + file_name);
+        logError("MasterRenderer::saveFrameToFile()", PUFFIN_MSG_FILE_SAVE_ERROR(file_name));
     }
 
-    logInfo("MasterRenderer::saveFrameToFile()", "Screen capture saved to file: " + file_name);
+    logInfo("MasterRenderer::saveFrameToFile()", PUFFIN_MSG_FILE_SAVED(file_name));
 
     delete[] buffer;
     capture_screen_flag_ = false;
