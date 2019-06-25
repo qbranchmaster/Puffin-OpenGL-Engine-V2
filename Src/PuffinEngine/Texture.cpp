@@ -155,12 +155,13 @@ GLboolean Texture::loadTextureCube(std::array<std::string, 6> paths) {
     bind();
 
     for (GLushort i = 0; i < 6; i++) {
+        GLboolean loaded = true;
         if (!loadImage(paths[i])) {
-            return false;
+            loaded = false;
         }
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width_, height_, 0, GL_BGR,
-            GL_UNSIGNED_BYTE, img_handle_.accessPixels());
+            GL_UNSIGNED_BYTE, loaded ? img_handle_.accessPixels() : nullptr);
         freeImage();
     }
 

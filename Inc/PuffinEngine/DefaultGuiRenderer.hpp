@@ -60,10 +60,8 @@ namespace puffin {
         void renderShadowMappingDialog();
         void renderFogDialog();
         void renderCaptureDialog();
-
-        void renderWaterRendererDialog();
-        void renderSkyboxRendererDialog();
-        void renderMeshRendererDialog();
+        void renderRenderersDialog();
+        void renderObjectInspectorDialog();
 
         void renderSaveSceneDialog();
         void renderLoadSceneDialog();
@@ -81,10 +79,8 @@ namespace puffin {
         bool render_capture_dialog_{false};
         bool render_save_scene_dialog_{false};
         bool render_load_scene_dialog_{false};
-
-        bool render_water_renderer_dialog_{false};
-        bool render_skybox_renderer_dialog_{false};
-        bool render_mesh_renderer_dialog_{false};
+        bool render_renderers_dialog_{false};
+        bool render_object_inspector_dialog_{false};
 
         bool render_add_skybox_dialog_{false};
         bool render_add_mesh_dialog_{false};

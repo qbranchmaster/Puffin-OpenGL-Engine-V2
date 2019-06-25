@@ -66,8 +66,11 @@ void SceneLoader::loadScene(
 
 void SceneLoader::saveCameraSettings(CameraPtr camera) {
     if (!camera) {
+        saveInt(0, "camera", "state"); // State 0 - camera not saved to file
         return;
     }
+
+    saveInt(1, "camera", "state"); // State 1 - camera saved to file
 
     saveFloat(camera->getAspect(), "camera", "aspect");
     saveFloat(camera->getFov(), "camera", "fov");
@@ -85,6 +88,11 @@ void SceneLoader::saveCameraSettings(CameraPtr camera) {
 
 void SceneLoader::loadCameraSettings(CameraPtr camera) {
     if (!camera) {
+        return;
+    }
+
+    // Check state, 0 means that camera was not saved
+    if (loadInt("camera", "state") == 0) {
         return;
     }
 
@@ -144,12 +152,20 @@ void SceneLoader::loadSkybox(ScenePtr scene) {
 
 void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
     if (!render_settings) {
+        saveInt(0, "render_settings", "state");
         return;
-	}
+    }
+
+    saveInt(1, "render_settings", "state");
 }
 
 void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
     if (!render_settings) {
+        return;
+    }
+
+    // Check state, 0 means that render settings were not saved
+    if (loadInt("render_settings", "state") == 0) {
         return;
     }
 }
@@ -163,7 +179,12 @@ void SceneLoader::saveVec3(const glm::vec3 &vec, std::string section, std::strin
 
 glm::vec3 SceneLoader::loadVec3(std::string section, std::string key) {
     std::stringstream ss;
-    ss << ini_file_.GetValue(section.c_str(), key.c_str());
+    const char *ptr = ini_file_.GetValue(section.c_str(), key.c_str());
+    if (!ptr) {
+        return glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+
+    ss << *ptr;
 
     std::string val;
     GLfloat val_tab[3];

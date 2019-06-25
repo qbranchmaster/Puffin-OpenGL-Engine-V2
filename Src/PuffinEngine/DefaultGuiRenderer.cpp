@@ -55,10 +55,8 @@ void DefaultGuiRenderer::render(ScenePtr scene) {
     renderShadowMappingDialog();
     renderFogDialog();
     renderCaptureDialog();
-
-    renderWaterRendererDialog();
-    renderSkyboxRendererDialog();
-    renderMeshRendererDialog();
+    renderRenderersDialog();
+    renderObjectInspectorDialog();
 
     renderSaveSceneDialog();
     renderLoadSceneDialog();
@@ -118,6 +116,8 @@ void DefaultGuiRenderer::setupImGui() {
     style.AntiAliasedLines = true;
     style.AntiAliasedFill = true;
 
+    ImFont *font = io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16);
+
     // ImGui::StyleColorsLight();
     // ImGui::StyleColorsClassic();
     // ImGui::StyleColorsDark();
@@ -125,71 +125,59 @@ void DefaultGuiRenderer::setupImGui() {
 }
 
 void DefaultGuiRenderer::setupCustomStyle() {
+#define HI(v) ImVec4(0.502f, 0.075f, 0.256f, v)
+#define MED(v) ImVec4(0.455f, 0.198f, 0.301f, v)
+#define LOW(v) ImVec4(0.232f, 0.201f, 0.271f, v)
+#define BG(v) ImVec4(0.200f, 0.220f, 0.270f, v)
+#define TEXT(v) ImVec4(0.860f, 0.930f, 0.890f, v)
+
     auto &style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_Text] = TEXT(0.78f);
+    style.Colors[ImGuiCol_TextDisabled] = TEXT(0.28f);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.17f, 0.85f);
+    style.Colors[ImGuiCol_ChildWindowBg] = BG(0.58f);
+    style.Colors[ImGuiCol_PopupBg] = BG(0.9f);
+    style.Colors[ImGuiCol_Border] = ImVec4(0.31f, 0.31f, 1.00f, 0.00f);
+    style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    style.Colors[ImGuiCol_FrameBg] = BG(1.00f);
+    style.Colors[ImGuiCol_FrameBgHovered] = MED(0.78f);
+    style.Colors[ImGuiCol_FrameBgActive] = MED(1.00f);
+    style.Colors[ImGuiCol_TitleBg] = LOW(1.00f);
+    style.Colors[ImGuiCol_TitleBgActive] = HI(1.00f);
+    style.Colors[ImGuiCol_TitleBgCollapsed] = BG(0.75f);
+    style.Colors[ImGuiCol_MenuBarBg] = BG(0.47f);
+    style.Colors[ImGuiCol_ScrollbarBg] = BG(1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.09f, 0.15f, 0.16f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = MED(0.78f);
+    style.Colors[ImGuiCol_ScrollbarGrabActive] = MED(1.00f);
+    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+    style.Colors[ImGuiCol_ButtonHovered] = MED(0.86f);
+    style.Colors[ImGuiCol_ButtonActive] = MED(1.00f);
+    style.Colors[ImGuiCol_Header] = MED(0.76f);
+    style.Colors[ImGuiCol_HeaderHovered] = MED(0.86f);
+    style.Colors[ImGuiCol_HeaderActive] = HI(1.00f);
+    style.Colors[ImGuiCol_Column] = ImVec4(0.14f, 0.16f, 0.19f, 1.00f);
+    style.Colors[ImGuiCol_ColumnHovered] = MED(0.78f);
+    style.Colors[ImGuiCol_ColumnActive] = MED(1.00f);
+    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.47f, 0.77f, 0.83f, 0.04f);
+    style.Colors[ImGuiCol_ResizeGripHovered] = MED(0.78f);
+    style.Colors[ImGuiCol_ResizeGripActive] = MED(1.00f);
+    style.Colors[ImGuiCol_PlotLines] = TEXT(0.63f);
+    style.Colors[ImGuiCol_PlotLinesHovered] = MED(1.00f);
+    style.Colors[ImGuiCol_PlotHistogram] = TEXT(0.63f);
+    style.Colors[ImGuiCol_PlotHistogramHovered] = MED(1.00f);
+    style.Colors[ImGuiCol_TextSelectedBg] = MED(0.43f);
+    style.Colors[ImGuiCol_ModalWindowDarkening] = BG(0.73f);
+    style.Colors[ImGuiCol_Border] = ImVec4(0.539f, 0.479f, 0.255f, 0.162f);
 
-    style.WindowPadding = ImVec2(15, 15);
-    style.WindowRounding = 10.0f;
-    style.FramePadding = ImVec2(5, 5);
-    style.FrameRounding = 12.0f; // Make all elements (checkboxes, etc) circles
-    style.ItemSpacing = ImVec2(12, 8);
-    style.ItemInnerSpacing = ImVec2(8, 6);
-    style.IndentSpacing = 25.0f;
-    style.ScrollbarSize = 15.0f;
-    style.ScrollbarRounding = 9.0f;
-    style.GrabMinSize = 20.0f; // Make grab a circle
-    style.GrabRounding = 12.0f;
-    style.PopupRounding = 7.f;
-    style.Alpha = 1.0;
-
-    ImVec4 *colors = style.Colors;
-    colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextDisabled] = ImVec4(0.32f, 0.32f, 0.32f, 1.00f);
-    colors[ImGuiCol_WindowBg] = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
-    colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.98f);
-    colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
-    colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.00f);
-    colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.95f, 0.95f, 0.95f, 0.30f);
-    colors[ImGuiCol_FrameBgActive] = ImVec4(0.66f, 0.66f, 0.66f, 0.67f);
-    colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
-    colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 0.80f);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.49f, 0.49f, 0.49f, 0.80f);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-    colors[ImGuiCol_CheckMark] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-    colors[ImGuiCol_SliderGrab] = ImVec4(1.000f, 0.777f, 0.578f, 0.780f);
-    colors[ImGuiCol_SliderGrabActive] = ImVec4(1.000f, 0.987f, 0.611f, 0.600f);
-    colors[ImGuiCol_Button] = ImVec4(1.00f, 0.77f, 0.00f, 1.00f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(1.00f, 1.00f, 0.00f, 1.00f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.84f, 0.97f, 0.01f, 1.00f);
-    colors[ImGuiCol_Header] = ImVec4(1.00f, 1.00f, 1.00f, 0.31f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.80f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_Separator] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-    colors[ImGuiCol_SeparatorHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.78f);
-    colors[ImGuiCol_SeparatorActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_ResizeGrip] = ImVec4(0.80f, 0.80f, 0.80f, 0.56f);
-    colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.67f);
-    colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.95f);
-    colors[ImGuiCol_Tab] = ImVec4(1.00f, 0.54f, 0.01f, 0.71f);
-    colors[ImGuiCol_TabHovered] = ImVec4(0.96f, 0.73f, 0.09f, 0.90f);
-    colors[ImGuiCol_TabActive] = ImVec4(1.00f, 0.97f, 0.00f, 1.00f);
-    colors[ImGuiCol_TabUnfocused] = ImVec4(0.92f, 0.93f, 0.94f, 0.99f);
-    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.45f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextSelectedBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.35f);
-    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 1.00f, 0.95f);
-    colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.80f);
-    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
-    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
-    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+#undef HI
+#undef MID
+#undef LOW
+#undef BG
+#undef TEXT
 }
 
 void DefaultGuiRenderer::renderMainMenuBar() {
@@ -211,26 +199,25 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Object")) {
-            ImGui::MenuItem("Add skybox", NULL, &render_add_skybox_dialog_);
-            ImGui::MenuItem("Add mesh", NULL, &render_add_mesh_dialog_);
-            ImGui::MenuItem("Add water tile", NULL, &render_add_water_tile_dialog_);
+        if (ImGui::BeginMenu("Add")) {
+            ImGui::MenuItem("Skybox", NULL, &render_add_skybox_dialog_);
+            ImGui::MenuItem("Mesh", NULL, &render_add_mesh_dialog_);
+            ImGui::MenuItem("Water tile", NULL, &render_add_water_tile_dialog_);
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Window")) {
+            ImGui::MenuItem("Object inspector", NULL, &render_object_inspector_dialog_);
             ImGui::MenuItem("Camera", NULL, &render_camera_dialog_);
+            ImGui::Separator();
+            ImGui::MenuItem("Renderers", NULL, &render_renderers_dialog_);
             ImGui::MenuItem("Lighting", NULL, &render_lighting_dialog_);
             ImGui::MenuItem("Shadow mapping", NULL, &render_shadow_map_dialog_);
-            ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
             ImGui::MenuItem("Fog", NULL, &render_fog_dialog_);
+            ImGui::MenuItem("Postprocess", NULL, &render_postprocess_dialog_);
             ImGui::Separator();
-            ImGui::MenuItem("Skybox renderer", NULL, &render_skybox_renderer_dialog_);
-            ImGui::MenuItem("Mesh renderer", NULL, &render_mesh_renderer_dialog_);
-            ImGui::MenuItem("Water renderer", NULL, &render_water_renderer_dialog_);
-            ImGui::Separator();
-            ImGui::MenuItem("Capture", NULL, &render_capture_dialog_);
+            ImGui::MenuItem("Screen capture", NULL, &render_capture_dialog_);
 
             ImGui::EndMenu();
         }
@@ -254,14 +241,14 @@ void DefaultGuiRenderer::renderAboutDialog() {
     window_flags |= ImGuiWindowFlags_NoCollapse;
     window_flags |= ImGuiWindowFlags_NoResize;
 
-    ImGui::SetNextWindowSize(ImVec2(496, 110), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(465, 120), ImGuiCond_Always);
 
     if (!ImGui::Begin("About Puffin Engine", &render_about_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-    ImGui::Text("Puffin Engine ver. 2.0");
+    ImGui::Text("Puffin OpenGL Engine ver. 2.0");
     ImGui::Separator();
     ImGui::Text("Coded by: Sebastian 'qbranchmaster' Tabaka");
     ImGui::Text("Contact:  sebastian.tabaka@outlook.com");
@@ -285,7 +272,7 @@ void DefaultGuiRenderer::renderCameraDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(350, 195), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(360, 220), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Camera", &render_camera_dialog_, window_flags)) {
         ImGui::End();
@@ -326,7 +313,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(360, 375), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Postprocess", &render_postprocess_dialog_, window_flags)) {
         ImGui::End();
@@ -445,7 +432,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(485, 220), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(465, 245), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Lighting", &render_lighting_dialog_, window_flags)) {
         ImGui::End();
@@ -505,7 +492,7 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(385, 385), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(360, 400), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Shadow mapping", &render_shadow_map_dialog_, window_flags)) {
         ImGui::End();
@@ -543,7 +530,7 @@ void DefaultGuiRenderer::renderFogDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(296, 200), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(315, 220), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Fog", &render_fog_dialog_, window_flags)) {
         ImGui::End();
@@ -586,9 +573,9 @@ void DefaultGuiRenderer::renderCaptureDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 105), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(370, 120), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Capture", &render_capture_dialog_, window_flags)) {
+    if (!ImGui::Begin("Screen capture", &render_capture_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
@@ -608,22 +595,42 @@ void DefaultGuiRenderer::renderCaptureDialog() {
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderWaterRendererDialog() {
-    if (!render_water_renderer_dialog_) {
+void DefaultGuiRenderer::renderRenderersDialog() {
+    if (!render_renderers_dialog_) {
         return;
     }
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(380, 260), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(355, 205), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Water renderer", &render_water_renderer_dialog_, window_flags)) {
+    if (!ImGui::Begin("Renderers", &render_renderers_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
+    ImGui::Text("Mesh renderer");
+
+    bool mesh_renderer_enabled = master_renderer_->meshRenderer()->isEnabled();
+    ImGui::Checkbox("Enabled##MR_Enabled", &mesh_renderer_enabled);
+    master_renderer_->meshRenderer()->enable(mesh_renderer_enabled);
+
+    DefaultMeshRendererPtr mesh_renderer =
+        std::static_pointer_cast<DefaultMeshRenderer>(master_renderer_->meshRenderer());
+
+    ImGui::Text("Skybox renderer");
+
+    bool skybox_renderer_enabled = master_renderer_->skyboxRenderer()->isEnabled();
+    ImGui::Checkbox("Enabled##SR_Enabled", &skybox_renderer_enabled);
+    master_renderer_->skyboxRenderer()->enable(skybox_renderer_enabled);
+
+    DefaultSkyboxRendererPtr skybox_renderer =
+        std::static_pointer_cast<DefaultSkyboxRenderer>(master_renderer_->skyboxRenderer());
+
+    ImGui::Text("Water renderer");
+
     bool water_renderer_enabled = master_renderer_->waterRenderer()->isEnabled();
-    ImGui::Checkbox("Enabled", &water_renderer_enabled);
+    ImGui::Checkbox("Enabled##WR_Enabled", &water_renderer_enabled);
     master_renderer_->waterRenderer()->enable(water_renderer_enabled);
 
     DefaultWaterRendererPtr water_renderer =
@@ -633,120 +640,82 @@ void DefaultGuiRenderer::renderWaterRendererDialog() {
     ImGui::SliderInt("Texture tiling", &texture_tiling, 1, 10);
     water_renderer->setTextureTiling(texture_tiling);
 
-    ImGui::Text("Water render parameters");
-
-    std::vector<WaterTilePtr> water_tiles;
-    for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
-        water_tiles.push_back(current_scene_->getWaterTile(i));
-    }
-
-    static WaterTilePtr selected_obj = nullptr;
-    static std::string current_item = "";
-
-    if (ImGui::BeginCombo("Water tile", current_item.c_str())) {
-        if (water_tiles.size() != 0) {
-            for (unsigned int i = 0; i < water_tiles.size(); i++) {
-                bool is_selected = current_item == water_tiles[i]->getName();
-                if (ImGui::Selectable(water_tiles[i]->getName().c_str(), is_selected)) {
-                    current_item = water_tiles[i]->getName();
-                    selected_obj = water_tiles[i];
-                }
-            }
-        }
-
-        ImGui::EndCombo();
-    }
-
-    if (selected_obj) {
-        glm::vec3 water_color = selected_obj->getWaterColor();
-        float color[] = {water_color.r, water_color.g, water_color.b};
-        ImGui::ColorEdit3("Color", color);
-        selected_obj->setWaterColor(glm::vec3(color[0], color[1], color[2]));
-
-        float wave_strength = selected_obj->getWaveStrength();
-        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
-        selected_obj->setWaveStrength(wave_strength);
-
-        float wave_speed = selected_obj->getWaveSpeed();
-        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
-        selected_obj->setWaveSpeed(wave_speed);
-
-        int shininess = selected_obj->getShininess();
-        ImGui::SliderInt("Shininess", &shininess, 1, 100);
-        selected_obj->setShininess(shininess);
-
-        float ambient_factor = selected_obj->getAmbientFactor();
-        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
-        selected_obj->setAmbientFactor(ambient_factor);
-
-        float specular_factor = selected_obj->getSpecularFactor();
-        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
-        selected_obj->setSpecularFactor(specular_factor);
-    }
-    else {
-        ImGui::Text("No water object selected");
-    }
-
     ImGui::End();
 }
 
-void DefaultGuiRenderer::renderSkyboxRendererDialog() {
-    if (!render_skybox_renderer_dialog_) {
+void DefaultGuiRenderer::renderObjectInspectorDialog() {
+    if (!render_object_inspector_dialog_) {
         return;
     }
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(280, 135), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Skybox renderer", &render_skybox_renderer_dialog_, window_flags)) {
+    if (!ImGui::Begin("Object inspector", &render_object_inspector_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-    bool skybox_renderer_enabled = master_renderer_->skyboxRenderer()->isEnabled();
-    ImGui::Checkbox("Enabled", &skybox_renderer_enabled);
-    master_renderer_->skyboxRenderer()->enable(skybox_renderer_enabled);
-
-    DefaultSkyboxRendererPtr skybox_renderer =
-        std::static_pointer_cast<DefaultSkyboxRenderer>(master_renderer_->skyboxRenderer());
-
-    ImGui::Text("Skybox render parameters");
-
-    SkyboxPtr skybox = current_scene_->getSkybox();
-    if (!skybox) {
-        ImGui::Text("No skybox in scene");
-    }
-    else {
-        ImGui::Text(std::string("Name: " + skybox->getName()).c_str());
-        ImGui::Text("No configuration is available yet");
-    }
-
     ImGui::End();
-}
 
-void DefaultGuiRenderer::renderMeshRendererDialog() {
-    if (!render_mesh_renderer_dialog_) {
-        return;
-    }
-
-    ImGuiWindowFlags window_flags = 0;
-    // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(280, 135), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Mesh renderer", &render_mesh_renderer_dialog_, window_flags)) {
-        ImGui::End();
-        return;
-    }
-
-    bool mesh_renderer_enabled = master_renderer_->meshRenderer()->isEnabled();
-    ImGui::Checkbox("Enabled", &mesh_renderer_enabled);
-    master_renderer_->meshRenderer()->enable(mesh_renderer_enabled);
-
-    DefaultMeshRendererPtr mesh_renderer =
-        std::static_pointer_cast<DefaultMeshRenderer>(master_renderer_->meshRenderer());
-
-    ImGui::End();
+    // void DefaultGuiRenderer::renderWaterRendererDialog() {
+    //    ImGui::Text("Water render parameters");
+    //
+    //    std::vector<WaterTilePtr> water_tiles;
+    //    for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
+    //        water_tiles.push_back(current_scene_->getWaterTile(i));
+    //    }
+    //
+    //    static WaterTilePtr selected_obj = nullptr;
+    //    static std::string current_item = "";
+    //
+    //    if (ImGui::BeginCombo("Water tile", current_item.c_str())) {
+    //        if (water_tiles.size() != 0) {
+    //            for (unsigned int i = 0; i < water_tiles.size(); i++) {
+    //                bool is_selected = current_item == water_tiles[i]->getName();
+    //                if (ImGui::Selectable(water_tiles[i]->getName().c_str(), is_selected)) {
+    //                    current_item = water_tiles[i]->getName();
+    //                    selected_obj = water_tiles[i];
+    //                }
+    //            }
+    //        }
+    //
+    //        ImGui::EndCombo();
+    //    }
+    //
+    //    if (selected_obj) {
+    //        glm::vec3 water_color = selected_obj->getWaterColor();
+    //        float color[] = {water_color.r, water_color.g, water_color.b};
+    //        ImGui::ColorEdit3("Color", color);
+    //        selected_obj->setWaterColor(glm::vec3(color[0], color[1], color[2]));
+    //
+    //        float wave_strength = selected_obj->getWaveStrength();
+    //        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
+    //        selected_obj->setWaveStrength(wave_strength);
+    //
+    //        float wave_speed = selected_obj->getWaveSpeed();
+    //        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
+    //        selected_obj->setWaveSpeed(wave_speed);
+    //
+    //        int shininess = selected_obj->getShininess();
+    //        ImGui::SliderInt("Shininess", &shininess, 1, 100);
+    //        selected_obj->setShininess(shininess);
+    //
+    //        float ambient_factor = selected_obj->getAmbientFactor();
+    //        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
+    //        selected_obj->setAmbientFactor(ambient_factor);
+    //
+    //        float specular_factor = selected_obj->getSpecularFactor();
+    //        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
+    //        selected_obj->setSpecularFactor(specular_factor);
+    //    }
+    //    else {
+    //        ImGui::Text("No water object selected");
+    //    }
+    //
+    //    ImGui::End();
+    //}
 }
 
 void DefaultGuiRenderer::renderSaveSceneDialog() {
@@ -756,22 +725,27 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(390, 145), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Save scene", &render_save_scene_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-    // TODO: Add checkboxes to select scene parts to save
-
     static std::string file_name = "new_scene";
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
+    static bool save_camera = true;
+    ImGui::Checkbox("Save camera", &save_camera);
+
+    static bool save_render_settings = true;
+    ImGui::Checkbox("Save render settings", &save_render_settings);
+
     if (ImGui::Button("Save scene")) {
-        scene_loader_->saveScene(file_name, current_scene_, camera_, render_settings_);
+        scene_loader_->saveScene(file_name, current_scene_, save_camera ? camera_ : nullptr,
+            save_render_settings ? render_settings_ : nullptr);
     }
 
     ImGui::End();
@@ -784,14 +758,12 @@ void DefaultGuiRenderer::renderLoadSceneDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(390, 90), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Load scene", &render_load_scene_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
-
-    // TODO: Add recent files
 
     static std::string file_name = "new_scene";
     ImGuiInputTextFlags flags = 0;
@@ -812,7 +784,7 @@ void DefaultGuiRenderer::renderAddSkyboxDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(410, 265), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Add skybox", &render_add_skybox_dialog_, window_flags)) {
         ImGui::End();
@@ -824,7 +796,7 @@ void DefaultGuiRenderer::renderAddSkyboxDialog() {
     static std::string name = "new_skybox";
     ImGui::InputText("Name", &name, flags);
 
-    ImGui::Text("Texture file path");
+    ImGui::Text("Skybox textures");
     static std::array<std::string, 6> textures;
     ImGui::InputText("Right", &textures[0], flags);
     ImGui::InputText("Left", &textures[1], flags);
@@ -833,7 +805,7 @@ void DefaultGuiRenderer::renderAddSkyboxDialog() {
     ImGui::InputText("Back", &textures[4], flags);
     ImGui::InputText("Front", &textures[5], flags);
 
-    if (ImGui::Button("Add")) {
+    if (ImGui::Button("Add skybox")) {
         SkyboxPtr skybox(new Skybox(name));
         TexturePtr texture(new Texture());
 
@@ -853,29 +825,29 @@ void DefaultGuiRenderer::renderAddMeshDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(405, 115), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Add mesh", &render_add_mesh_dialog_, window_flags)) {
         ImGui::End();
         return;
     }
 
-	ImGuiInputTextFlags flags = 0;
+    ImGuiInputTextFlags flags = 0;
 
-	static std::string name = "new_mesh";
+    static std::string name = "new_mesh";
     ImGui::InputText("Name", &name, flags);
 
-	static std::string path = "";
+    static std::string path = "";
     ImGui::InputText("Path", &path, flags);
 
-	if (ImGui::Button("Add")) {
+    if (ImGui::Button("Add mesh")) {
         MeshPtr mesh(new Mesh(name));
         mesh->loadFromFile(path);
 
-		if (mesh) {
+        if (mesh) {
             current_scene_->addMesh(mesh);
         }
-	}
+    }
 
     ImGui::End();
 }
