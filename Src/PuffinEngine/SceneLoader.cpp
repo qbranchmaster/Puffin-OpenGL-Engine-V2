@@ -27,8 +27,9 @@ void SceneLoader::saveScene(
     file_name += ".psc";
 
     saveCameraSettings(camera);
-    saveSkybox(scene);
     saveRenderSettings(render_settings);
+    saveSkybox(scene);
+    saveMeshes(scene);
 
     if (ini_file_.SaveFile(file_name.c_str()) < 0) {
         logError("SceneLoader::saveScene()", PUFFIN_MSG_FILE_SAVE_ERROR(file_name));
@@ -57,20 +58,23 @@ void SceneLoader::loadScene(
         return;
     }
 
+    scene->reset();
+
     loadCameraSettings(camera);
-    loadSkybox(scene);
     loadRenderSettings(render_settings);
+    loadSkybox(scene);
+    loadMeshes(scene);
 
     logInfo("SceneLoader::loadScene()", PUFFIN_MSG_FILE_LOADED(file_name));
 }
 
 void SceneLoader::saveCameraSettings(CameraPtr camera) {
     if (!camera) {
-        saveInt(0, "camera", "state"); // State 0 - camera not saved to file
+        saveInt(0, "camera", "state"); // State 0 - values not saved to file
         return;
     }
 
-    saveInt(1, "camera", "state"); // State 1 - camera saved to file
+    saveInt(1, "camera", "state"); // State 1 - values saved to file
 
     saveFloat(camera->getAspect(), "camera", "aspect");
     saveFloat(camera->getFov(), "camera", "fov");
@@ -91,7 +95,7 @@ void SceneLoader::loadCameraSettings(CameraPtr camera) {
         return;
     }
 
-    // Check state, 0 means that camera was not saved
+    // Check state, 0 means that values were not saved to file
     if (loadInt("camera", "state") == 0) {
         return;
     }
@@ -150,6 +154,51 @@ void SceneLoader::loadSkybox(ScenePtr scene) {
     scene->setSkybox(skybox);
 }
 
+void SceneLoader::saveMeshes(ScenePtr scene) {
+    auto meshes_count = scene->getMeshesCount();
+    saveInt(meshes_count, "meshes", "count");
+    if (meshes_count < 1) {
+        return;
+    }
+
+    for (GLuint i = 0; i < meshes_count; i++) {
+        auto mesh = scene->getMesh(i);
+        if (!mesh) {
+            continue;
+        }
+
+        std::string section = "mesh_" + std::to_string(i);
+
+        saveString(mesh->getName(), section, "name");
+        saveString(mesh->getPath(), section, "path");
+
+        saveVec3(mesh->getPosition(), section, "position");
+        saveVec3(mesh->getScale(), section, "scale");
+        saveMat4(mesh->getRotationMatrix(), section, "rotation_matrix");
+    }
+}
+
+void SceneLoader::loadMeshes(ScenePtr scene) {
+    auto meshes_count = loadInt("meshes", "count");
+    if (meshes_count < 1) {
+        return;
+    }
+
+    for (GLint i = 0; i < meshes_count; i++) {
+        std::string section = "mesh_" + std::to_string(i);
+
+        MeshPtr mesh(new Mesh(loadString(section, "name")));
+        auto path = loadString(section, "path");
+        mesh->loadFromFile(path);
+
+        mesh->setPosition(loadVec3(section, "position"));
+        mesh->setScale(loadVec3(section, "scale"));
+        mesh->setRotationMatrix(loadMat4(section, "rotation_matrix"));
+
+        scene->addMesh(mesh);
+    }
+}
+
 void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
     if (!render_settings) {
         saveInt(0, "render_settings", "state");
@@ -164,7 +213,6 @@ void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
         return;
     }
 
-    // Check state, 0 means that render settings were not saved
     if (loadInt("render_settings", "state") == 0) {
         return;
     }
@@ -184,10 +232,10 @@ glm::vec3 SceneLoader::loadVec3(std::string section, std::string key) {
         return glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
-    ss << *ptr;
+    ss << ptr;
 
     std::string val;
-    GLfloat val_tab[3];
+    GLfloat val_tab[3] = {0.0f};
 
     for (GLushort i = 0; i < 3; i++) {
         std::getline(ss, val, ',');
@@ -221,4 +269,36 @@ void SceneLoader::saveString(std::string value, std::string section, std::string
 
 std::string SceneLoader::loadString(std::string section, std::string key) {
     return std::string(ini_file_.GetValue(section.c_str(), key.c_str()));
+}
+
+void SceneLoader::saveMat4(const glm::mat4 &matrix, std::string section, std::string key) {
+    std::stringstream ss;
+    const GLfloat *mat = (const GLfloat *)glm::value_ptr(matrix);
+
+    for (GLushort i = 0; i < 16; i++) {
+        ss << mat[i] << ", ";
+    }
+
+    ini_file_.SetValue(section.c_str(), key.c_str(), ss.str().c_str());
+}
+
+glm::mat4 SceneLoader::loadMat4(std::string section, std::string key) {
+    std::stringstream ss;
+    const char *ptr = ini_file_.GetValue(section.c_str(), key.c_str());
+    if (!ptr) {
+        return glm::mat4(1.0f);
+    }
+
+    ss << ptr;
+
+    std::string val;
+    GLfloat val_tab[16] = {0.0f};
+
+    for (GLushort i = 0; i < 16; i++) {
+        std::getline(ss, val, ',');
+        val_tab[i] = static_cast<GLfloat>(std::atof(val.c_str()));
+    }
+
+    glm::mat4 mat = glm::make_mat4(val_tab);
+    return mat;
 }

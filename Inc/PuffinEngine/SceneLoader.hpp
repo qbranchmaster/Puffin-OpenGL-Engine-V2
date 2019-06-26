@@ -12,6 +12,7 @@
 #include <SimpleIni.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <memory>
 #include <sstream>
@@ -39,11 +40,17 @@ namespace puffin {
         void saveSkybox(ScenePtr scene);
         void loadSkybox(ScenePtr scene);
 
+        void saveMeshes(ScenePtr scene);
+        void loadMeshes(ScenePtr scene);
+
         void saveRenderSettings(RenderSettingsPtr render_settings);
         void loadRenderSettings(RenderSettingsPtr render_settings);
 
         void saveVec3(const glm::vec3 &vec, std::string section, std::string key);
         glm::vec3 loadVec3(std::string section, std::string key);
+
+        void saveMat4(const glm::mat4 &matrix, std::string section, std::string key);
+        glm::mat4 loadMat4(std::string section, std::string key);
 
         void saveFloat(GLfloat value, std::string section, std::string key);
         GLfloat loadFloat(std::string section, std::string key);

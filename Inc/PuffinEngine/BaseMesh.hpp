@@ -79,6 +79,11 @@ namespace puffin {
         void setRotationAngle(GLfloat angle, const glm::vec3 &axis);
         void zeroRotation();
 
+		void setRotationMatrix(const glm::mat4& matrix) {
+            rotation_matrix_ = matrix;
+            model_matrix_changed_ = true;
+		}
+
         glm::mat4 getRotationMatrix() const {
             return rotation_matrix_;
         }
