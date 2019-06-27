@@ -29,7 +29,13 @@ namespace puffin {
         Right,
     };
 
+	class Camera;
+	using CameraPtr = std::shared_ptr<Camera>;
+
     class Camera {
+        friend std::ostream &operator<<(std::ostream &os, CameraPtr camera);
+        friend std::istream &operator>>(std::istream &is, CameraPtr camera);
+
     public:
         Camera();
 
@@ -156,8 +162,6 @@ namespace puffin {
         GLfloat ahead_speed_{0.0f};
         GLfloat side_speed_{0.0f};
     };
-
-    using CameraPtr = std::shared_ptr<Camera>;
 } // namespace puffin
 
 #endif // PUFFIN_CAMERA_HPP

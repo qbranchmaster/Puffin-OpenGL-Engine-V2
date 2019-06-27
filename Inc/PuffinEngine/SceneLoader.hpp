@@ -19,6 +19,7 @@
 #include <string>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/CommonUtils.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
@@ -34,6 +35,20 @@ namespace puffin {
             RenderSettingsPtr render_settings = nullptr);
 
     private:
+        template<typename T>
+        void saveObjectData(std::string section, std::string key, const T &obj);
+        template<typename T>
+        void loadObjectData(std::string section, std::string key, T &obj);
+
+        void saveFloat(std::string section, std::string key, GLfloat value);
+        GLfloat loadFloat(std::string section, std::string key);
+
+        void saveInt(std::string section, std::string key, GLint value);
+        GLint loadInt(std::string section, std::string key);
+
+        void saveString(std::string section, std::string key, std::string value);
+        std::string loadString(std::string section, std::string key);
+
         void saveCameraSettings(CameraPtr camera);
         void loadCameraSettings(CameraPtr camera);
 
@@ -46,25 +61,24 @@ namespace puffin {
         void saveRenderSettings(RenderSettingsPtr render_settings);
         void loadRenderSettings(RenderSettingsPtr render_settings);
 
-        void saveVec3(const glm::vec3 &vec, std::string section, std::string key);
-        glm::vec3 loadVec3(std::string section, std::string key);
-
-        void saveMat4(const glm::mat4 &matrix, std::string section, std::string key);
-        glm::mat4 loadMat4(std::string section, std::string key);
-
-        void saveFloat(GLfloat value, std::string section, std::string key);
-        GLfloat loadFloat(std::string section, std::string key);
-
-        void saveInt(GLint value, std::string section, std::string key);
-        GLint loadInt(std::string section, std::string key);
-
-        void saveString(std::string value, std::string section, std::string key);
-        std::string loadString(std::string section, std::string key);
-
         CSimpleIniA ini_file_;
     };
 
     using SceneLoaderPtr = std::shared_ptr<SceneLoader>;
+
+    template<typename T>
+    inline void SceneLoader::saveObjectData(std::string section, std::string key, const T &obj) {
+        std::stringstream ss;
+        ss << obj;
+        saveString(section, key, ss.str());
+    }
+
+    template<typename T>
+    inline void SceneLoader::loadObjectData(std::string section, std::string key, T &obj) {
+        std::stringstream ss;
+        ss << loadString(section, key);
+        ss >> obj;
+    }
 } // namespace puffin
 
 #endif // PUFFIN_SCENE_LOADER_HPP
