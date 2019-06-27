@@ -12,6 +12,8 @@
 
 namespace puffin {
     class Skybox : public BaseMesh {
+        friend class SceneLoader;
+
     public:
         Skybox(std::string name = "");
 

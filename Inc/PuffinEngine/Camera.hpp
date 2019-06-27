@@ -30,6 +30,8 @@ namespace puffin {
     };
 
     class Camera {
+        friend class SceneLoader;
+
     public:
         Camera();
 

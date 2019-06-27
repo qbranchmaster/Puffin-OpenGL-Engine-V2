@@ -19,6 +19,7 @@
 #include <string>
 
 #include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/CommonUtils.hpp"
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/Scene.hpp"
@@ -34,6 +35,11 @@ namespace puffin {
             RenderSettingsPtr render_settings = nullptr);
 
     private:
+        template<typename T>
+        void saveValue(std::string section, std::string key, const T &obj);
+        template<typename T>
+        void loadValue(std::string section, std::string key, T &obj);
+
         void saveCameraSettings(CameraPtr camera);
         void loadCameraSettings(CameraPtr camera);
 
@@ -46,25 +52,24 @@ namespace puffin {
         void saveRenderSettings(RenderSettingsPtr render_settings);
         void loadRenderSettings(RenderSettingsPtr render_settings);
 
-        void saveVec3(const glm::vec3 &vec, std::string section, std::string key);
-        glm::vec3 loadVec3(std::string section, std::string key);
-
-        void saveMat4(const glm::mat4 &matrix, std::string section, std::string key);
-        glm::mat4 loadMat4(std::string section, std::string key);
-
-        void saveFloat(GLfloat value, std::string section, std::string key);
-        GLfloat loadFloat(std::string section, std::string key);
-
-        void saveInt(GLint value, std::string section, std::string key);
-        GLint loadInt(std::string section, std::string key);
-
-        void saveString(std::string value, std::string section, std::string key);
-        std::string loadString(std::string section, std::string key);
-
         CSimpleIniA ini_file_;
     };
 
     using SceneLoaderPtr = std::shared_ptr<SceneLoader>;
+
+    template<typename T>
+    inline void SceneLoader::saveValue(std::string section, std::string key, const T &obj) {
+        std::stringstream ss;
+        ss << obj;
+        ini_file_.SetValue(section.c_str(), key.c_str(), ss.str().c_str());
+    }
+
+    template<typename T>
+    inline void SceneLoader::loadValue(std::string section, std::string key, T &obj) {
+        std::stringstream ss;
+        ss << ini_file_.GetValue(section.c_str(), key.c_str(), "0");
+        ss >> obj;
+    }
 } // namespace puffin
 
 #endif // PUFFIN_SCENE_LOADER_HPP
