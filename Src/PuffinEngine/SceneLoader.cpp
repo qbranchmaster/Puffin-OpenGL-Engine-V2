@@ -72,12 +72,36 @@ void SceneLoader::loadScene(
 
 void SceneLoader::saveCameraSettings(CameraPtr camera) {
     if (!camera) {
-        saveInt("camera", "state", 0); // State 0 - values not saved to file
+        saveValue("camera", "valid", 0);
         return;
     }
 
-    saveInt("camera", "state", 1); // State 1 - values saved to file
-	saveObjectData("camera", "data", camera);
+    saveValue("camera", "valid", 1);
+
+    saveValue("camera", "horizontal_angle", camera->horizontal_angle_);
+    saveValue("camera", "vertical_angle", camera->vertical_angle_);
+
+    saveValue("camera", "projection_matrix", camera->projection_matrix_);
+    saveValue("camera", "projection_matrix_inverted", camera->projection_matrix_inverted_);
+    saveValue("camera", "view_matrix", camera->view_matrix_);
+    saveValue("camera", "view_matrix_static", camera->view_matrix_static_);
+    saveValue("camera", "view_matrix_inverted", camera->view_matrix_inverted_);
+
+    saveValue("camera", "rotation_matrix", camera->rotation_matrix_);
+    saveValue("camera", "rotation_matrix_inverted", camera->rotation_matrix_inverted_);
+
+    saveValue("camera", "position", camera->position_);
+    saveValue("camera", "direction", camera->direction_);
+    saveValue("camera", "right", camera->right_);
+    saveValue("camera", "up", camera->up_);
+
+    saveValue("camera", "aspect", camera->aspect_);
+    saveValue("camera", "near_plane", camera->near_plane_);
+    saveValue("camera", "far_plane", camera->far_plane_);
+    saveValue("camera", "fov", camera->fov_);
+
+    saveValue("camera", "camera_move_speed", camera->camera_move_speed_);
+    saveValue("camera", "move_resistance_factor", camera->move_resistance_factor_);
 }
 
 void SceneLoader::loadCameraSettings(CameraPtr camera) {
@@ -85,88 +109,80 @@ void SceneLoader::loadCameraSettings(CameraPtr camera) {
         return;
     }
 
-    // Check state, 0 means that values were not saved to file
-    if (loadInt("camera", "state") == 0) {
+    GLushort valid = 0;
+    loadValue("camera", "valid", valid);
+    if (!valid) {
         return;
     }
 
-    loadObjectData("camera", "data", camera);
+    loadValue("camera", "horizontal_angle", camera->horizontal_angle_);
+    loadValue("camera", "vertical_angle", camera->vertical_angle_);
+
+    loadValue("camera", "projection_matrix", camera->projection_matrix_);
+    loadValue("camera", "projection_matrix_inverted", camera->projection_matrix_inverted_);
+    loadValue("camera", "view_matrix", camera->view_matrix_);
+    loadValue("camera", "view_matrix_static", camera->view_matrix_static_);
+    loadValue("camera", "view_matrix_inverted", camera->view_matrix_inverted_);
+
+    loadValue("camera", "rotation_matrix", camera->rotation_matrix_);
+    loadValue("camera", "rotation_matrix_inverted", camera->rotation_matrix_inverted_);
+
+    loadValue("camera", "position", camera->position_);
+    loadValue("camera", "direction", camera->direction_);
+    loadValue("camera", "right", camera->right_);
+    loadValue("camera", "up", camera->up_);
+
+    loadValue("camera", "aspect", camera->aspect_);
+    loadValue("camera", "near_plane", camera->near_plane_);
+    loadValue("camera", "far_plane", camera->far_plane_);
+    loadValue("camera", "fov", camera->fov_);
+
+    loadValue("camera", "camera_move_speed", camera->camera_move_speed_);
+    loadValue("camera", "move_resistance_factor", camera->move_resistance_factor_);
 }
 
 void SceneLoader::saveSkybox(ScenePtr scene) {
     auto skybox = scene->getSkybox();
     if (!skybox) {
-        saveInt("skybox", "count", 0);
+        saveValue("skybox", "count", 0);
         return;
     }
 
-    saveInt("skybox", "count", 1);
-    saveObjectData("skybox", "data", skybox);
+    saveValue("skybox", "count", 1);
+
+    saveValue("skybox", "name", skybox->getName());
+    auto textures = skybox->getTexture()->getCubemapPath();
+    for (GLushort i = 0; i < textures.size(); i++) {
+        saveValue("skybox", "texture_" + std::to_string(i), textures[i]);
+    }
 }
 
 void SceneLoader::loadSkybox(ScenePtr scene) {
-    auto count = loadInt("skybox", "count");
+    GLushort count = 0;
+    loadValue("skybox", "count", count);
     if (count < 1) {
         return;
     }
-}
 
-void SceneLoader::saveMeshes(ScenePtr scene) {
-    auto meshes_count = scene->getMeshesCount();
-    saveInt("meshes", "count", meshes_count);
-    if (meshes_count < 1) {
-        return;
-    }
-}
+    std::string name;
+    loadValue("skybox", "name", name);
 
-void SceneLoader::loadMeshes(ScenePtr scene) {
-    auto meshes_count = loadInt("meshes", "count");
-    if (meshes_count < 1) {
-        return;
-    }
-}
-
-void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
-    if (!render_settings) {
-        saveInt("render_settings", "state", 0);
-        return;
+    SkyboxPtr skybox(new Skybox(name));
+    TexturePtr texture(new Texture());
+    std::array<std::string, 6> paths;
+    for (GLushort i = 0; i < 6; i++) {
+        loadValue("skybox", "texture_" + std::to_string(i), paths[i]);
     }
 
-    saveInt("render_settings", "state", 1);
+    texture->loadTextureCube(paths);
+    skybox->setTexture(texture);
+    scene->setSkybox(skybox);
 }
 
-void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
-    if (!render_settings) {
-        return;
-    }
+void SceneLoader::saveMeshes(ScenePtr scene) {}
 
-    if (loadInt("render_settings", "state") == 0) {
-        return;
-    }
-}
+void SceneLoader::loadMeshes(ScenePtr scene) {}
 
-void SceneLoader::saveFloat(std::string section, std::string key, GLfloat value) {
-    ini_file_.SetDoubleValue(section.c_str(), key.c_str(), value);
-}
+void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {}
 
-GLfloat SceneLoader::loadFloat(std::string section, std::string key) {
-    GLdouble value = ini_file_.GetDoubleValue(section.c_str(), key.c_str());
-    return static_cast<GLfloat>(value);
-}
-
-void SceneLoader::saveInt(std::string section, std::string key, GLint value) {
-    ini_file_.SetLongValue(section.c_str(), key.c_str(), value);
-}
-
-GLint SceneLoader::loadInt(std::string section, std::string key) {
-    GLint value = ini_file_.GetLongValue(section.c_str(), key.c_str());
-    return value;
-}
-
-void SceneLoader::saveString(std::string section, std::string key, std::string value) {
-    ini_file_.SetValue(section.c_str(), key.c_str(), value.c_str());
-}
-
-std::string SceneLoader::loadString(std::string section, std::string key) {
-    return std::string(ini_file_.GetValue(section.c_str(), key.c_str()));
-}
+void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {}

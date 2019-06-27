@@ -12,22 +12,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <ios>
-
-#include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/Skybox.hpp"
+#include <iostream>
 
 namespace puffin {
-    std::ostream &operator<<(std::ostream &os, CameraPtr camera);
-    std::istream &operator>>(std::istream &is, CameraPtr camera);
-
-	std::ostream &operator<<(std::ostream &os, SkyboxPtr skybox);
-    std::istream &operator>>(std::istream &is, SkyboxPtr skybox);
-
-    std::ostream &operator<<(std::ostream &os, glm::vec3 &vec);
+    std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec);
     std::istream &operator>>(std::istream &is, glm::vec3 &vec);
 
-    std::ostream &operator<<(std::ostream &os, glm::mat4 &mat);
+    std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
     std::istream &operator>>(std::istream &is, glm::mat4 &mat);
 } // namespace puffin
 

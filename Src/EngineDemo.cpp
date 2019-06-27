@@ -12,7 +12,7 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    InitConfig::instance().setFrameResolution(240, 120);
+    InitConfig::instance().setFrameResolution(1280, 720);
     InitConfig::instance().setMsaaSamples(2);
     InitConfig::instance().setOpenGLVersion(4, 0);
     InitConfig::instance().enableFullscreen(false);
@@ -25,7 +25,6 @@ EngineDemo::EngineDemo() : Core() {
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
-    window()->setPosition(2200, 150);
 
     camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
     camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);

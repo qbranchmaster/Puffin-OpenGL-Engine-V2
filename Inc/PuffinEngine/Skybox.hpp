@@ -11,12 +11,8 @@
 #include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
-    class Skybox;
-    using SkyboxPtr = std::shared_ptr<Skybox>;
-
     class Skybox : public BaseMesh {
-        friend std::ostream &operator<<(std::ostream &os, SkyboxPtr skybox);
-        friend std::istream &operator>>(std::istream &is, SkyboxPtr skybox);
+        friend class SceneLoader;
 
     public:
         Skybox(std::string name = "");
@@ -30,6 +26,8 @@ namespace puffin {
     private:
         TexturePtr texture_{nullptr};
     };
+
+    using SkyboxPtr = std::shared_ptr<Skybox>;
 } // namespace puffin
 
 #endif // PUFFIN_SKYBOX_HPP

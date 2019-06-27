@@ -36,18 +36,9 @@ namespace puffin {
 
     private:
         template<typename T>
-        void saveObjectData(std::string section, std::string key, const T &obj);
+        void saveValue(std::string section, std::string key, const T &obj);
         template<typename T>
-        void loadObjectData(std::string section, std::string key, T &obj);
-
-        void saveFloat(std::string section, std::string key, GLfloat value);
-        GLfloat loadFloat(std::string section, std::string key);
-
-        void saveInt(std::string section, std::string key, GLint value);
-        GLint loadInt(std::string section, std::string key);
-
-        void saveString(std::string section, std::string key, std::string value);
-        std::string loadString(std::string section, std::string key);
+        void loadValue(std::string section, std::string key, T &obj);
 
         void saveCameraSettings(CameraPtr camera);
         void loadCameraSettings(CameraPtr camera);
@@ -67,16 +58,16 @@ namespace puffin {
     using SceneLoaderPtr = std::shared_ptr<SceneLoader>;
 
     template<typename T>
-    inline void SceneLoader::saveObjectData(std::string section, std::string key, const T &obj) {
+    inline void SceneLoader::saveValue(std::string section, std::string key, const T &obj) {
         std::stringstream ss;
         ss << obj;
-        saveString(section, key, ss.str());
+        ini_file_.SetValue(section.c_str(), key.c_str(), ss.str().c_str());
     }
 
     template<typename T>
-    inline void SceneLoader::loadObjectData(std::string section, std::string key, T &obj) {
+    inline void SceneLoader::loadValue(std::string section, std::string key, T &obj) {
         std::stringstream ss;
-        ss << loadString(section, key);
+        ss << ini_file_.GetValue(section.c_str(), key.c_str(), "0");
         ss >> obj;
     }
 } // namespace puffin
