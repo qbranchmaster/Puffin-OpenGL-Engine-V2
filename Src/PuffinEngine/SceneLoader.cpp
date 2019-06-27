@@ -179,7 +179,21 @@ void SceneLoader::loadSkybox(ScenePtr scene) {
     scene->setSkybox(skybox);
 }
 
-void SceneLoader::saveMeshes(ScenePtr scene) {}
+void SceneLoader::saveMeshes(ScenePtr scene) {
+    auto count = scene->getMeshesCount();
+    saveValue("meshes", "count", count);
+
+    for (GLuint i = 0; i < count; i++) {
+        auto mesh = scene->getMesh(i);
+        if (!mesh) {
+            continue;
+        }
+
+        std::string section = "mesh_" + std::to_string(i);
+
+        saveValue(section, "name", mesh->name_);
+    }
+}
 
 void SceneLoader::loadMeshes(ScenePtr scene) {}
 

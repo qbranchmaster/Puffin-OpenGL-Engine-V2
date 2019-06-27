@@ -15,6 +15,8 @@
 
 namespace puffin {
     class Mesh : public BaseMesh {
+        friend class SceneLoader;
+
     public:
         Mesh(std::string name = "") : BaseMesh(name) {}
 
