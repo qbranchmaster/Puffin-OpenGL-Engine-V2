@@ -120,8 +120,8 @@ void DefaultGuiRenderer::setupImGui() {
 
     // ImGui::StyleColorsLight();
     // ImGui::StyleColorsClassic();
-    // ImGui::StyleColorsDark();
-    setupCustomStyle();
+    ImGui::StyleColorsDark();
+    // setupCustomStyle();
 }
 
 void DefaultGuiRenderer::setupCustomStyle() {
@@ -654,65 +654,116 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
         return;
     }
 
-    ImGui::End();
+    static BaseMeshPtr selected_object = nullptr;
 
-    // void DefaultGuiRenderer::renderWaterRendererDialog() {
-    //    ImGui::Text("Water render parameters");
-    //
-    //    std::vector<WaterTilePtr> water_tiles;
-    //    for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
-    //        water_tiles.push_back(current_scene_->getWaterTile(i));
-    //    }
-    //
-    //    static WaterTilePtr selected_obj = nullptr;
-    //    static std::string current_item = "";
-    //
-    //    if (ImGui::BeginCombo("Water tile", current_item.c_str())) {
-    //        if (water_tiles.size() != 0) {
-    //            for (unsigned int i = 0; i < water_tiles.size(); i++) {
-    //                bool is_selected = current_item == water_tiles[i]->getName();
-    //                if (ImGui::Selectable(water_tiles[i]->getName().c_str(), is_selected)) {
-    //                    current_item = water_tiles[i]->getName();
-    //                    selected_obj = water_tiles[i];
-    //                }
-    //            }
-    //        }
-    //
-    //        ImGui::EndCombo();
-    //    }
-    //
-    //    if (selected_obj) {
-    //        glm::vec3 water_color = selected_obj->getWaterColor();
-    //        float color[] = {water_color.r, water_color.g, water_color.b};
-    //        ImGui::ColorEdit3("Color", color);
-    //        selected_obj->setWaterColor(glm::vec3(color[0], color[1], color[2]));
-    //
-    //        float wave_strength = selected_obj->getWaveStrength();
-    //        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
-    //        selected_obj->setWaveStrength(wave_strength);
-    //
-    //        float wave_speed = selected_obj->getWaveSpeed();
-    //        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
-    //        selected_obj->setWaveSpeed(wave_speed);
-    //
-    //        int shininess = selected_obj->getShininess();
-    //        ImGui::SliderInt("Shininess", &shininess, 1, 100);
-    //        selected_obj->setShininess(shininess);
-    //
-    //        float ambient_factor = selected_obj->getAmbientFactor();
-    //        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
-    //        selected_obj->setAmbientFactor(ambient_factor);
-    //
-    //        float specular_factor = selected_obj->getSpecularFactor();
-    //        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
-    //        selected_obj->setSpecularFactor(specular_factor);
-    //    }
-    //    else {
-    //        ImGui::Text("No water object selected");
-    //    }
-    //
-    //    ImGui::End();
-    //}
+    if (ImGui::TreeNode("Scene objects")) {
+        if (ImGui::TreeNode("Skyboxes")) {
+            auto skybox = current_scene_->getSkybox();
+            if (ImGui::Selectable(skybox->getName().c_str(), selected_object == skybox)) {
+                selected_object = skybox;
+            }
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Meshes")) {
+            for (GLuint i = 0; i < current_scene_->getMeshesCount(); i++) {
+                auto mesh = current_scene_->getMesh(i);
+                if (ImGui::Selectable(mesh->getName().c_str(), selected_object == mesh)) {
+                    selected_object = mesh;
+                }
+            }
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Water tiles")) {
+            for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
+                auto water_tile = current_scene_->getWaterTile(i);
+                if (ImGui::Selectable(
+                        water_tile->getName().c_str(), selected_object == water_tile)) {
+                    selected_object = water_tile;
+                }
+            }
+
+            ImGui::TreePop();
+        }
+
+        ImGui::TreePop();
+    }
+
+    ImGui::Separator();
+
+    ImGui::Text("Configuration");
+    if (!selected_object) {
+        ImGui::Text("[ No object selected ]");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Name: ");
+    ImGui::SameLine();
+    ImGui::Text(selected_object->getName().c_str());
+    ImGui::Text("Type: ");
+    ImGui::SameLine();
+
+    switch (selected_object->getMeshType()) {
+    case MeshType::Mesh:
+        ImGui::Text("Mesh");
+        break;
+    case MeshType::Skybox:
+        ImGui::Text("Skybox");
+        break;
+    case MeshType::WaterTile:
+        ImGui::Text("WaterTile");
+        break;
+    default:
+        ImGui::Text("Unknown");
+        break;
+    }
+
+    if (selected_object->getMeshType() == MeshType::WaterTile ||
+        selected_object->getMeshType() == MeshType::Mesh) {
+        ImGui::Text("Transformation");
+
+        glm::vec3 position = selected_object->getPosition();
+        float pos[] = {position.x, position.y, position.z};
+        ImGui::DragFloat3("Position", pos, 0.01f);
+        selected_object->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+    }
+
+    if (selected_object->getMeshType() == MeshType::WaterTile) {
+        ImGui::Text("Render settings");
+
+        WaterTilePtr water_tile = std::static_pointer_cast<WaterTile>(selected_object);
+
+        glm::vec3 water_color = water_tile->getWaterColor();
+        float color[] = {water_color.r, water_color.g, water_color.b};
+        ImGui::ColorEdit3("Color", color);
+        water_tile->setWaterColor(glm::vec3(color[0], color[1], color[2]));
+
+        float wave_strength = water_tile->getWaveStrength();
+        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
+        water_tile->setWaveStrength(wave_strength);
+
+        float wave_speed = water_tile->getWaveSpeed();
+        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
+        water_tile->setWaveSpeed(wave_speed);
+
+        int shininess = water_tile->getShininess();
+        ImGui::SliderInt("Shininess", &shininess, 1, 100);
+        water_tile->setShininess(shininess);
+
+        float ambient_factor = water_tile->getAmbientFactor();
+        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
+        water_tile->setAmbientFactor(ambient_factor);
+
+        float specular_factor = water_tile->getSpecularFactor();
+        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
+        water_tile->setSpecularFactor(specular_factor);
+    }
+
+    ImGui::End();
 }
 
 void DefaultGuiRenderer::renderSaveSceneDialog() {

@@ -34,6 +34,10 @@ namespace puffin {
             return shadow_cast_enabled_;
         }
 
+		MeshType getMeshType() const {
+            return MeshType::Mesh;
+        }
+
     protected:
         struct NodeData {
             glm::mat4 model_matrix;

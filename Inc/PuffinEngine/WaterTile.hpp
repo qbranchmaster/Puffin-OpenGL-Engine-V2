@@ -116,6 +116,10 @@ namespace puffin {
             return specular_factor_;
         }
 
+		MeshType getMeshType() const {
+            return MeshType::WaterTile;
+        }
+
     private:
         glm::vec3 water_color_{0.0f, 0.3f, 0.5f};
         GLuint shininess_{10};

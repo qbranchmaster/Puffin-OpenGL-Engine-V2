@@ -26,6 +26,13 @@
 #include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
+	enum class MeshType {
+		BaseMesh,
+		Skybox,
+		Mesh,
+		WaterTile,
+	};
+
     class BaseMesh {
     public:
         BaseMesh(std::string name = "");
@@ -110,6 +117,10 @@ namespace puffin {
         glm::mat3 getNormalMatrix() const {
             return normal_matrix_;
         }
+
+		virtual MeshType getMeshType() const {
+            return MeshType::BaseMesh;
+		}
 
     protected:
         void deleteVertexBuffers();

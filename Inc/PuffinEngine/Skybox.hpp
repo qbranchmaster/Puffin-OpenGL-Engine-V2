@@ -23,6 +23,10 @@ namespace puffin {
             return texture_;
         }
 
+		MeshType getMeshType() const {
+            return MeshType::Skybox;
+        }
+
     private:
         TexturePtr texture_{nullptr};
     };
