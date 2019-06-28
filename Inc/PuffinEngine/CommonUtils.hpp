@@ -20,6 +20,12 @@ namespace puffin {
 
     std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
     std::istream &operator>>(std::istream &is, glm::mat4 &mat);
+
+	std::ostream &operator<<(std::ostream &os, const glm::mat3 &mat);
+    std::istream &operator>>(std::istream &is, glm::mat3 &mat);
+
+	std::ostream &operator<<(std::ostream &os, GLboolean val);
+    std::istream &operator>>(std::istream &is, GLboolean &val);
 } // namespace puffin
 
 #endif // PUFFIN_COMMON_UTILS_HPP

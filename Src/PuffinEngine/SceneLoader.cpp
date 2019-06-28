@@ -192,10 +192,50 @@ void SceneLoader::saveMeshes(ScenePtr scene) {
         std::string section = "mesh_" + std::to_string(i);
 
         saveValue(section, "name", mesh->name_);
+        saveValue(section, "path", mesh->path_);
+
+        saveValue(section, "shadow_cast_enabled", mesh->shadow_cast_enabled_);
+
+        saveValue(section, "model_matrix", mesh->model_matrix_);
+        saveValue(section, "normal_matrix", mesh->normal_matrix_);
+        saveValue(section, "rotation_matrix", mesh->rotation_matrix_);
+        saveValue(section, "scale_matrix", mesh->scale_matrix_);
+        saveValue(section, "translation_matrix", mesh->translation_matrix_);
+        saveValue(section, "position", mesh->position_);
+        saveValue(section, "scale", mesh->scale_);
     }
 }
 
-void SceneLoader::loadMeshes(ScenePtr scene) {}
+void SceneLoader::loadMeshes(ScenePtr scene) {
+    GLuint count = 0;
+    loadValue("meshes", "count", count);
+    if (count < 1) {
+        return;
+    }
+
+    for (GLuint i = 0; i < count; i++) {
+        std::string section = "mesh_" + std::to_string(i);
+
+        std::string name, path;
+        loadValue(section, "name", name);
+        loadValue(section, "path", path);
+
+        MeshPtr mesh(new Mesh(name));
+        mesh->loadFromFile(path);
+
+        loadValue(section, "shadow_cast_enabled", mesh->shadow_cast_enabled_);
+
+        loadValue(section, "model_matrix", mesh->model_matrix_);
+        loadValue(section, "normal_matrix", mesh->normal_matrix_);
+        loadValue(section, "rotation_matrix", mesh->rotation_matrix_);
+        loadValue(section, "scale_matrix", mesh->scale_matrix_);
+        loadValue(section, "translation_matrix", mesh->translation_matrix_);
+        loadValue(section, "position", mesh->position_);
+        loadValue(section, "scale", mesh->scale_);
+
+        scene->addMesh(mesh);
+    }
+}
 
 void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {}
 
