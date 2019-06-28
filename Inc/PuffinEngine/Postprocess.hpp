@@ -30,6 +30,8 @@ namespace puffin {
     };
 
     class Postprocess {
+        friend class SceneLoader;
+
     public:
         void setEffect(PostprocessEffect effect) {
             effect_ = effect;

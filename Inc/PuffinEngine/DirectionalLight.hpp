@@ -18,6 +18,8 @@
 
 namespace puffin {
     class DirectionalLight {
+        friend class SceneLoader;
+
     public:
         void enable(GLboolean state) {
             enabled_ = state;

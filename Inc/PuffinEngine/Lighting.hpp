@@ -20,6 +20,8 @@
 
 namespace puffin {
     class Lighting {
+        friend class SceneLoader;
+
     public:
         Lighting() {
             directional_light_.reset(new DirectionalLight());

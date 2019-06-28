@@ -31,6 +31,7 @@ void SceneLoader::saveScene(
 
     saveSkybox(scene);
     saveMeshes(scene);
+    saveWaterTiles(scene);
 
     if (ini_file_.SaveFile(file_name.c_str()) < 0) {
         logError("SceneLoader::saveScene()", PUFFIN_MSG_FILE_SAVE_ERROR(file_name));
@@ -66,6 +67,7 @@ void SceneLoader::loadScene(
 
     loadSkybox(scene);
     loadMeshes(scene);
+    loadWaterTiles(scene);
 
     logInfo("SceneLoader::loadScene()", PUFFIN_MSG_FILE_LOADED(file_name));
 }
@@ -237,6 +239,213 @@ void SceneLoader::loadMeshes(ScenePtr scene) {
     }
 }
 
-void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {}
+void SceneLoader::saveWaterTiles(ScenePtr scene) {
+    auto count = scene->getWaterTilesCount();
+    saveValue("water_tiles", "count", count);
 
-void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {}
+    for (GLuint i = 0; i < count; i++) {
+        auto water_tile = scene->getWaterTile(i);
+        if (!water_tile) {
+            continue;
+        }
+
+        std::string section = "water_tile_" + std::to_string(i);
+
+        saveValue(section, "name", water_tile->name_);
+
+        saveValue(section, "water_color", water_tile->water_color_);
+        saveValue(section, "shininess", water_tile->shininess_);
+        saveValue(section, "ambient_factor", water_tile->ambient_factor_);
+        saveValue(section, "specular_factor", water_tile->specular_factor_);
+
+        saveValue(section, "wave_strength", water_tile->wave_strength_);
+        saveValue(section, "wave_speed", water_tile->wave_speed_);
+
+        saveValue(section, "model_matrix", water_tile->model_matrix_);
+        saveValue(section, "normal_matrix", water_tile->normal_matrix_);
+        saveValue(section, "rotation_matrix", water_tile->rotation_matrix_);
+        saveValue(section, "scale_matrix", water_tile->scale_matrix_);
+        saveValue(section, "translation_matrix", water_tile->translation_matrix_);
+        saveValue(section, "position", water_tile->position_);
+        saveValue(section, "scale", water_tile->scale_);
+    }
+}
+
+void SceneLoader::loadWaterTiles(ScenePtr scene) {
+    GLuint count = 0;
+    loadValue("water_tiles", "count", count);
+    if (count < 1) {
+        return;
+    }
+
+    for (GLuint i = 0; i < count; i++) {
+        std::string section = "water_tile_" + std::to_string(i);
+
+        std::string name;
+        loadValue(section, "name", name);
+
+        WaterTilePtr water_tile(new WaterTile(name));
+
+        loadValue(section, "water_color", water_tile->water_color_);
+        loadValue(section, "shininess", water_tile->shininess_);
+        loadValue(section, "ambient_factor", water_tile->ambient_factor_);
+        loadValue(section, "specular_factor", water_tile->specular_factor_);
+
+        loadValue(section, "wave_strength", water_tile->wave_strength_);
+        loadValue(section, "wave_speed", water_tile->wave_speed_);
+
+        loadValue(section, "model_matrix", water_tile->model_matrix_);
+        loadValue(section, "normal_matrix", water_tile->normal_matrix_);
+        loadValue(section, "rotation_matrix", water_tile->rotation_matrix_);
+        loadValue(section, "scale_matrix", water_tile->scale_matrix_);
+        loadValue(section, "translation_matrix", water_tile->translation_matrix_);
+        loadValue(section, "position", water_tile->position_);
+        loadValue(section, "scale", water_tile->scale_);
+
+        scene->addWaterTile(water_tile);
+    }
+}
+
+void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
+    if (!render_settings) {
+        saveValue("render_settings", "valid", 0);
+        return;
+    }
+
+    saveValue("render_settings", "valid", 1);
+
+    // Lighting
+    auto lighting = render_settings->lighting();
+    saveValue("lighting", "enabled", lighting->enabled_);
+    saveValue("lighting", "blinn_phong_enabled", lighting->blinn_phong_enabled_);
+
+    saveValue("lighting", "shadow_mapping_enabled", lighting->shadow_mapping_enabled_);
+    saveValue("lighting", "directional_light_shadow_map_size",
+        lighting->directional_light_shadow_map_size_);
+    saveValue("lighting", "shadow_distance", lighting->shadow_distance_);
+    saveValue("lighting", "emission_factor", lighting->emission_factor_);
+    saveValue("lighting", "shadows_pcf_samples_count", lighting->shadows_pcf_samples_count_);
+
+    saveValue("lighting", "skybox_light_color", lighting->skybox_light_color_);
+
+    // Directional light
+    saveValue("directional_light", "enabled", lighting->directional_light_->enabled_);
+    saveValue("directional_light", "ambient_color", lighting->directional_light_->ambient_color_);
+    saveValue("directional_light", "diffuse_color", lighting->directional_light_->diffuse_color_);
+    saveValue("directional_light", "specular_color", lighting->directional_light_->specular_color_);
+    saveValue("directional_light", "direction", lighting->directional_light_->direction_);
+
+    // Fog
+    auto fog = render_settings->fog();
+    saveValue("fog", "enabled", fog->enabled_);
+
+    saveValue("fog", "density", fog->density_);
+    saveValue("fog", "color", fog->color_);
+
+    saveValue("fog", "skybox_fog_overall_density", fog->skybox_fog_overall_density_);
+    saveValue("fog", "skybox_fog_transition_power", fog->skybox_fog_transition_power_);
+    saveValue("fog", "skybox_fog_height", fog->skybox_fog_height_);
+
+    // Postprocess
+    auto postprocess = render_settings->postprocess();
+    saveValue("postprocess", "effect", static_cast<GLuint>(postprocess->effect_));
+
+    saveValue("postprocess", "glow_bloom_enabled", postprocess->glow_bloom_enabled_);
+    saveValue("postprocess", "glow_bloom_thresh_", postprocess->glow_bloom_thresh_);
+
+    saveValue("postprocess", "tint_color", postprocess->tint_color_);
+    saveValue("postprocess", "kernel_size", postprocess->kernel_size_);
+
+    saveValue("postprocess", "dof_enabled", postprocess->dof_enabled_);
+    saveValue("postprocess", "dof_max_blur", postprocess->dof_max_blur_);
+
+    saveValue("postprocess", "aperture", postprocess->aperture_);
+    saveValue("postprocess", "focus_distance", postprocess->focus_distance_);
+
+    saveValue("postprocess", "gamma", postprocess->gamma_);
+    saveValue("postprocess", "exposure", postprocess->exposure_);
+
+    // Wireframe
+    auto wireframe = render_settings->wireframe();
+    saveValue("wireframe", "enabled", wireframe->enabled_);
+
+    saveValue("wireframe", "mode", static_cast<GLuint>(wireframe->mode_));
+    saveValue("wireframe", "color", wireframe->color_);
+    saveValue("wireframe", "line_width", wireframe->line_width_);
+}
+
+void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
+    if (!render_settings) {
+        return;
+    }
+
+    GLushort valid = 0;
+    loadValue("render_settings", "valid", valid);
+    if (!valid) {
+        return;
+    }
+
+    // Lighting
+    auto lighting = render_settings->lighting();
+    loadValue("lighting", "enabled", lighting->enabled_);
+    loadValue("lighting", "blinn_phong_enabled", lighting->blinn_phong_enabled_);
+
+    loadValue("lighting", "shadow_mapping_enabled", lighting->shadow_mapping_enabled_);
+    loadValue("lighting", "directional_light_shadow_map_size",
+        lighting->directional_light_shadow_map_size_);
+    loadValue("lighting", "shadow_distance", lighting->shadow_distance_);
+    loadValue("lighting", "emission_factor", lighting->emission_factor_);
+    loadValue("lighting", "shadows_pcf_samples_count", lighting->shadows_pcf_samples_count_);
+
+    loadValue("lighting", "skybox_light_color", lighting->skybox_light_color_);
+
+    // Directional light
+    loadValue("directional_light", "enabled", lighting->directional_light_->enabled_);
+    loadValue("directional_light", "ambient_color", lighting->directional_light_->ambient_color_);
+    loadValue("directional_light", "diffuse_color", lighting->directional_light_->diffuse_color_);
+    loadValue("directional_light", "specular_color", lighting->directional_light_->specular_color_);
+    loadValue("directional_light", "direction", lighting->directional_light_->direction_);
+
+    // Fog
+    auto fog = render_settings->fog();
+    loadValue("fog", "enabled", fog->enabled_);
+
+    loadValue("fog", "density", fog->density_);
+    loadValue("fog", "color", fog->color_);
+
+    loadValue("fog", "skybox_fog_overall_density", fog->skybox_fog_overall_density_);
+    loadValue("fog", "skybox_fog_transition_power", fog->skybox_fog_transition_power_);
+    loadValue("fog", "skybox_fog_height", fog->skybox_fog_height_);
+
+    // Postprocess
+    auto postprocess = render_settings->postprocess();
+    GLuint postprocess_effect = 0;
+    loadValue("postprocess", "effect", postprocess_effect);
+    postprocess->effect_ = static_cast<PostprocessEffect>(postprocess_effect);
+
+    loadValue("postprocess", "glow_bloom_enabled", postprocess->glow_bloom_enabled_);
+    loadValue("postprocess", "glow_bloom_thresh_", postprocess->glow_bloom_thresh_);
+
+    loadValue("postprocess", "tint_color", postprocess->tint_color_);
+    loadValue("postprocess", "kernel_size", postprocess->kernel_size_);
+
+    loadValue("postprocess", "dof_enabled", postprocess->dof_enabled_);
+    loadValue("postprocess", "dof_max_blur", postprocess->dof_max_blur_);
+
+    loadValue("postprocess", "aperture", postprocess->aperture_);
+    loadValue("postprocess", "focus_distance", postprocess->focus_distance_);
+
+    loadValue("postprocess", "gamma", postprocess->gamma_);
+    loadValue("postprocess", "exposure", postprocess->exposure_);
+
+    // Wireframe
+    auto wireframe = render_settings->wireframe();
+    loadValue("wireframe", "enabled", wireframe->enabled_);
+
+    GLuint wireframe_mode = 0;
+    loadValue("wireframe", "mode", wireframe_mode);
+    wireframe->mode_ = static_cast<WireframeMode>(wireframe_mode);
+
+    loadValue("wireframe", "color", wireframe->color_);
+    loadValue("wireframe", "line_width", wireframe->line_width_);
+}

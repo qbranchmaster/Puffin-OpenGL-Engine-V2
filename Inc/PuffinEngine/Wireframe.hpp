@@ -21,6 +21,8 @@ namespace puffin {
     };
 
     class Wireframe {
+        friend class SceneLoader;
+
     public:
         void setMode(WireframeMode mode) {
             mode_ = mode;

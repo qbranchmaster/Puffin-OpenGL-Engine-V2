@@ -49,6 +49,9 @@ namespace puffin {
         void saveMeshes(ScenePtr scene);
         void loadMeshes(ScenePtr scene);
 
+		void saveWaterTiles(ScenePtr scene);
+        void loadWaterTiles(ScenePtr scene);
+
         void saveRenderSettings(RenderSettingsPtr render_settings);
         void loadRenderSettings(RenderSettingsPtr render_settings);
 

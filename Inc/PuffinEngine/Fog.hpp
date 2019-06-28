@@ -15,6 +15,8 @@
 
 namespace puffin {
     class Fog {
+        friend class SceneLoader;
+
     public:
         void enable(GLboolean state) {
             enabled_ = state;

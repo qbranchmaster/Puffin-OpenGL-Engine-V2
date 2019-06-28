@@ -12,6 +12,8 @@
 
 namespace puffin {
     class WaterTile : public BaseMesh {
+        friend class SceneLoader;
+
     public:
         WaterTile(std::string name = "") : BaseMesh(name) {
             // clang-format off
