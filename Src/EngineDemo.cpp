@@ -96,7 +96,7 @@ void EngineDemo::createScene() {
 void EngineDemo::pollKeyboard() {
     if (gui_renderer_->isCapturingKeyboard()) {
         return;
-	}
+    }
 
     if (input()->keyPressed(Key::Escape, false)) {
         stop();
@@ -135,10 +135,10 @@ void EngineDemo::rotateSkybox() {
     auto skybox = scene_->getSkybox();
     if (!skybox) {
         return;
-	}
+    }
 
     static GLfloat rotation_angle = 0.0f;
-    skybox->setRotationAngle(rotation_angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    skybox->setRotation(glm::vec3(0.0f, rotation_angle, 0.0f));
     rotation_angle += 0.0005f;
 }
 

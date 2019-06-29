@@ -95,6 +95,9 @@ namespace puffin {
 
         ScenePtr current_scene_{nullptr};
         SceneLoaderPtr scene_loader_{nullptr};
+
+        ImFont *font_normal_{nullptr};
+        ImFont *font_bold_{nullptr};
     };
 
     using DefaultGuiRendererPtr = std::shared_ptr<DefaultGuiRenderer>;

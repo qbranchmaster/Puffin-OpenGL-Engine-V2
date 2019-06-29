@@ -116,7 +116,8 @@ void DefaultGuiRenderer::setupImGui() {
     style.AntiAliasedLines = true;
     style.AntiAliasedFill = true;
 
-    ImFont *font = io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16);
+    font_normal_ = io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Regular.ttf", 16);
+    font_bold_ = io.Fonts->AddFontFromFileTTF("Data/Fonts/Roboto-Black.ttf", 16);
 
     // ImGui::StyleColorsLight();
     // ImGui::StyleColorsClassic();
@@ -245,7 +246,9 @@ void DefaultGuiRenderer::renderAboutDialog() {
         return;
     }
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Puffin OpenGL Engine ver. 2.0");
+    ImGui::PopFont();
     ImGui::Separator();
     ImGui::Text("Coded by: Sebastian 'qbranchmaster' Tabaka");
     ImGui::Text("Contact:  sebastian.tabaka@outlook.com");
@@ -387,7 +390,9 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
     }
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Wire frame");
+    ImGui::PopFont();
 
     {
         WireframeMode current = render_settings_->wireframe()->getMode();
@@ -440,7 +445,10 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::Checkbox("Enabled", &enabled);
     render_settings_->lighting()->enable(enabled);
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Directional light");
+    ImGui::PopFont();
+
     glm::vec3 dir_light_direction =
         render_settings_->lighting()->directionalLight()->getDirection();
     float direction[3] = {dir_light_direction.x, dir_light_direction.y, dir_light_direction.z};
@@ -508,7 +516,9 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 10);
     render_settings_->lighting()->setShadowMappingPcfsamplesCount(shadow_pcf_samples);
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Shadow map");
+    ImGui::PopFont();
 
     DefaultShadowMapRendererPtr sm_renderer =
         std::static_pointer_cast<DefaultShadowMapRenderer>(master_renderer_->shadowMapRenderer());
@@ -547,7 +557,9 @@ void DefaultGuiRenderer::renderFogDialog() {
     ImGui::SliderFloat("Density", &density, 0.0f, 1.0f);
     render_settings_->fog()->setDensity(density);
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Skybox fog");
+    ImGui::PopFont();
 
     float sb_density = render_settings_->fog()->getSkyboxFogOverallDensity();
     ImGui::SliderFloat("Density##SkyboxDensity", &sb_density, 0.0f, 1.0f);
@@ -606,7 +618,9 @@ void DefaultGuiRenderer::renderRenderersDialog() {
         return;
     }
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Mesh renderer");
+    ImGui::PopFont();
 
     bool mesh_renderer_enabled = master_renderer_->meshRenderer()->isEnabled();
     ImGui::Checkbox("Enabled##MR_Enabled", &mesh_renderer_enabled);
@@ -615,7 +629,9 @@ void DefaultGuiRenderer::renderRenderersDialog() {
     DefaultMeshRendererPtr mesh_renderer =
         std::static_pointer_cast<DefaultMeshRenderer>(master_renderer_->meshRenderer());
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Skybox renderer");
+    ImGui::PopFont();
 
     bool skybox_renderer_enabled = master_renderer_->skyboxRenderer()->isEnabled();
     ImGui::Checkbox("Enabled##SR_Enabled", &skybox_renderer_enabled);
@@ -624,7 +640,9 @@ void DefaultGuiRenderer::renderRenderersDialog() {
     DefaultSkyboxRendererPtr skybox_renderer =
         std::static_pointer_cast<DefaultSkyboxRenderer>(master_renderer_->skyboxRenderer());
 
+    ImGui::PushFont(font_bold_);
     ImGui::Text("Water renderer");
+    ImGui::PopFont();
 
     bool water_renderer_enabled = master_renderer_->waterRenderer()->isEnabled();
     ImGui::Checkbox("Enabled##WR_Enabled", &water_renderer_enabled);
@@ -647,7 +665,7 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
 
     ImGuiWindowFlags window_flags = 0;
     // window_flags |= ImGuiWindowFlags_NoResize;
-    ImGui::SetNextWindowSize(ImVec2(390, 80), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(450, 550), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Object inspector", &render_object_inspector_dialog_, window_flags)) {
         ImGui::End();
@@ -694,7 +712,6 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
 
     ImGui::Separator();
 
-    ImGui::Text("Configuration");
     if (!selected_object) {
         ImGui::Text("[ No object selected ]");
         ImGui::End();
@@ -724,16 +741,56 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
 
     if (selected_object->getMeshType() == MeshType::WaterTile ||
         selected_object->getMeshType() == MeshType::Mesh) {
-        ImGui::Text("Transformation");
+        ImGui::PushFont(font_bold_);
+        ImGui::Text("Transform");
+        ImGui::PopFont();
 
         glm::vec3 position = selected_object->getPosition();
         float pos[] = {position.x, position.y, position.z};
         ImGui::DragFloat3("Position", pos, 0.01f);
         selected_object->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+
+        static bool lock_scale = false;
+        glm::vec3 scale = selected_object->getScale();
+        static float prev_scale[] = {scale.x, scale.y, scale.z};
+        float current_scale[] = {scale.x, scale.y, scale.z};
+        if (ImGui::DragFloat3("Scale", current_scale, 0.0001f)) {
+            if (lock_scale) {
+                // Detect which value has changed
+                for (GLushort i = 0; i < 3; i++) {
+                    if (current_scale[i] != prev_scale[i]) {
+                        float new_val = current_scale[i];
+                        for (GLushort j = 0; j < 3; j++) {
+                            current_scale[j] = new_val;
+                            prev_scale[j] = new_val;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Lock", &lock_scale)) {
+            if (lock_scale) {
+                current_scale[1] = current_scale[0];
+                current_scale[2] = current_scale[0];
+            }
+        }
+
+        selected_object->setScale(glm::vec3(current_scale[0], current_scale[1], current_scale[2]));
+
+        glm::vec3 angles = selected_object->getRotationAngles();
+        float rot_an[] = {angles.x, angles.y, angles.z};
+        ImGui::DragFloat3("Rotation", rot_an, 0.001f);
+        selected_object->setRotation(glm::vec3(rot_an[0], rot_an[1], rot_an[2]));
     }
 
     if (selected_object->getMeshType() == MeshType::WaterTile) {
-        ImGui::Text("Render settings");
+        ImGui::PushFont(font_bold_);
+        ImGui::Text("Render");
+        ImGui::PopFont();
 
         WaterTilePtr water_tile = std::static_pointer_cast<WaterTile>(selected_object);
 
@@ -761,6 +818,17 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
         float specular_factor = water_tile->getSpecularFactor();
         ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
         water_tile->setSpecularFactor(specular_factor);
+    }
+    else if (selected_object->getMeshType() == MeshType::Mesh) {
+        ImGui::PushFont(font_bold_);
+        ImGui::Text("Render");
+        ImGui::PopFont();
+
+        MeshPtr mesh = std::static_pointer_cast<Mesh>(selected_object);
+
+        bool cast_shadow = mesh->isShadowCastingEnabled();
+        ImGui::Checkbox("Cast shadows", &cast_shadow);
+        mesh->enableShadowCasting(cast_shadow);
     }
 
     ImGui::End();

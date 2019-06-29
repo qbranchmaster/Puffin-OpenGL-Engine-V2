@@ -26,12 +26,12 @@
 #include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
-	enum class MeshType {
-		BaseMesh,
-		Skybox,
-		Mesh,
-		WaterTile,
-	};
+    enum class MeshType {
+        BaseMesh,
+        Skybox,
+        Mesh,
+        WaterTile,
+    };
 
     class BaseMesh {
     public:
@@ -82,14 +82,19 @@ namespace puffin {
             return position_;
         }
 
-        void rotate(GLfloat angle, const glm::vec3 &axis);
-        void setRotationAngle(GLfloat angle, const glm::vec3 &axis);
+        void setRotation(const glm::vec3 &angles);
+        void rotate(const glm::vec3 &angles);
+
+        glm::vec3 getRotationAngles() const {
+            return rotation_angles_;
+        }
+
         void zeroRotation();
 
-		void setRotationMatrix(const glm::mat4& matrix) {
+        void setRotationMatrix(const glm::mat4 &matrix) {
             rotation_matrix_ = matrix;
             model_matrix_changed_ = true;
-		}
+        }
 
         glm::mat4 getRotationMatrix() const {
             return rotation_matrix_;
@@ -118,9 +123,9 @@ namespace puffin {
             return normal_matrix_;
         }
 
-		virtual MeshType getMeshType() const {
+        virtual MeshType getMeshType() const {
             return MeshType::BaseMesh;
-		}
+        }
 
     protected:
         void deleteVertexBuffers();
@@ -141,6 +146,8 @@ namespace puffin {
         glm::mat4 translation_matrix_{1.0f};
         glm::vec3 position_{0.0f, 0.0f, 0.0f};
         glm::vec3 scale_{1.0f, 1.0f, 1.0f};
+
+        glm::vec3 rotation_angles_{0.0f, 0.0f, 0.0f};
 
         std::vector<GLfloat> v_positions_;
         std::vector<GLfloat> v_normals_;

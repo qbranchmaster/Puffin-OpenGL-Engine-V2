@@ -53,18 +53,35 @@ void BaseMesh::zeroTranslation() {
     model_matrix_changed_ = true;
 }
 
-void BaseMesh::rotate(GLfloat angle, const glm::vec3 &axis) {
-    rotation_matrix_ = glm::rotate(rotation_matrix_, angle, axis);
+void BaseMesh::setRotation(const glm::vec3 &angles) {
+    zeroRotation();
+
+    // X
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    // Y
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    // Z
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    rotation_angles_ = angles;
     model_matrix_changed_ = true;
 }
 
-void BaseMesh::setRotationAngle(GLfloat angle, const glm::vec3 &axis) {
-    rotation_matrix_ = glm::mat4(1.0f);
-    rotate(angle, axis);
+void BaseMesh::rotate(const glm::vec3 &angles) {
+    // X
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    // Y
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    // Z
+    rotation_matrix_ = glm::rotate(rotation_matrix_, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    rotation_angles_ += angles;
+    model_matrix_changed_ = true;
 }
 
 void BaseMesh::zeroRotation() {
     rotation_matrix_ = glm::mat4(1.0f);
+    rotation_angles_ = glm::vec3(0.0f, 0.0f, 0.0f);
     model_matrix_changed_ = true;
 }
 
