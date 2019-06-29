@@ -1,14 +1,15 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #ifndef PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 #define PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP
 
 #include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/DepthTest.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
 #include "PuffinEngine/RenderSettings.hpp"
@@ -17,8 +18,7 @@
 namespace puffin {
     class DefaultPostprocessRenderer : public PostprocessRenderer {
     public:
-        DefaultPostprocessRenderer(RenderSettingsPtr render_settings,
-            CameraPtr camera);
+        DefaultPostprocessRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
 
         void render(FrameBufferPtr frame_buffer);
 
@@ -29,16 +29,15 @@ namespace puffin {
         void drawMesh(MeshPtr mesh);
         void renderGlowBloom(FrameBufferPtr frame_buffer);
 
-        CameraPtr camera_;
-        FrameBufferPtr bloom_frame_buffer_[2];
-        MeshPtr screen_mesh_;
-        RenderSettingsPtr render_settings_;
-        ShaderProgramPtr default_shader_program_;
-        ShaderProgramPtr bloom_shader_program_;
+        CameraPtr camera_{nullptr};
+        FrameBufferPtr bloom_frame_buffer_[2]{nullptr};
+        MeshPtr screen_mesh_{nullptr};
+        RenderSettingsPtr render_settings_{nullptr};
+        ShaderProgramPtr default_shader_program_{nullptr};
+        ShaderProgramPtr bloom_shader_program_{nullptr};
     };
 
-    using DefaultPostprocessRendererPtr =
-        std::shared_ptr<DefaultPostprocessRenderer>;
+    using DefaultPostprocessRendererPtr = std::shared_ptr<DefaultPostprocessRenderer>;
 } // namespace puffin
 
 #endif // PUFFIN_DEFAULT_POSTPROCESS_RENDERER_HPP

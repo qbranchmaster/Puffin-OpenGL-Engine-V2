@@ -60,15 +60,13 @@ void DefaultMeshRenderer::setDefaultShaderUniforms() {
     // Shadow mapping
     default_shader_program_->setUniform(
         "shadow_mapping.enabled", render_settings_->lighting()->isShadowMappingEnabled());
-    if (render_settings_->lighting()->isShadowMappingEnabled()) {
-        default_shader_program_->setUniform("shadow_mapping.shadow_map_texture", 6);
-        default_shader_program_->setUniform("matrices.dir_light_matrix",
-            shadow_map_renderer_->getOutputData().dir_light_space_matrix);
-        default_shader_program_->setUniform("shadow_mapping.shadow_map_size",
-            static_cast<GLint>(render_settings_->lighting()->getDirectionalLightShadowMapSize()));
-        default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
-            static_cast<GLint>(render_settings_->lighting()->getShadowMappingPcfSamplesCount()));
-    }
+    default_shader_program_->setUniform("shadow_mapping.shadow_map_texture", 6);
+    default_shader_program_->setUniform(
+        "matrices.dir_light_matrix", shadow_map_renderer_->getOutputData().dir_light_space_matrix);
+    default_shader_program_->setUniform("shadow_mapping.shadow_map_size",
+        static_cast<GLint>(render_settings_->lighting()->getDirectionalLightShadowMapSize()));
+    default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
+        static_cast<GLint>(render_settings_->lighting()->getShadowMappingPcfSamplesCount()));
 
     default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
     default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
@@ -223,10 +221,8 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
         glEnable(GL_CLIP_DISTANCE0);
     }
 
-    if (render_settings_->lighting()->isShadowMappingEnabled()) {
-        Texture::setTextureSlot(6);
-        shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
-    }
+    Texture::setTextureSlot(6);
+    shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
 
     default_shader_program_->activate();
     setDefaultShaderUniforms();

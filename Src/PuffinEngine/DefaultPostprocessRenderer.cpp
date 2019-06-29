@@ -1,7 +1,8 @@
 /*
-* Puffin OpenGL Engine ver. 2.0
-* Coded by: Sebastian 'qbranchmaster' Tabaka
-*/
+ * Puffin OpenGL Engine ver. 2.1
+ * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
+ */
 
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 
@@ -11,8 +12,7 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
     RenderSettingsPtr render_settings, CameraPtr camera) {
     if (!render_settings || !camera) {
         throw Exception(
-            "DefaultPostprocessRenderer::DefaultPostprocessRenderer()",
-            "Not initialized object.");
+            "DefaultPostprocessRenderer::DefaultPostprocessRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     camera_ = camera;
@@ -32,53 +32,54 @@ DefaultPostprocessRenderer::DefaultPostprocessRenderer(
 
 void DefaultPostprocessRenderer::loadShaders() {
     default_shader_program_.reset(new ShaderProgram("postprocess_shader_program"));
-    default_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
-        "Data/Shaders/Postprocess.frag");
+    default_shader_program_->loadShaders(
+        "Data/Shaders/Postprocess.vert", "Data/Shaders/Postprocess.frag");
 
     bloom_shader_program_.reset(new ShaderProgram("bloom_shader_program"));
-    bloom_shader_program_->loadShaders("Data/Shaders/Postprocess.vert",
-        "Data/Shaders/PostprocessGlowBloom.frag");
+    bloom_shader_program_->loadShaders(
+        "Data/Shaders/Postprocess.vert", "Data/Shaders/PostprocessGlowBloom.frag");
 }
 
 void DefaultPostprocessRenderer::setShadersUniforms() {
-    default_shader_program_->setUniform("color.effect",
-        static_cast<GLint>(render_settings_->postprocess()->getEffect()));
-    default_shader_program_->setUniform("color.kernel_size",
-        render_settings_->postprocess()->getKernelSize());
-    default_shader_program_->setUniform("color.tint_color",
-        render_settings_->postprocess()->getTintColor());
+    default_shader_program_->setUniform(
+        "color.effect", static_cast<GLint>(render_settings_->postprocess()->getEffect()));
+    default_shader_program_->setUniform(
+        "color.kernel_size", render_settings_->postprocess()->getKernelSize());
+    default_shader_program_->setUniform(
+        "color.tint_color", render_settings_->postprocess()->getTintColor());
     default_shader_program_->setUniform("color.screen_texture", 0);
     default_shader_program_->setUniform("color.depth_texture", 1);
     default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
-    default_shader_program_->setUniform("color.exposure", render_settings_->postprocess()->getExposure());
-    default_shader_program_->setUniform("color.glow_bloom_enabled",
-        render_settings_->postprocess()->isGlowBloomEnabled());
-    default_shader_program_->setUniform("color.dof_enabled",
-        render_settings_->postprocess()->isDepthOfFieldEnabled());
+    default_shader_program_->setUniform(
+        "color.exposure", render_settings_->postprocess()->getExposure());
+    default_shader_program_->setUniform(
+        "color.glow_bloom_enabled", render_settings_->postprocess()->isGlowBloomEnabled());
+    default_shader_program_->setUniform(
+        "color.dof_enabled", render_settings_->postprocess()->isDepthOfFieldEnabled());
 
     if (render_settings_->postprocess()->isGlowBloomEnabled()) {
         default_shader_program_->setUniform("color.glow_bloom_texture", 2);
     }
 
     if (render_settings_->postprocess()->isDepthOfFieldEnabled()) {
-        default_shader_program_->setUniform("color.aperture",
-            render_settings_->postprocess()->getAperture());
-        default_shader_program_->setUniform("color.focus_distance",
-            render_settings_->postprocess()->getFocusDistance());
-        default_shader_program_->setUniform("color.dof_max_blur",
-            render_settings_->postprocess()->getDepthOfFieldMaxBlur());
-        default_shader_program_->setUniform("color.camera_aspect",
-            camera_->getAspect());
+        default_shader_program_->setUniform(
+            "color.aperture", render_settings_->postprocess()->getAperture());
+        default_shader_program_->setUniform(
+            "color.focus_distance", render_settings_->postprocess()->getFocusDistance());
+        default_shader_program_->setUniform(
+            "color.dof_max_blur", render_settings_->postprocess()->getDepthOfFieldMaxBlur());
+        default_shader_program_->setUniform("color.camera_aspect", camera_->getAspect());
     }
 }
 
 void DefaultPostprocessRenderer::createScreenMesh() {
     screen_mesh_.reset(new Mesh());
+    // clang-format off
     std::vector<GLfloat> positions = {
         -1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        1.0f, 1.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,
     };
 
     std::vector<GLfloat> texture_coords = {
@@ -87,10 +88,9 @@ void DefaultPostprocessRenderer::createScreenMesh() {
         1.0f, 0.0f,
         1.0f, 1.0f,
     };
+    // clang-format on
 
-    std::vector<GLuint> indices = {
-        0, 1, 3, 3, 1, 2
-    };
+    std::vector<GLuint> indices = {0, 1, 3, 3, 1, 2};
 
     screen_mesh_->bind();
     screen_mesh_->setMeshData(positions, 0, 3);
@@ -100,7 +100,7 @@ void DefaultPostprocessRenderer::createScreenMesh() {
 
 void DefaultPostprocessRenderer::drawMesh(MeshPtr mesh) {
     if (!mesh) {
-        logError("DefaultPostprocessRenderer::drawMesh()", "Null input.");
+        logError("DefaultPostprocessRenderer::drawMesh()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
@@ -142,7 +142,7 @@ void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
 
 void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     if (!frame_buffer) {
-        logError("DefaultPostprocessRenderer::render()", "Null input.");
+        logError("DefaultPostprocessRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
@@ -153,8 +153,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     FrameBuffer::unbindAll();
     FrameBuffer::setViewportSize(
         InitConfig::instance().getFrameWidth(), InitConfig::instance().getFrameHeight());
-    FrameBuffer::clear(FrameBufferClearType::DepthAndColor,
-        glm::vec3(0.0f, 0.0f, 0.0f));
+    FrameBuffer::clear(FrameBufferClearType::DepthAndColor, glm::vec3(0.0f, 0.0f, 0.0f));
 
     default_shader_program_->activate();
     setShadersUniforms();

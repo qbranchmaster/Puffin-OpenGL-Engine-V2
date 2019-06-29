@@ -194,7 +194,7 @@ void MasterRenderer::drawScene(ScenePtr scene) {
         skybox_renderer_->render(default_frame_buffer_multisample_, scene);
     }
 
-    if (shadow_map_renderer_ && render_settings_->lighting()->isShadowMappingEnabled()) {
+    if (shadow_map_renderer_) {
         shadow_map_renderer_->render(scene);
     }
 

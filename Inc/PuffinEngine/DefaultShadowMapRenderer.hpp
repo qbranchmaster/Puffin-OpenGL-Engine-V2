@@ -1,6 +1,7 @@
 /*
- * Puffin OpenGL Engine ver. 2.0
+ * Puffin OpenGL Engine ver. 2.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
+ * Contact: sebastian.tabaka@outlook.com
  */
 
 #ifndef PUFFIN_DEFAULT_SHADOW_MAP_RENDERER_HPP
@@ -24,8 +25,7 @@ namespace puffin {
 
     class DefaultShadowMapRenderer : public ShadowMapRenderer {
     public:
-        DefaultShadowMapRenderer(RenderSettingsPtr render_settings,
-            CameraPtr camera);
+        DefaultShadowMapRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
 
         void render(ScenePtr scene);
 
@@ -36,17 +36,17 @@ namespace puffin {
     private:
         void loadShaders();
         void createDirectionalLightFrameBuffer();
-        void renderDirectionalLightShadowMap(MeshPtr mesh);
+        void renderDirectionalLightShadowMap(ScenePtr scene);
         glm::mat4 calculateDirectionalLightSpaceMatrix();
 
-        CameraPtr camera_;
-        CameraFrustumPtr camera_frustum_;
-        RenderSettingsPtr render_settings_;
-        ShaderProgramPtr directional_light_shader_program_;
+        CameraPtr camera_{nullptr};
+        CameraFrustumPtr camera_frustum_{nullptr};
+        RenderSettingsPtr render_settings_{nullptr};
+        ShaderProgramPtr directional_light_shader_program_{nullptr};
 
         ShadowMapRendererOutputData output_data_{};
 
-        FrameBufferPtr directional_light_shadow_map_frame_bufer_;
+        FrameBufferPtr directional_light_shadow_map_frame_bufer_{nullptr};
     };
 
     using DefaultShadowMapRendererPtr = std::shared_ptr<DefaultShadowMapRenderer>;
