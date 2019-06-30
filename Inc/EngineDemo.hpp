@@ -32,6 +32,7 @@ private:
     puffin::TextPtr text_demo_{nullptr};
     puffin::TexturePtr skybox_texture_{nullptr};
     puffin::WaterTilePtr water_tile_{nullptr};
+    puffin::PointLightPtr point_light_{nullptr};
 
     puffin::TimerPtr fps_caption_timer_{nullptr};
     puffin::TimerPtr skybox_rotate_timer_{nullptr};

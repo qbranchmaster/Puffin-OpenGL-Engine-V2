@@ -15,8 +15,10 @@
 #include <glm/glm.hpp>
 
 #include <memory>
+#include <vector>
 
 #include "PuffinEngine/DirectionalLight.hpp"
+#include "PuffinEngine/PointLight.hpp"
 
 namespace puffin {
     class Lighting {
@@ -111,6 +113,29 @@ namespace puffin {
             return shadows_pcf_samples_count_;
         }
 
+        void addPointLight(PointLightPtr point_light) {
+            if (!point_light) {
+                logError("Lighting::addPointLight()", PUFFIN_MSG_NULL_OBJECT);
+                return;
+            }
+
+            point_lights_.push_back(point_light);
+        }
+
+        PointLightPtr getPointLight(GLuint index) {
+            if (index >= point_lights_.size()) {
+                logError(
+                    "Lighting::getPointLight()", PUFFIN_MSG_OUT_OF_RANGE(0, point_lights_.size()));
+                return nullptr;
+            }
+
+            return point_lights_[index];
+        }
+
+        GLuint getPointLightsCount() const {
+            return point_lights_.size();
+        }
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};
@@ -124,6 +149,7 @@ namespace puffin {
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 
         DirectionalLightPtr directional_light_{nullptr};
+        std::vector<PointLightPtr> point_lights_;
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;

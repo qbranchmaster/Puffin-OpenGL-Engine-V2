@@ -41,7 +41,7 @@ namespace puffin {
         MeshPtr getMesh(GLuint index) {
             if (index >= meshes_.size()) {
                 logError("Scene::getMesh()", PUFFIN_MSG_OUT_OF_RANGE(0, meshes_.size()));
-                return MeshPtr();
+                return nullptr;
             }
 
             return meshes_[index];
@@ -71,7 +71,7 @@ namespace puffin {
         TextPtr getText(GLuint index) {
             if (index >= textes_.size()) {
                 logError("Scene::getText()", PUFFIN_MSG_OUT_OF_RANGE(0, textes_.size()));
-                return TextPtr();
+                return nullptr;
             }
 
             return textes_[index];
@@ -93,7 +93,7 @@ namespace puffin {
         WaterTilePtr getWaterTile(GLuint index) {
             if (index >= water_tiles_.size()) {
                 logError("Scene::getWaterTile()", PUFFIN_MSG_OUT_OF_RANGE(0, water_tiles_.size()));
-                return WaterTilePtr();
+                return nullptr;
             }
 
             return water_tiles_[index];
