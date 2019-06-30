@@ -21,6 +21,12 @@ struct Color {
     float camera_aspect;
 };
 
+struct ChromaticAberration {
+	bool enabled;
+	sampler2D lens_texture;
+	vec3 max_channels_offset;
+};
+
 in VS_OUT {
     vec2 tex_coord;
 } fs_in;
@@ -28,6 +34,7 @@ in VS_OUT {
 out vec4 frag_color;
 
 uniform Color color;
+uniform ChromaticAberration chromatic_aberration;
 
 vec3 depthOfFieldTexturesSample(vec2 tex_coords, vec2 coords_offset,
     vec2 blur_value, vec2 aspect_correct) {
@@ -106,7 +113,26 @@ vec3 depthOfField(vec3 input_color, vec2 input_coords) {
 }
 
 vec3 sampleAccumTextures(vec2 tex_coords) {
-    vec3 result = texture(color.screen_texture, tex_coords).rgb;
+	vec3 result = vec3(0.0f, 0.0f, 0.0f);
+
+	if (chromatic_aberration.enabled) {
+		float offset = texture2D(chromatic_aberration.lens_texture, tex_coords).r;
+		offset = clamp(offset, 0.0f, 1.0f);
+
+		vec2 r_offset = vec2(chromatic_aberration.max_channels_offset.r * offset, 0.0f);
+		vec2 g_offset = vec2(chromatic_aberration.max_channels_offset.g * offset, 0.0f);
+		vec2 b_offset = vec2(chromatic_aberration.max_channels_offset.b * offset, 0.0f);
+
+		vec4 r_value = texture2D(color.screen_texture, tex_coords - r_offset);
+		vec4 g_value = texture2D(color.screen_texture, tex_coords - g_offset);
+		vec4 b_value = texture2D(color.screen_texture, tex_coords - b_offset);
+
+		result = vec3(r_value.r, g_value.g, b_value.b);
+	}
+	else {
+		result = texture(color.screen_texture, tex_coords).rgb;
+	}
+
     if (color.glow_bloom_enabled) {
 		result = result + texture(color.glow_bloom_texture, tex_coords).rgb;
     }

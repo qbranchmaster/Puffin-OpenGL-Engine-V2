@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/Texture.hpp"
 
 namespace puffin {
     enum class PostprocessEffect {
@@ -33,6 +34,11 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
+        Postprocess() {
+            chromatic_aberration_texture_.reset(new Texture());
+            chromatic_aberration_texture_->loadTexture2D("Data/Textures/LensAberration.bmp");
+        }
+
         void setEffect(PostprocessEffect effect) {
             effect_ = effect;
         }
@@ -153,6 +159,36 @@ namespace puffin {
             return exposure_;
         }
 
+        void enableChromaticAberration(GLboolean state) {
+            chromatic_aberration_enabled_ = state;
+        }
+
+        GLboolean isChromaticAberrationEnabled() const {
+            return chromatic_aberration_enabled_;
+        }
+
+        void setChromaticAberrationLensTexture(TexturePtr texture) {
+            if (!texture) {
+                logError(
+                    "Postprocess::setChromaticAberrationLensTexture()", PUFFIN_MSG_NULL_OBJECT);
+                return;
+            }
+
+            chromatic_aberration_texture_ = texture;
+        }
+
+        TexturePtr getChromaticAberrationLensTexture() const {
+            return chromatic_aberration_texture_;
+        }
+
+        void setChromaticAberrationMaxChannelsOffset(const glm::vec3 &max_offsets) {
+            chromatic_aberration_max_offset_ = max_offsets;
+        }
+
+        glm::vec3 getChromaticAberrationMaxChannelsOffset() const {
+            return chromatic_aberration_max_offset_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::None};
 
@@ -170,6 +206,10 @@ namespace puffin {
 
         GLfloat gamma_{2.2f};
         GLfloat exposure_{1.0f};
+
+        GLboolean chromatic_aberration_enabled_{false};
+        TexturePtr chromatic_aberration_texture_{nullptr};
+        glm::vec3 chromatic_aberration_max_offset_{0.01f, 0.0f, -0.01f};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

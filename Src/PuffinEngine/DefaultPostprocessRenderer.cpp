@@ -70,6 +70,15 @@ void DefaultPostprocessRenderer::setShadersUniforms() {
             "color.dof_max_blur", render_settings_->postprocess()->getDepthOfFieldMaxBlur());
         default_shader_program_->setUniform("color.camera_aspect", camera_->getAspect());
     }
+
+    default_shader_program_->setUniform("chromatic_aberration.enabled",
+        render_settings_->postprocess()->isChromaticAberrationEnabled());
+
+    if (render_settings_->postprocess()->isChromaticAberrationEnabled()) {
+        default_shader_program_->setUniform("chromatic_aberration.lens_texture", 3);
+        default_shader_program_->setUniform("chromatic_aberration.max_channels_offset",
+            render_settings_->postprocess()->getChromaticAberrationMaxChannelsOffset());
+    }
 }
 
 void DefaultPostprocessRenderer::createScreenMesh() {
@@ -169,6 +178,9 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     else {
         Texture::unbindTextureType(TextureType::Texture2D);
     }
+
+    Texture::setTextureSlot(3);
+    render_settings_->postprocess()->getChromaticAberrationLensTexture()->bind();
 
     DepthTest::instance().enable(false);
     DepthTest::instance().enableDepthMask(false);

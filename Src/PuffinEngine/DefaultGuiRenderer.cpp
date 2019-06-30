@@ -390,6 +390,38 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
     }
 
+    bool chromatic_enabled = render_settings_->postprocess()->isChromaticAberrationEnabled();
+    ImGui::Checkbox("Chromatic aberration", &chromatic_enabled);
+    render_settings_->postprocess()->enableChromaticAberration(chromatic_enabled);
+
+    if (chromatic_enabled) {
+        ImGui::Text("Lens texture");
+        auto texture = render_settings_->postprocess()->getChromaticAberrationLensTexture();
+        auto texture_size = texture->getSize();
+        ImTextureID texture_handle = (void *)(texture->getHandle());
+        ImGui::Image(texture_handle, ImVec2(texture_size.first / 4.0f, texture_size.second / 4.0f));
+
+        ImGuiInputTextFlags flags = 0;
+        static std::string path = "";
+        ImGui::InputText("Texture path", &path, flags);
+
+        if (ImGui::Button("Load texture")) {
+            render_settings_->postprocess()->getChromaticAberrationLensTexture()->loadTexture2D(
+                path);
+        }
+
+        auto max_offsets =
+            render_settings_->postprocess()->getChromaticAberrationMaxChannelsOffset();
+        float r_offset = max_offsets.r;
+        float g_offset = max_offsets.g;
+        float b_offset = max_offsets.b;
+        ImGui::SliderFloat("R offset", &r_offset, -0.1f, 0.1f);
+        ImGui::SliderFloat("G offset", &g_offset, -0.1f, 0.1f);
+        ImGui::SliderFloat("B offset", &b_offset, -0.1f, 0.1f);
+        render_settings_->postprocess()->setChromaticAberrationMaxChannelsOffset(
+            glm::vec3(r_offset, g_offset, b_offset));
+    }
+
     ImGui::PushFont(font_bold_);
     ImGui::Text("Wire frame");
     ImGui::PopFont();
