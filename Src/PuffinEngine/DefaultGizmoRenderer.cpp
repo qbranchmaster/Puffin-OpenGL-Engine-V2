@@ -33,10 +33,12 @@ void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer) {
     }
 
     // Prepare rendering process
-    frame_buffer->bind(FrameBufferBindType::Normal);
-    FrameBuffer::setViewportSize(frame_buffer);
+    FrameBuffer::unbindAll();
+    FrameBuffer::setViewportSize(
+        InitConfig::instance().getFrameWidth(), InitConfig::instance().getFrameHeight());
 
-    AlphaBlend::instance().enable(false);
+    AlphaBlend::instance().enable(true);
+    AlphaBlend::instance().setBlendFunction(BlendFunction::Normal);
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(false);
     FaceCull::instance().enable(false);
@@ -49,11 +51,23 @@ void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer) {
 	for (GLuint i = 0; i < render_settings_->lighting()->getPointLightsCount(); i++) {
         auto point_light = render_settings_->lighting()->getPointLight(i);
 
-		default_shader_program_->setUniform("view_matrix", camera_->getViewMatrix());
+        auto view_matrix = camera_->getViewMatrix();
+        default_shader_program_->setUniform("view_matrix", view_matrix);
         default_shader_program_->setUniform("projection_matrix", camera_->getProjectionMatrix());
 
 		glm::mat4 model_matrix(1.0f);
         model_matrix = glm::translate(model_matrix, point_light->getPosition());
+
+        model_matrix[0][0] = view_matrix[0][0];
+        model_matrix[1][0] = view_matrix[0][1];
+        model_matrix[2][0] = view_matrix[0][2];
+        model_matrix[0][1] = view_matrix[1][0];
+        model_matrix[1][1] = view_matrix[1][1];
+        model_matrix[2][1] = view_matrix[1][2];
+        model_matrix[0][2] = view_matrix[2][0];
+        model_matrix[1][2] = view_matrix[2][1];
+        model_matrix[2][2] = view_matrix[2][2];
+
         default_shader_program_->setUniform("model_matrix", model_matrix);
 
 		default_shader_program_->setUniform("gizmo_texture", 0);
@@ -79,12 +93,12 @@ void DefaultGizmoRenderer::createGizmoMesh() {
     gizmo_mesh_.reset(new Mesh("gizmo_mesh"));
 	// clang-format off
 	std::vector<GLfloat> positions = {
-        -10.1f,  10.1f, 0.0f,
-        -10.1f, -10.1f, 0.0f,
-         10.1f,  10.1f, 0.0f,
-         10.1f,  10.1f, 0.0f,
-        -10.1f, -10.1f, 0.0f,
-         10.1f, -10.1f, 0.0f
+        -0.1f,  0.1f, 0.0f,
+        -0.1f, -0.1f, 0.0f,
+         0.1f,  0.1f, 0.0f,
+         0.1f,  0.1f, 0.0f,
+        -0.1f, -0.1f, 0.0f,
+         0.1f, -0.1f, 0.0f
     };
 
     std::vector<GLfloat> texture_coords = {
