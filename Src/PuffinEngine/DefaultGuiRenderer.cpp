@@ -519,6 +519,52 @@ void DefaultGuiRenderer::renderLightingDialog() {
     render_settings_->lighting()->setSkyboxLightingColor(
         glm::vec3(sb_light[0], sb_light[1], sb_light[2]));
 
+    ImGui::PushFont(font_bold_);
+    ImGui::Text("Point lights");
+    ImGui::PopFont();
+
+    ImGui::Text("Max count: %d", render_settings_->lighting()->getMaxPointLightsCount());
+
+    static PointLightPtr selected_point_light = nullptr;
+
+    if (ImGui::TreeNode("Point lights")) {
+        for (GLuint i = 0; i < render_settings_->lighting()->getPointLightsCount(); i++) {
+            auto pl = render_settings_->lighting()->getPointLight(i);
+            if (ImGui::Selectable(pl->getName().c_str(), selected_point_light == pl)) {
+                selected_point_light = pl;
+            }
+        }
+
+        ImGui::TreePop();
+    }
+
+    ImGui::Text("Add new");
+    static std::string new_pl_name;
+    ImGui::InputText("Name", &new_pl_name);
+    if (ImGui::Button("Add")) {
+        PointLightPtr point_light(new PointLight(new_pl_name));
+        render_settings_->lighting()->addPointLight(point_light);
+    }
+
+    ImGui::Separator();
+
+    if (!selected_point_light) {
+        ImGui::Text("[ No point light selected ]");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Name: ");
+    ImGui::SameLine();
+    ImGui::Text(selected_point_light->getName().c_str());
+
+    {
+        glm::vec3 position = selected_point_light->getPosition();
+        float pos[] = {position.x, position.y, position.z};
+        ImGui::DragFloat3("Position", pos, 0.01f);
+        selected_point_light->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+    }
+
     ImGui::End();
 }
 

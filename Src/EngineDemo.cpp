@@ -92,7 +92,7 @@ void EngineDemo::createScene() {
     water_tile_->setScale(glm::vec3(15.0f, 15.0f, 15.0f));
     scene_->addWaterTile(water_tile_);
 
-    point_light_.reset(new PointLight());
+    point_light_.reset(new PointLight("test_light"));
     point_light_->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
     point_light_->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
     renderSettings()->lighting()->addPointLight(point_light_);

@@ -8,6 +8,7 @@
 #define PUFFIN_CORE_HPP
 
 #include "PuffinEngine/DefaultFontRenderer.hpp"
+#include "PuffinEngine/DefaultGizmoRenderer.hpp"
 #include "PuffinEngine/DefaultGuiRenderer.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
@@ -64,6 +65,7 @@ namespace puffin {
         DefaultShadowMapRendererPtr default_shadow_map_renderer_{nullptr};
         DefaultSkyboxRendererPtr default_skybox_renderer_{nullptr};
         DefaultWaterRendererPtr default_water_renderer_{nullptr};
+        DefaultGizmoRendererPtr default_gizmo_renderer_{nullptr};
     };
 } // namespace puffin
 

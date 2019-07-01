@@ -19,6 +19,7 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FontRenderer.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
+#include "PuffinEngine/GizmoRenderer.hpp"
 #include "PuffinEngine/GuiRenderer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
@@ -49,6 +50,7 @@ namespace puffin {
         void assignFontRenderer(FontRendererPtr renderer);
         void assignGuiRenderer(GuiRendererPtr renderer);
         void assignWaterRenderer(WaterRendererPtr renderer);
+        void assignGizmoRenderer(GizmoRendererPtr renderer);
 
         void drawScene(ScenePtr scene);
         void captureScreen(std::string file_name, GLboolean add_timestamp);
@@ -83,6 +85,10 @@ namespace puffin {
             return water_renderer_;
         }
 
+		GizmoRendererPtr gizmoRenderer() const {
+            return gizmo_renderer_;
+		}
+
     private:
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
@@ -112,6 +118,7 @@ namespace puffin {
         ShadowMapRendererPtr shadow_map_renderer_{nullptr};
         FontRendererPtr font_renderer_{nullptr};
         WaterRendererPtr water_renderer_{nullptr};
+        GizmoRendererPtr gizmo_renderer_{nullptr};
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;

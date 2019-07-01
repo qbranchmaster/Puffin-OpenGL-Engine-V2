@@ -78,6 +78,10 @@ void MasterRenderer::start() {
             postprocess_renderer_->render(default_frame_buffer_);
         }
 
+		if (gizmo_renderer_) {
+            gizmo_renderer_->render(default_frame_buffer_);
+		}
+
         if (rendered_scene) {
             for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
                 auto text = rendered_scene->getText(i);
@@ -183,6 +187,15 @@ void MasterRenderer::assignWaterRenderer(WaterRendererPtr renderer) {
     }
 
     water_renderer_ = renderer;
+}
+
+void MasterRenderer::assignGizmoRenderer(GizmoRendererPtr renderer) {
+    if (!renderer) {
+        logError("MasterRenderer::assignGizmoRenderer()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    gizmo_renderer_ = renderer;
 }
 
 void MasterRenderer::drawScene(ScenePtr scene) {

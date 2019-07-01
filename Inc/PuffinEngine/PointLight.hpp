@@ -23,6 +23,14 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
+		PointLight(std::string name = "") {
+            name_ = name;
+		}
+
+		std::string getName() const {
+            return name_;
+		}
+
         void enable(GLboolean state) {
             enabled_ = state;
         }
@@ -69,6 +77,8 @@ namespace puffin {
         }
 
     private:
+        std::string name_;
+
         GLboolean enabled_{false};
 
         GLfloat linear_factor_{0.14f};

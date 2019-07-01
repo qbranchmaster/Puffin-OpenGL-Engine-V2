@@ -119,6 +119,12 @@ namespace puffin {
                 return;
             }
 
+			if (point_lights_.size() >= max_point_lights_count_) {
+                logError("Lighting::addPointLight()",
+                    PUFFIN_MSG_OUT_OF_RANGE(0, max_point_lights_count_));
+                return;
+			}
+
             point_lights_.push_back(point_light);
         }
 
@@ -136,6 +142,10 @@ namespace puffin {
             return point_lights_.size();
         }
 
+		GLushort getMaxPointLightsCount() const {
+            return max_point_lights_count_;
+		}
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};
@@ -150,6 +160,8 @@ namespace puffin {
 
         DirectionalLightPtr directional_light_{nullptr};
         std::vector<PointLightPtr> point_lights_;
+
+        constexpr static GLushort max_point_lights_count_{4};
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;
