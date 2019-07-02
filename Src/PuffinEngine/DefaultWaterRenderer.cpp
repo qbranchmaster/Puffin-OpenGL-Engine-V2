@@ -8,14 +8,13 @@
 
 using namespace puffin;
 
-DefaultWaterRenderer::DefaultWaterRenderer(RenderSettingsPtr render_settings, CameraPtr camera,
+DefaultWaterRenderer::DefaultWaterRenderer(RenderSettingsPtr render_settings,
     DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer) {
-    if (!render_settings || !camera || !mesh_renderer || !skybox_renderer) {
+    if (!render_settings || !mesh_renderer || !skybox_renderer) {
         throw Exception("DefaultWaterRenderer::DefaultWaterRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     render_settings_ = render_settings;
-    camera_ = camera;
     mesh_renderer_ = mesh_renderer;
     skybox_renderer_ = skybox_renderer;
 
@@ -41,7 +40,7 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
-    switch (render_settings_->wireframe()->getMode()) {
+    switch (render_settings_->postprocess()->wireframe()->getMode()) {
     case WireframeMode::None:
         renderNormal(frame_buffer, scene);
         break;
@@ -79,16 +78,16 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
         reflection_frame_buffer_->getWidth(), reflection_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
 
-    auto wireframe_mode = render_settings_->wireframe()->getMode();
-    render_settings_->wireframe()->setMode(WireframeMode::None);
+    auto wireframe_mode = render_settings_->postprocess()->wireframe()->getMode();
+    render_settings_->postprocess()->wireframe()->setMode(WireframeMode::None);
 
     auto water_level = water_tile->getPosition().y;
 
-    auto camera_pos = camera_->getPosition();
+    auto camera_pos = scene->camera()->getPosition();
     GLfloat offset = 2.0f * (camera_pos.y - water_level);
     glm::vec3 new_camera_pos(camera_pos.x, camera_pos.y - offset, camera_pos.z);
-    camera_->setPosition(new_camera_pos);
-    camera_->flipPitch();
+    scene->camera()->setPosition(new_camera_pos);
+    scene->camera()->flipPitch();
 
     skybox_renderer_->render(reflection_frame_buffer_, scene);
 
@@ -98,10 +97,10 @@ void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->enableClippingPlane(false);
 
     // Restore previous camera position and orientation
-    camera_->setPosition(camera_pos);
-    camera_->flipPitch();
+    scene->camera()->setPosition(camera_pos);
+    scene->camera()->flipPitch();
 
-    render_settings_->wireframe()->setMode(wireframe_mode);
+    render_settings_->postprocess()->wireframe()->setMode(wireframe_mode);
 }
 
 void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene) {
@@ -119,8 +118,8 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
         refraction_frame_buffer_->getWidth(), refraction_frame_buffer_->getHeight());
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
 
-    auto wireframe_mode = render_settings_->wireframe()->getMode();
-    render_settings_->wireframe()->setMode(WireframeMode::None);
+    auto wireframe_mode = render_settings_->postprocess()->wireframe()->getMode();
+    render_settings_->postprocess()->wireframe()->setMode(WireframeMode::None);
 
     auto water_level = water_tile->getPosition().y;
 
@@ -131,7 +130,7 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->render(refraction_frame_buffer_, scene);
     mesh_renderer_->enableClippingPlane(false);
 
-    render_settings_->wireframe()->setMode(wireframe_mode);
+    render_settings_->postprocess()->wireframe()->setMode(wireframe_mode);
 }
 
 void DefaultWaterRenderer::loadShaders() {
@@ -143,10 +142,10 @@ void DefaultWaterRenderer::loadShaders() {
         "Data/Shaders/Wireframe.vert", "Data/Shaders/Wireframe.frag");
 }
 
-void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile) {
-    default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile, LightingPtr lighting, FogPtr fog, CameraPtr camera) {
+    default_shader_program_->setUniform("matrices.view_matrix", camera->getViewMatrix());
     default_shader_program_->setUniform(
-        "matrices.projection_matrix", camera_->getProjectionMatrix());
+        "matrices.projection_matrix", camera->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix", water_tile->getModelMatrix());
 
     default_shader_program_->setUniform("reflection_texture", 0);
@@ -164,7 +163,6 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile) {
     default_shader_program_->setUniform(
         "water_tile.specular_factor", water_tile->getSpecularFactor());
 
-    auto lighting = render_settings_->lighting();
     default_shader_program_->setUniform(
         "directional_light.enabled", lighting->directionalLight()->isEnabled());
     default_shader_program_->setUniform(
@@ -181,22 +179,22 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile) {
     default_shader_program_->setUniform("postprocess.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());
 
-    default_shader_program_->setUniform("camera_position", camera_->getPosition());
+    default_shader_program_->setUniform("camera_position", camera->getPosition());
     default_shader_program_->setUniform("texture_tiling", texture_tiling_);
 
-    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
-    default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
-    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
+    default_shader_program_->setUniform("fog.enabled", fog->isEnabled());
+    default_shader_program_->setUniform("fog.density", fog->getDensity());
+    default_shader_program_->setUniform("fog.color", fog->getColor());
 }
 
-void DefaultWaterRenderer::setWireframeShaderUniforms(WaterTilePtr water_tile) {
-    wireframe_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+void DefaultWaterRenderer::setWireframeShaderUniforms(WaterTilePtr water_tile, CameraPtr camera) {
+    wireframe_shader_program_->setUniform("matrices.view_matrix", camera->getViewMatrix());
     wireframe_shader_program_->setUniform(
-        "matrices.projection_matrix", camera_->getProjectionMatrix());
+        "matrices.projection_matrix", camera->getProjectionMatrix());
     wireframe_shader_program_->setUniform("matrices.model_matrix", water_tile->getModelMatrix());
 
     wireframe_shader_program_->setUniform(
-        "wireframe_color", render_settings_->wireframe()->getColor());
+        "wireframe_color", render_settings_->postprocess()->wireframe()->getColor());
 }
 
 void DefaultWaterRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene) {
@@ -221,7 +219,7 @@ void DefaultWaterRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sc
         AlphaBlend::instance().enable(false);
 
         default_shader_program_->activate();
-        setDefaultShaderUniforms(water_tile);
+        setDefaultShaderUniforms(water_tile, scene->lighting(), scene->fog(), scene->camera());
 
         Texture::setTextureSlot(0);
         reflection_frame_buffer_->getTextureBuffer(0)->bind();
@@ -254,13 +252,13 @@ void DefaultWaterRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr
         AlphaBlend::instance().enable(false);
 
         wireframe_shader_program_->activate();
-        setWireframeShaderUniforms(water_tile);
+        setWireframeShaderUniforms(water_tile, scene->camera());
 
-        render_settings_->wireframe()->enable(true);
+        render_settings_->postprocess()->wireframe()->enable(true);
 
         drawWaterTile(water_tile);
 
-        render_settings_->wireframe()->enable(false);
+        render_settings_->postprocess()->wireframe()->enable(false);
     }
 }
 

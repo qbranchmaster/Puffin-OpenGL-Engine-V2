@@ -36,7 +36,7 @@
 namespace puffin {
     class DefaultGuiRenderer : public GuiRenderer {
     public:
-        DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window, CameraPtr camera,
+        DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window,
             MasterRendererPtr master_renderer);
 
         void render(ScenePtr scene);
@@ -88,7 +88,6 @@ namespace puffin {
 
         GLboolean enabled_{true};
 
-        CameraPtr camera_{nullptr};
         MasterRendererPtr master_renderer_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};
         WindowPtr target_window_{nullptr};

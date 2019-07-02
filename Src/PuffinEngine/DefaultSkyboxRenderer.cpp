@@ -8,13 +8,8 @@
 
 using namespace puffin;
 
-DefaultSkyboxRenderer::DefaultSkyboxRenderer(RenderSettingsPtr render_settings, CameraPtr camera) {
-    if (!render_settings || !camera) {
-        throw Exception("DefaultSkyboxRenderer::DefaultSkyboxRenderer()", PUFFIN_MSG_NULL_OBJECT);
-    }
+DefaultSkyboxRenderer::DefaultSkyboxRenderer() {
 
-    render_settings_ = render_settings;
-    camera_ = camera;
 
     loadShaders();
 }
@@ -60,7 +55,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     }
 
     default_shader_program_->activate();
-    setDefaultShaderUniforms(skybox);
+    setDefaultShaderUniforms(scene);
 
     Texture::setTextureSlot(0);
     auto texture = skybox->getTexture();
@@ -74,38 +69,41 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     drawSkybox(skybox);
 }
 
-void DefaultSkyboxRenderer::setDefaultShaderUniforms(SkyboxPtr skybox) {
-    if (!skybox) {
+void DefaultSkyboxRenderer::setDefaultShaderUniforms(ScenePtr scene) {
+    if (!scene) {
         logError("DefaultSkyboxRenderer::setShadersUniforms()", PUFFIN_MSG_NULL_OBJECT);
         return;
     }
 
-    // Skybox should not be affected by changing near and far plane values
-    auto near_plane = camera_->getNearPlane();
-    auto far_plane = camera_->getFarPlane();
-    camera_->setProjection(camera_->getFov(), camera_->getAspect(), 0.5f, 2.5f);
+	auto skybox = scene->getSkybox();
 
-    default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrixStatic());
+    // Skybox should not be affected by changing near and far plane values
+    auto near_plane = scene->camera()->getNearPlane();
+    auto far_plane = scene->camera()->getFarPlane();
+    scene->camera()->setProjection(
+        scene->camera()->getFov(), scene->camera()->getAspect(), 0.5f, 2.5f);
+
     default_shader_program_->setUniform(
-        "matrices.projection_matrix", camera_->getProjectionMatrix());
+        "matrices.view_matrix", scene->camera()->getViewMatrixStatic());
+    default_shader_program_->setUniform(
+        "matrices.projection_matrix", scene->camera()->getProjectionMatrix());
     default_shader_program_->setUniform("matrices.model_matrix", skybox->getModelMatrix());
 
     // Restore previous near and far plane values
-    camera_->setProjection(camera_->getFov(), camera_->getAspect(), near_plane, far_plane);
+    scene->camera()->setProjection(
+        scene->camera()->getFov(), scene->camera()->getAspect(), near_plane, far_plane);
 
     default_shader_program_->setUniform("color.cube_texture", 0);
     default_shader_program_->setUniform(
-        "color.light_color", render_settings_->lighting()->getSkyboxLightColor());
+        "color.light_color", scene->lighting()->getSkyboxLightColor());
     default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
     default_shader_program_->setUniform("color.bloom_threshold_color",
         render_settings_->postprocess()->getGlowBloomThresholdColor());
 
-    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
-    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
+    default_shader_program_->setUniform("fog.enabled", scene->fog()->isEnabled());
+    default_shader_program_->setUniform("fog.color", scene->fog()->getColor());
+    default_shader_program_->setUniform("fog.density", scene->fog()->getSkyboxFogOverallDensity());
     default_shader_program_->setUniform(
-        "fog.density", render_settings_->fog()->getSkyboxFogOverallDensity());
-    default_shader_program_->setUniform(
-        "fog.transition_power", render_settings_->fog()->getSkyboxFogTransitionPower());
-    default_shader_program_->setUniform(
-        "fog.height", render_settings_->fog()->getSkyboxFogHeight());
+        "fog.transition_power", scene->fog()->getSkyboxFogTransitionPower());
+    default_shader_program_->setUniform("fog.height", scene->fog()->getSkyboxFogHeight());
 }

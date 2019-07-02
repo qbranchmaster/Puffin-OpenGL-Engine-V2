@@ -10,6 +10,9 @@
 #include <memory>
 #include <vector>
 
+#include "PuffinEngine/Camera.hpp"
+#include "PuffinEngine/Fog.hpp"
+#include "PuffinEngine/Lighting.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/Skybox.hpp"
 #include "PuffinEngine/Text.hpp"
@@ -18,6 +21,12 @@
 namespace puffin {
     class Scene {
     public:
+		Scene() {
+            camera_.reset(new Camera());
+            fog_.reset(new Fog());
+            lighting_.reset(new Lighting());
+		}
+
         void reset() {
             meshes_.clear();
             textes_.clear();
@@ -99,11 +108,27 @@ namespace puffin {
             return water_tiles_[index];
         }
 
+        FogPtr fog() const {
+            return fog_;
+        }
+
+        LightingPtr lighting() const {
+            return lighting_;
+        }
+
+		CameraPtr camera() const {
+            return camera_;
+        }
+
     private:
         std::vector<MeshPtr> meshes_;
         std::vector<TextPtr> textes_;
         std::vector<WaterTilePtr> water_tiles_;
         SkyboxPtr active_skybox_{nullptr};
+
+		CameraPtr camera_{nullptr};
+		FogPtr fog_{nullptr};
+        LightingPtr lighting_{nullptr};
     };
 
     using ScenePtr = std::shared_ptr<Scene>;

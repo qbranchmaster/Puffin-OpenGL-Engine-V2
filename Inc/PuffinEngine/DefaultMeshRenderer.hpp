@@ -13,7 +13,6 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 
 namespace puffin {
@@ -21,8 +20,7 @@ namespace puffin {
         friend class DefaultWaterRenderer;
 
     public:
-        DefaultMeshRenderer(RenderSettingsPtr render_settings, CameraPtr camera,
-            DefaultShadowMapRendererPtr shadow_map_renderer);
+        DefaultMeshRenderer(DefaultShadowMapRendererPtr shadow_map_renderer);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -40,9 +38,9 @@ namespace puffin {
 
     private:
         void loadShaders();
-        void setDefaultShaderUniforms();
+        void setDefaultShaderUniforms(ScenePtr scene);
         void setDefaultShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity);
-        void setWireframeShaderUniforms();
+        void setWireframeShaderUniforms(CameraPtr camera);
         void setWireframeShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity);
         void renderMeshEntity(MeshPtr mesh, GLuint entity_index);
         void drawMeshEntity(MeshEntityPtr entity);
@@ -53,8 +51,6 @@ namespace puffin {
         GLboolean clipping_plane_enabled_{false};
         glm::vec4 clipping_plane_{0.0f, -1.0f, 0.0f, 1.0f};
 
-        CameraPtr camera_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
         ShaderProgramPtr wireframe_shader_program_{nullptr};
 

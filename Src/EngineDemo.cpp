@@ -12,7 +12,7 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    InitConfig::instance().setFrameResolution(1280, 720);
+    InitConfig::instance().setFrameResolution(240, 120);
     InitConfig::instance().setMsaaSamples(2);
     InitConfig::instance().setOpenGLVersion(4, 0);
     InitConfig::instance().enableFullscreen(false);
@@ -25,28 +25,13 @@ EngineDemo::EngineDemo() : Core() {
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
-
-    camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
-    camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);
-    camera()->setFov(0.85f);
+    window()->setPosition(2150, 600);
 
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
 
     renderSettings()->postprocess()->setEffect(PostprocessEffect::None);
     renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
     renderSettings()->postprocess()->enableGlowBloom(false);
-
-    renderSettings()->lighting()->enable(true);
-    renderSettings()->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
-    renderSettings()->lighting()->enableShadowMapping(true);
-    renderSettings()->lighting()->setDirectionalLightShadowMapSize(1024);
-    renderSettings()->lighting()->setShadowDistance(20.0f);
-    renderSettings()->lighting()->directionalLight()->enable(true);
-    renderSettings()->lighting()->enableBlinnPhong(true);
-    renderSettings()->lighting()->directionalLight()->setDirection(glm::vec3(0.5f, -0.5f, -0.5f));
-    renderSettings()->lighting()->directionalLight()->setAmbientColor(glm::vec3(0.1f, 0.1f, 0.1f));
-    renderSettings()->lighting()->directionalLight()->setDiffuseColor(glm::vec3(0.8f, 0.8f, 0.8f));
-    renderSettings()->lighting()->directionalLight()->setSpecularColor(glm::vec3(5.5f, 5.5f, 5.5f));
 
     createScene();
 
@@ -95,7 +80,22 @@ void EngineDemo::createScene() {
     point_light_.reset(new PointLight("test_light"));
     point_light_->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
     point_light_->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    renderSettings()->lighting()->addPointLight(point_light_);
+    scene_->lighting()->addPointLight(point_light_);
+
+	scene_->lighting()->enable(true);
+    scene_->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
+    scene_->lighting()->enableShadowMapping(true);
+    scene_->lighting()->setShadowDistance(20.0f);
+    scene_->lighting()->directionalLight()->enable(true);
+    scene_->lighting()->enableBlinnPhong(true);
+    scene_->lighting()->directionalLight()->setDirection(glm::vec3(0.5f, -0.5f, -0.5f));
+    scene_->lighting()->directionalLight()->setAmbientColor(glm::vec3(0.1f, 0.1f, 0.1f));
+    scene_->lighting()->directionalLight()->setDiffuseColor(glm::vec3(0.8f, 0.8f, 0.8f));
+    scene_->lighting()->directionalLight()->setSpecularColor(glm::vec3(5.5f, 5.5f, 5.5f));
+
+	scene_->camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
+    scene_->camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);
+    scene_->camera()->setFov(0.85f);
 }
 
 void EngineDemo::pollKeyboard() {
@@ -149,26 +149,26 @@ void EngineDemo::rotateSkybox() {
 
 void EngineDemo::moveCamera() {
     if (input()->keyPressed(Key::LeftShift, true)) {
-        camera()->setMoveSpeed(2.0f);
+        scene_->camera()->setMoveSpeed(2.0f);
     }
     else {
-        camera()->setMoveSpeed(1.0f);
+        scene_->camera()->setMoveSpeed(1.0f);
     }
 
     if (input()->keyPressed(Key::A, true)) {
-        camera()->move(CameraMoveDirection::Left);
+        scene_->camera()->move(CameraMoveDirection::Left);
     }
 
     if (input()->keyPressed(Key::D, true)) {
-        camera()->move(CameraMoveDirection::Right);
+        scene_->camera()->move(CameraMoveDirection::Right);
     }
 
     if (input()->keyPressed(Key::W, true)) {
-        camera()->move(CameraMoveDirection::Forward);
+        scene_->camera()->move(CameraMoveDirection::Forward);
     }
 
     if (input()->keyPressed(Key::S, true)) {
-        camera()->move(CameraMoveDirection::Backward);
+        scene_->camera()->move(CameraMoveDirection::Backward);
     }
 }
 
@@ -186,10 +186,10 @@ void EngineDemo::rotateCamera() {
         GLdouble x_diff = cur_x - cursor_x;
         GLdouble y_diff = cur_y - cursor_y;
 
-        camera()->rotate((GLfloat)(y_diff * mouse_speed), (GLfloat)(x_diff * mouse_speed));
+        scene_->camera()->rotate((GLfloat)(y_diff * mouse_speed), (GLfloat)(x_diff * mouse_speed));
 
         // Clamp vertical angle from 0 to 90 degrees
-        GLfloat v_angle = camera()->getVerticalAngle();
+        GLfloat v_angle = scene_->camera()->getVerticalAngle();
         if (v_angle > glm::half_pi<GLfloat>()) {
             v_angle = glm::half_pi<GLfloat>();
         }
@@ -197,7 +197,7 @@ void EngineDemo::rotateCamera() {
             v_angle = -glm::half_pi<GLfloat>();
         }
 
-        camera()->setRotation(camera()->getHorizontalAngle(), v_angle);
+        scene_->camera()->setRotation(scene_->camera()->getHorizontalAngle(), v_angle);
 
         cursor_x = cur_x;
         cursor_y = cur_y;

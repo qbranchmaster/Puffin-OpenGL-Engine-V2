@@ -11,7 +11,6 @@
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/InitConfig.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/WaterRenderer.hpp"
@@ -19,8 +18,7 @@
 namespace puffin {
     class DefaultWaterRenderer : public WaterRenderer {
     public:
-        DefaultWaterRenderer(RenderSettingsPtr render_settings, CameraPtr camera,
-            DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer);
+        DefaultWaterRenderer(DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -32,8 +30,8 @@ namespace puffin {
 
     private:
         void loadShaders();
-        void setDefaultShaderUniforms(WaterTilePtr water_tile);
-        void setWireframeShaderUniforms(WaterTilePtr water_tile);
+        void setDefaultShaderUniforms(WaterTilePtr water_tile, LightingPtr lighting, FogPtr fog, CameraPtr camera);
+        void setWireframeShaderUniforms(WaterTilePtr water_tile, CameraPtr camera);
 
         void renderNormal(FrameBufferPtr frame_buffer, ScenePtr scene);
         void renderWireframe(FrameBufferPtr frame_buffer, ScenePtr scene);
@@ -43,7 +41,6 @@ namespace puffin {
         void renderToRefractionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene);
         void drawWaterTile(WaterTilePtr water_tile);
 
-        CameraPtr camera_{nullptr};
         DefaultMeshRendererPtr mesh_renderer_{nullptr};
         DefaultSkyboxRendererPtr skybox_renderer_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};

@@ -13,7 +13,7 @@ SceneLoader::SceneLoader() {
 }
 
 void SceneLoader::saveScene(
-    std::string file_name, ScenePtr scene, CameraPtr camera, RenderSettingsPtr render_settings) {
+    std::string file_name, ScenePtr scene, CameraPtr camera) {
     if (!scene) {
         logError("SceneLoader::saveScene()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -27,7 +27,7 @@ void SceneLoader::saveScene(
     file_name += ".psc";
 
     saveCameraSettings(camera);
-    saveRenderSettings(render_settings);
+    //saveRenderSettings(render_settings);
 
     saveSkybox(scene);
     saveMeshes(scene);
@@ -42,7 +42,7 @@ void SceneLoader::saveScene(
 }
 
 void SceneLoader::loadScene(
-    std::string file_name, ScenePtr scene, CameraPtr camera, RenderSettingsPtr render_settings) {
+    std::string file_name, ScenePtr scene, CameraPtr camera) {
     if (!scene) {
         logError("SceneLoader::loadScene()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -63,7 +63,7 @@ void SceneLoader::loadScene(
     scene->reset();
 
     loadCameraSettings(camera);
-    loadRenderSettings(render_settings);
+    //loadRenderSettings(render_settings);
 
     loadSkybox(scene);
     loadMeshes(scene);
@@ -305,8 +305,8 @@ void SceneLoader::loadWaterTiles(ScenePtr scene) {
         scene->addWaterTile(water_tile);
     }
 }
-
-void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
+/*
+    void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
     if (!render_settings) {
         saveValue("render_settings", "valid", 0);
         return;
@@ -366,15 +366,15 @@ void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {
     saveValue("postprocess", "exposure", postprocess->exposure_);
 
     // Wireframe
-    auto wireframe = render_settings->wireframe();
+    auto wireframe = render_settings->postprocess()->wireframe();
     saveValue("wireframe", "enabled", wireframe->enabled_);
 
     saveValue("wireframe", "mode", static_cast<GLuint>(wireframe->mode_));
     saveValue("wireframe", "color", wireframe->color_);
     saveValue("wireframe", "line_width", wireframe->line_width_);
-}
+}*/
 
-void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
+/*void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
     if (!render_settings) {
         return;
     }
@@ -439,7 +439,7 @@ void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
     loadValue("postprocess", "exposure", postprocess->exposure_);
 
     // Wireframe
-    auto wireframe = render_settings->wireframe();
+    auto wireframe = render_settings->postprocess()->wireframe();
     loadValue("wireframe", "enabled", wireframe->enabled_);
 
     GLuint wireframe_mode = 0;
@@ -448,4 +448,4 @@ void SceneLoader::loadRenderSettings(RenderSettingsPtr render_settings) {
 
     loadValue("wireframe", "color", wireframe->color_);
     loadValue("wireframe", "line_width", wireframe->line_width_);
-}
+}*/

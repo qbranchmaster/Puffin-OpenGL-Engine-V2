@@ -66,19 +66,6 @@ namespace puffin {
             return shadow_mapping_enabled_;
         }
 
-        void setDirectionalLightShadowMapSize(GLuint size) {
-            if (size == 0) {
-                logError("Lighting::setDirectionalLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
-                return;
-            }
-
-            directional_light_shadow_map_size_ = size;
-        }
-
-        GLuint getDirectionalLightShadowMapSize() const {
-            return directional_light_shadow_map_size_;
-        }
-
         void setShadowDistance(GLfloat distance) {
             if (distance <= 0.0f) {
                 logError("Lighting::setShadowDistance()", PUFFIN_MSG_INVALID_VALUE);
@@ -151,7 +138,6 @@ namespace puffin {
         GLboolean blinn_phong_enabled_{false};
 
         GLboolean shadow_mapping_enabled_{true};
-        GLuint directional_light_shadow_map_size_{1024};
         GLfloat shadow_distance_{10.0f};
         GLfloat emission_factor_{10.0f};
         GLuint shadows_pcf_samples_count_{1};

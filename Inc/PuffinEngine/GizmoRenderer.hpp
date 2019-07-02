@@ -9,11 +9,12 @@
 
 #include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/Renderer.hpp"
+#include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
     class GizmoRenderer : public Renderer {
     public:
-        virtual void render(FrameBufferPtr frame_buffer) = 0;
+        virtual void render(FrameBufferPtr frame_buffer, ScenePtr scene) = 0;
     };
 
     using GizmoRendererPtr = std::shared_ptr<GizmoRenderer>;

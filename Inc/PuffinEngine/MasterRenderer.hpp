@@ -24,7 +24,6 @@
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShadowMapRenderer.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
 #include "PuffinEngine/System.hpp"
@@ -36,7 +35,7 @@
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window, CameraPtr camera, RenderSettingsPtr render_settings);
+        MasterRenderer(WindowPtr window);
 
         void start();
         void stop();
@@ -99,10 +98,8 @@ namespace puffin {
         GLboolean rendering_enabled_{false};
         std::function<ScenePtr()> rendering_function_{nullptr};
 
-        CameraPtr camera_{nullptr};
         FrameBufferPtr default_frame_buffer_{nullptr};
         FrameBufferPtr default_frame_buffer_multisample_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         WindowPtr target_window_{nullptr};
 
         std::vector<TimerPtr> timers_;

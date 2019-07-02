@@ -8,22 +8,14 @@
 
 using namespace puffin;
 
-puffin::DefaultGizmoRenderer::DefaultGizmoRenderer(
-    RenderSettingsPtr render_settings, CameraPtr camera) {
-    if (!render_settings || !camera) {
-        throw Exception("DefaultGizmoRenderer::DefaultGizmoRenderer()", PUFFIN_MSG_NULL_OBJECT);
-    }
-
-    render_settings_ = render_settings;
-    camera_ = camera;
-
+puffin::DefaultGizmoRenderer::DefaultGizmoRenderer() {
     loadShaders();
     loadTextures();
     createGizmoMesh();
 }
 
-void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer) {
-    if (!frame_buffer) {
+void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
+    if (!frame_buffer || !scene) {
         logError("DefaultGizmoRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
         return;
 	}
@@ -48,12 +40,13 @@ void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer) {
 
 	gizmo_mesh_->bind();
 
-	for (GLuint i = 0; i < render_settings_->lighting()->getPointLightsCount(); i++) {
-        auto point_light = render_settings_->lighting()->getPointLight(i);
+	for (GLuint i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
+        auto point_light = scene->lighting()->getPointLight(i);
 
-        auto view_matrix = camera_->getViewMatrix();
+        auto view_matrix = scene->camera()->getViewMatrix();
         default_shader_program_->setUniform("view_matrix", view_matrix);
-        default_shader_program_->setUniform("projection_matrix", camera_->getProjectionMatrix());
+        default_shader_program_->setUniform(
+            "projection_matrix", scene->camera()->getProjectionMatrix());
 
 		glm::mat4 model_matrix(1.0f);
         model_matrix = glm::translate(model_matrix, point_light->getPosition());

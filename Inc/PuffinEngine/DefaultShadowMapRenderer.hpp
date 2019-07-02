@@ -13,7 +13,7 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/FrameBuffer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
+#include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/ShadowMapRenderer.hpp"
 
@@ -25,7 +25,7 @@ namespace puffin {
 
     class DefaultShadowMapRenderer : public ShadowMapRenderer {
     public:
-        DefaultShadowMapRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
+        DefaultShadowMapRenderer();
 
         void render(ScenePtr scene);
 
@@ -37,11 +37,9 @@ namespace puffin {
         void loadShaders();
         void createDirectionalLightFrameBuffer();
         void renderDirectionalLightShadowMap(ScenePtr scene);
-        glm::mat4 calculateDirectionalLightSpaceMatrix();
+        glm::mat4 calculateDirectionalLightSpaceMatrix(LightingPtr lighting, CameraPtr camera);
 
-        CameraPtr camera_{nullptr};
         CameraFrustumPtr camera_frustum_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr directional_light_shader_program_{nullptr};
 
         ShadowMapRendererOutputData output_data_{};

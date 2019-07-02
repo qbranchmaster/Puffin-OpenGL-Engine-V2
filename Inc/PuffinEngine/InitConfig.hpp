@@ -81,6 +81,19 @@ namespace puffin {
             return std::make_pair(water_refraction_width_, water_refraction_height_);
         }
 
+		void setDirectionalLightShadowMapSize(GLuint size) {
+            if (size == 0) {
+                logError("InitConfig::setDirectionalLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            directional_light_shadow_map_size_ = size;
+        }
+
+        GLuint getDirectionalLightShadowMapSize() const {
+            return directional_light_shadow_map_size_;
+        }
+
     private:
         InitConfig() {}
         InitConfig(const InitConfig &) = delete;
@@ -91,6 +104,8 @@ namespace puffin {
         GLushort msaa_samples_{4};
         GLboolean fullscreen_{false};
         GLushort monitor_index_{0};
+
+		GLuint directional_light_shadow_map_size_{1024};
 
         GLuint water_reflection_width_{640};
         GLuint water_reflection_height_{320};

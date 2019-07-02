@@ -9,14 +9,12 @@
 using namespace puffin;
 
 MasterRenderer::MasterRenderer(
-    WindowPtr window, CameraPtr camera, RenderSettingsPtr render_settings) {
-    if (!window || !camera || !render_settings) {
+    WindowPtr window) {
+    if (!window) {
         throw Exception("MasterRenderer::MasterRenderer()", "Not initialized object.");
     }
 
-    camera_ = camera;
     target_window_ = window;
-    render_settings_ = render_settings;
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " + System::instance().getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " + System::instance().getGpuName());
@@ -75,11 +73,11 @@ void MasterRenderer::start() {
         if (postprocess_renderer_) {
             default_frame_buffer_multisample_->copyFrameBuffer(default_frame_buffer_, 0, true);
             default_frame_buffer_multisample_->copyFrameBuffer(default_frame_buffer_, 1, false);
-            postprocess_renderer_->render(default_frame_buffer_);
+            postprocess_renderer_->render(default_frame_buffer_, rendered_scene);
         }
 
 		if (gizmo_renderer_) {
-            gizmo_renderer_->render(default_frame_buffer_);
+            gizmo_renderer_->render(default_frame_buffer_, rendered_scene);
 		}
 
         if (rendered_scene) {
@@ -105,7 +103,7 @@ void MasterRenderer::start() {
 
         checkGlErrors();
 
-        camera_->updateSpeed(Time::instance().getDelta());
+        rendered_scene->camera()->updateSpeed(Time::instance().getDelta());
 
         for (const auto &timer : timers_) {
             timer->update(Time::instance().getDelta());

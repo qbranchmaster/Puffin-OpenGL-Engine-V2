@@ -8,15 +8,8 @@
 
 using namespace puffin;
 
-DefaultPostprocessRenderer::DefaultPostprocessRenderer(
-    RenderSettingsPtr render_settings, CameraPtr camera) {
-    if (!render_settings || !camera) {
-        throw Exception(
-            "DefaultPostprocessRenderer::DefaultPostprocessRenderer()", PUFFIN_MSG_NULL_OBJECT);
-    }
-
-    camera_ = camera;
-    render_settings_ = render_settings;
+DefaultPostprocessRenderer::DefaultPostprocessRenderer(PostprocessPtr postprocess) {
+    postprocess_ = postprocess;
 
     loadShaders();
     createScreenMesh();
@@ -40,44 +33,38 @@ void DefaultPostprocessRenderer::loadShaders() {
         "Data/Shaders/Postprocess.vert", "Data/Shaders/PostprocessGlowBloom.frag");
 }
 
-void DefaultPostprocessRenderer::setShadersUniforms() {
+void DefaultPostprocessRenderer::setShadersUniforms(CameraPtr camera) {
     default_shader_program_->setUniform(
-        "color.effect", static_cast<GLint>(render_settings_->postprocess()->getEffect()));
-    default_shader_program_->setUniform(
-        "color.kernel_size", render_settings_->postprocess()->getKernelSize());
-    default_shader_program_->setUniform(
-        "color.tint_color", render_settings_->postprocess()->getTintColor());
+        "color.effect", static_cast<GLint>(postprocess_->getEffect()));
+    default_shader_program_->setUniform("color.kernel_size", postprocess_->getKernelSize());
+    default_shader_program_->setUniform("color.tint_color", postprocess_->getTintColor());
     default_shader_program_->setUniform("color.screen_texture", 0);
     default_shader_program_->setUniform("color.depth_texture", 1);
-    default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
+    default_shader_program_->setUniform("color.gamma", postprocess_-> getGamma());
+    default_shader_program_->setUniform("color.exposure", postprocess_->getExposure());
     default_shader_program_->setUniform(
-        "color.exposure", render_settings_->postprocess()->getExposure());
-    default_shader_program_->setUniform(
-        "color.glow_bloom_enabled", render_settings_->postprocess()->isGlowBloomEnabled());
-    default_shader_program_->setUniform(
-        "color.dof_enabled", render_settings_->postprocess()->isDepthOfFieldEnabled());
+        "color.glow_bloom_enabled", postprocess_->isGlowBloomEnabled());
+    default_shader_program_->setUniform("color.dof_enabled", postprocess_->isDepthOfFieldEnabled());
 
-    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+    if (postprocess_->isGlowBloomEnabled()) {
         default_shader_program_->setUniform("color.glow_bloom_texture", 2);
     }
 
-    if (render_settings_->postprocess()->isDepthOfFieldEnabled()) {
+    if (postprocess_->isDepthOfFieldEnabled()) {
+        default_shader_program_->setUniform("color.aperture", postprocess_->getAperture());
         default_shader_program_->setUniform(
-            "color.aperture", render_settings_->postprocess()->getAperture());
+            "color.focus_distance", postprocess_->getFocusDistance());
         default_shader_program_->setUniform(
-            "color.focus_distance", render_settings_->postprocess()->getFocusDistance());
-        default_shader_program_->setUniform(
-            "color.dof_max_blur", render_settings_->postprocess()->getDepthOfFieldMaxBlur());
-        default_shader_program_->setUniform("color.camera_aspect", camera_->getAspect());
+            "color.dof_max_blur", postprocess_->getDepthOfFieldMaxBlur());
+        default_shader_program_->setUniform("color.camera_aspect", camera->getAspect());
     }
 
-    default_shader_program_->setUniform("chromatic_aberration.enabled",
-        render_settings_->postprocess()->isChromaticAberrationEnabled());
+    default_shader_program_->setUniform("chromatic_aberration.enabled", postprocess_->isChromaticAberrationEnabled());
 
-    if (render_settings_->postprocess()->isChromaticAberrationEnabled()) {
+    if (postprocess_->isChromaticAberrationEnabled()) {
         default_shader_program_->setUniform("chromatic_aberration.lens_texture", 3);
         default_shader_program_->setUniform("chromatic_aberration.max_channels_offset",
-            render_settings_->postprocess()->getChromaticAberrationMaxChannelsOffset());
+            postprocess_->getChromaticAberrationMaxChannelsOffset());
     }
 }
 
@@ -149,7 +136,7 @@ void DefaultPostprocessRenderer::renderGlowBloom(FrameBufferPtr frame_buffer) {
     }
 }
 
-void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
+void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
     if (!frame_buffer) {
         logError("DefaultPostprocessRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -165,7 +152,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer) {
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor, glm::vec3(0.0f, 0.0f, 0.0f));
 
     default_shader_program_->activate();
-    setShadersUniforms();
+    setShadersUniforms(scene->camera());
 
     Texture::setTextureSlot(0);
     frame_buffer->getTextureBuffer(0)->bind();

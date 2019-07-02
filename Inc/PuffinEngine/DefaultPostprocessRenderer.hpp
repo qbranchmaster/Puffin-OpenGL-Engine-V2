@@ -11,30 +11,30 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 #include "PuffinEngine/PostprocessRenderer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 
 namespace puffin {
     class DefaultPostprocessRenderer : public PostprocessRenderer {
     public:
-        DefaultPostprocessRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
+        DefaultPostprocessRenderer(PostprocessPtr postprocess);
 
-        void render(FrameBufferPtr frame_buffer);
+        void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
     private:
         void loadShaders();
-        void setShadersUniforms();
+        void setShadersUniforms(CameraPtr camera);
         void createScreenMesh();
         void drawMesh(MeshPtr mesh);
         void renderGlowBloom(FrameBufferPtr frame_buffer);
 
-        CameraPtr camera_{nullptr};
         FrameBufferPtr bloom_frame_buffer_[2]{nullptr};
         MeshPtr screen_mesh_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
         ShaderProgramPtr bloom_shader_program_{nullptr};
+
+		PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultPostprocessRendererPtr = std::shared_ptr<DefaultPostprocessRenderer>;

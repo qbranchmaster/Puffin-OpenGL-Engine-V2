@@ -11,24 +11,21 @@
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
 
 namespace puffin {
     class DefaultSkyboxRenderer : public SkyboxRenderer {
     public:
-        DefaultSkyboxRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
+        DefaultSkyboxRenderer();
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
     private:
         void loadShaders();
-        void setDefaultShaderUniforms(SkyboxPtr skybox);
+        void setDefaultShaderUniforms(ScenePtr scene);
         void drawSkybox(SkyboxPtr skybox);
 
-        CameraPtr camera_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
     };
 

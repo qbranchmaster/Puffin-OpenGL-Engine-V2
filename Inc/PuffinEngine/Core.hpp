@@ -18,16 +18,13 @@
 #include "PuffinEngine/Input.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/System.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 
 namespace puffin {
     class Core {
     public:
         Core();
         ~Core();
-
-        CameraPtr camera() const {
-            return camera_;
-        }
 
         InputPtr input() const {
             return input_;
@@ -50,13 +47,18 @@ namespace puffin {
         void start();
         void stop();
 
+		PostprocessPtr postprocess() const {
+            return postprocess_;
+        }
+
     private:
-        CameraPtr camera_{nullptr};
         InputPtr input_{nullptr};
         WindowPtr window_{nullptr};
 
         MasterRendererPtr master_renderer_{nullptr};
         RenderSettingsPtr render_settings_{nullptr};
+
+		PostprocessPtr postprocess_{nullptr};
 
         DefaultFontRendererPtr default_font_renderer_{nullptr};
         DefaultGuiRendererPtr default_gui_renderer_{nullptr};

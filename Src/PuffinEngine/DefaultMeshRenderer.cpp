@@ -8,15 +8,13 @@
 
 using namespace puffin;
 
-DefaultMeshRenderer::DefaultMeshRenderer(RenderSettingsPtr render_settings, CameraPtr camera,
+DefaultMeshRenderer::DefaultMeshRenderer(
     DefaultShadowMapRendererPtr shadow_map_renderer) {
-    if (!render_settings || !camera || !shadow_map_renderer) {
+    if (!shadow_map_renderer) {
         throw Exception("DefaultMeshRenderer::DefaultMeshRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
-    render_settings_ = render_settings;
     shadow_map_renderer_ = shadow_map_renderer;
-    camera_ = camera;
 
     loadShaders();
 }
@@ -30,15 +28,15 @@ void DefaultMeshRenderer::loadShaders() {
         "Data/Shaders/Wireframe.vert", "Data/Shaders/Wireframe.frag");
 }
 
-void DefaultMeshRenderer::setDefaultShaderUniforms() {
+void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform("clipping_plane", clipping_plane_);
 
-    default_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+    default_shader_program_->setUniform("matrices.view_matrix", scene->camera()->getViewMatrix());
     default_shader_program_->setUniform(
-        "matrices.projection_matrix", camera_->getProjectionMatrix());
+        "matrices.projection_matrix", scene->camera()->getProjectionMatrix());
 
     // Lighting
-    auto lighting = render_settings_->lighting();
+    auto lighting = scene->lighting();
     default_shader_program_->setUniform("lighting.enabled", lighting->isEnabled());
     default_shader_program_->setUniform(
         "lighting.directional_light.enabled", lighting->directionalLight()->isEnabled());
@@ -59,18 +57,18 @@ void DefaultMeshRenderer::setDefaultShaderUniforms() {
 
     // Shadow mapping
     default_shader_program_->setUniform(
-        "shadow_mapping.enabled", render_settings_->lighting()->isShadowMappingEnabled());
+        "shadow_mapping.enabled", lighting->isShadowMappingEnabled());
     default_shader_program_->setUniform("shadow_mapping.shadow_map_texture", 6);
     default_shader_program_->setUniform(
         "matrices.dir_light_matrix", shadow_map_renderer_->getOutputData().dir_light_space_matrix);
     default_shader_program_->setUniform("shadow_mapping.shadow_map_size",
-        static_cast<GLint>(render_settings_->lighting()->getDirectionalLightShadowMapSize()));
+        static_cast<GLint>(InitConfig::instance().getDirectionalLightShadowMapSize()));
     default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
-        static_cast<GLint>(render_settings_->lighting()->getShadowMappingPcfSamplesCount()));
+        static_cast<GLint>(lighting->getShadowMappingPcfSamplesCount()));
 
-    default_shader_program_->setUniform("fog.enabled", render_settings_->fog()->isEnabled());
-    default_shader_program_->setUniform("fog.color", render_settings_->fog()->getColor());
-    default_shader_program_->setUniform("fog.density", render_settings_->fog()->getDensity());
+    default_shader_program_->setUniform("fog.enabled", scene->fog()->isEnabled());
+    default_shader_program_->setUniform("fog.color", scene->fog()->getColor());
+    default_shader_program_->setUniform("fog.density", scene->fog()->getDensity());
 }
 
 void DefaultMeshRenderer::setDefaultShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity) {
@@ -225,7 +223,7 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
     shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
 
     default_shader_program_->activate();
-    setDefaultShaderUniforms();
+    setDefaultShaderUniforms(scene);
 
     for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
         auto mesh = scene->getMesh(i);
@@ -278,7 +276,7 @@ void DefaultMeshRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr 
     AlphaBlend::instance().enable(false);
 
     wireframe_shader_program_->activate();
-    setWireframeShaderUniforms();
+    setWireframeShaderUniforms(scene->camera());
 
     for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
         auto mesh = scene->getMesh(i);
@@ -294,19 +292,19 @@ void DefaultMeshRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr 
 
             setWireframeShaderMeshUniforms(mesh, entity);
 
-            render_settings_->wireframe()->enable(true);
+            render_settings_->postprocess()->wireframe()->enable(true);
             drawMeshEntity(entity);
-            render_settings_->wireframe()->enable(false);
+            render_settings_->postprocess()->wireframe()->enable(false);
         }
     }
 }
 
-void DefaultMeshRenderer::setWireframeShaderUniforms() {
+void DefaultMeshRenderer::setWireframeShaderUniforms(CameraPtr camera) {
     wireframe_shader_program_->setUniform(
-        "wireframe_color", render_settings_->wireframe()->getColor());
-    wireframe_shader_program_->setUniform("matrices.view_matrix", camera_->getViewMatrix());
+        "wireframe_color", render_settings_->postprocess()->wireframe()->getColor());
+    wireframe_shader_program_->setUniform("matrices.view_matrix", camera->getViewMatrix());
     wireframe_shader_program_->setUniform(
-        "matrices.projection_matrix", camera_->getProjectionMatrix());
+        "matrices.projection_matrix", camera->getProjectionMatrix());
 }
 
 void DefaultMeshRenderer::setWireframeShaderMeshUniforms(MeshPtr mesh, MeshEntityPtr entity) {
@@ -329,7 +327,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
-    switch (render_settings_->wireframe()->getMode()) {
+    switch (render_settings_->postprocess()->wireframe()->getMode()) {
     case WireframeMode::None:
         renderNormal(frame_buffer, scene);
         break;

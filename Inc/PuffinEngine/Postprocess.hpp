@@ -18,6 +18,7 @@
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/Texture.hpp"
+#include "PuffinEngine/Wireframe.hpp"
 
 namespace puffin {
     enum class PostprocessEffect {
@@ -35,6 +36,8 @@ namespace puffin {
 
     public:
         Postprocess() {
+            wireframe_.reset(new Wireframe());
+
             chromatic_aberration_texture_.reset(new Texture());
             chromatic_aberration_texture_->loadTexture2D("Data/Textures/LensAberration.bmp");
         }
@@ -189,6 +192,10 @@ namespace puffin {
             return chromatic_aberration_max_offset_;
         }
 
+		WireframePtr wireframe() const {
+            return wireframe_;
+        }
+
     private:
         PostprocessEffect effect_{PostprocessEffect::None};
 
@@ -210,6 +217,8 @@ namespace puffin {
         GLboolean chromatic_aberration_enabled_{false};
         TexturePtr chromatic_aberration_texture_{nullptr};
         glm::vec3 chromatic_aberration_max_offset_{0.01f, 0.0f, -0.01f};
+
+		WireframePtr wireframe_{nullptr};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

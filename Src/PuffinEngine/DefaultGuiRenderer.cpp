@@ -8,15 +8,13 @@
 
 using namespace puffin;
 
-DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window,
-    CameraPtr camera, MasterRendererPtr master_renderer) {
-    if (!window || !render_settings || !camera || !master_renderer) {
+DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window, MasterRendererPtr master_renderer) {
+    if (!window || !render_settings || !master_renderer) {
         throw Exception("DefaultGuiRenderer::DefaultGuiRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     render_settings_ = render_settings;
     target_window_ = window;
-    camera_ = camera;
     master_renderer_ = master_renderer;
 
     scene_loader_.reset(new SceneLoader());
@@ -279,7 +277,7 @@ void DefaultGuiRenderer::renderCameraDialog() {
         return;
     }
 
-    glm::vec3 position = camera_->getPosition();
+    /*glm::vec3 position = camera_->getPosition();
     float cam_pos[] = {position.x, position.y, position.z};
     ImGui::DragFloat3("Position", cam_pos, 0.01f);
     camera_->setPosition(glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
@@ -301,7 +299,7 @@ void DefaultGuiRenderer::renderCameraDialog() {
     ImGui::SliderFloat("FOV", &fov, 0.01f, 2.65f);
     float aspect = camera_->getAspect();
     ImGui::DragFloat("Aspect", &aspect, 0.01f);
-    camera_->setProjection(fov, aspect, near_plane, far_plane);
+    camera_->setProjection(fov, aspect, near_plane, far_plane);*/
 
     ImGui::End();
 }
@@ -427,7 +425,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     ImGui::PopFont();
 
     {
-        WireframeMode current = render_settings_->wireframe()->getMode();
+        WireframeMode current = render_settings_->postprocess()->wireframe()->getMode();
         GLuint selected_index = static_cast<GLuint>(current);
         const char *modes_str[] = {"None", "Overlay", "Full"};
         static const char *current_item = modes_str[selected_index];
@@ -437,7 +435,8 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
                 bool is_selected = (current_item == modes_str[i]);
                 if (ImGui::Selectable(modes_str[i], is_selected)) {
                     current_item = modes_str[i];
-                    render_settings_->wireframe()->setMode(static_cast<WireframeMode>(i));
+                    render_settings_->postprocess()->wireframe()->setMode(
+                        static_cast<WireframeMode>(i));
                 }
             }
 
@@ -445,14 +444,14 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         }
 
         if (current != WireframeMode::None) {
-            glm::vec3 wireframe_color = render_settings_->wireframe()->getColor();
+            glm::vec3 wireframe_color = render_settings_->postprocess()->wireframe()->getColor();
             float color[] = {wireframe_color.r, wireframe_color.g, wireframe_color.b};
             ImGui::ColorEdit3("Color", color);
-            render_settings_->wireframe()->setColor(glm::vec3(color[0], color[1], color[2]));
+            render_settings_->postprocess()->wireframe()->setColor(glm::vec3(color[0], color[1], color[2]));
 
-            int width = render_settings_->wireframe()->getLineWidth();
+            int width = render_settings_->postprocess()->wireframe()->getLineWidth();
             ImGui::SliderInt("Line width", &width, 1, 15);
-            render_settings_->wireframe()->setLineWidth(width);
+            render_settings_->postprocess()->wireframe()->setLineWidth(width);
         }
     }
 
@@ -473,63 +472,60 @@ void DefaultGuiRenderer::renderLightingDialog() {
         return;
     }
 
-    bool enabled = render_settings_->lighting()->isEnabled();
+    bool enabled = current_scene_->lighting()->isEnabled();
     ImGui::Checkbox("Enabled", &enabled);
-    render_settings_->lighting()->enable(enabled);
+    current_scene_->lighting()->enable(enabled);
 
     ImGui::PushFont(font_bold_);
     ImGui::Text("Directional light");
     ImGui::PopFont();
 
-    glm::vec3 dir_light_direction =
-        render_settings_->lighting()->directionalLight()->getDirection();
+    glm::vec3 dir_light_direction = current_scene_->lighting()->directionalLight()->getDirection();
     float direction[3] = {dir_light_direction.x, dir_light_direction.y, dir_light_direction.z};
     ImGui::DragFloat3("Direction", direction, 0.1f);
-    render_settings_->lighting()->directionalLight()->setDirection(
+    current_scene_->lighting()->directionalLight()->setDirection(
         glm::vec3(direction[0], direction[1], direction[2]));
 
-    glm::vec3 ambient_dir_color =
-        render_settings_->lighting()->directionalLight()->getAmbientColor();
+    glm::vec3 ambient_dir_color = current_scene_->lighting()->directionalLight()->getAmbientColor();
     float amb_dir_color[] = {ambient_dir_color.r, ambient_dir_color.g, ambient_dir_color.b};
     ImGui::ColorEdit3("Ambient color", amb_dir_color);
-    render_settings_->lighting()->directionalLight()->setAmbientColor(
+    current_scene_->lighting()->directionalLight()->setAmbientColor(
         glm::vec3(amb_dir_color[0], amb_dir_color[1], amb_dir_color[2]));
 
-    glm::vec3 diffuse_dir_color =
-        render_settings_->lighting()->directionalLight()->getDiffuseColor();
+    glm::vec3 diffuse_dir_color = current_scene_->lighting()->directionalLight()->getDiffuseColor();
     float diff_dir_color[] = {diffuse_dir_color.r, diffuse_dir_color.g, diffuse_dir_color.b};
     ImGui::ColorEdit3("Diffuse color", diff_dir_color);
-    render_settings_->lighting()->directionalLight()->setDiffuseColor(
+    current_scene_->lighting()->directionalLight()->setDiffuseColor(
         glm::vec3(diff_dir_color[0], diff_dir_color[1], diff_dir_color[2]));
 
     glm::vec3 specular_dir_color =
-        render_settings_->lighting()->directionalLight()->getSpecularColor();
+        current_scene_->lighting()->directionalLight()->getSpecularColor();
     float spec_dir_color[] = {specular_dir_color.r, specular_dir_color.g, specular_dir_color.b};
     ImGui::ColorEdit3("Specular color", spec_dir_color);
-    render_settings_->lighting()->directionalLight()->setSpecularColor(
+    current_scene_->lighting()->directionalLight()->setSpecularColor(
         glm::vec3(spec_dir_color[0], spec_dir_color[1], spec_dir_color[2]));
 
-    float emission_factor = render_settings_->lighting()->getEmissionFactor();
+    float emission_factor = current_scene_->lighting()->getEmissionFactor();
     ImGui::SliderFloat("Emission factor", &emission_factor, 0.0f, 30.0f);
-    render_settings_->lighting()->setEmissionFactor(emission_factor);
+    current_scene_->lighting()->setEmissionFactor(emission_factor);
 
-    glm::vec3 skybox_light_color = render_settings_->lighting()->getSkyboxLightColor();
+    glm::vec3 skybox_light_color = current_scene_->lighting()->getSkyboxLightColor();
     float sb_light[] = {skybox_light_color.r, skybox_light_color.g, skybox_light_color.b};
     ImGui::ColorEdit3("Skybox lighting color", sb_light);
-    render_settings_->lighting()->setSkyboxLightingColor(
+    current_scene_->lighting()->setSkyboxLightingColor(
         glm::vec3(sb_light[0], sb_light[1], sb_light[2]));
 
     ImGui::PushFont(font_bold_);
     ImGui::Text("Point lights");
     ImGui::PopFont();
 
-    ImGui::Text("Max count: %d", render_settings_->lighting()->getMaxPointLightsCount());
+    ImGui::Text("Max count: %d", current_scene_->lighting()->getMaxPointLightsCount());
 
     static PointLightPtr selected_point_light = nullptr;
 
     if (ImGui::TreeNode("Point lights")) {
-        for (GLuint i = 0; i < render_settings_->lighting()->getPointLightsCount(); i++) {
-            auto pl = render_settings_->lighting()->getPointLight(i);
+        for (GLuint i = 0; i < current_scene_->lighting()->getPointLightsCount(); i++) {
+            auto pl = current_scene_->lighting()->getPointLight(i);
             if (ImGui::Selectable(pl->getName().c_str(), selected_point_light == pl)) {
                 selected_point_light = pl;
             }
@@ -543,7 +539,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::InputText("Name", &new_pl_name);
     if (ImGui::Button("Add")) {
         PointLightPtr point_light(new PointLight(new_pl_name));
-        render_settings_->lighting()->addPointLight(point_light);
+        current_scene_->lighting()->addPointLight(point_light);
     }
 
     ImGui::Separator();
@@ -582,17 +578,17 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
         return;
     }
 
-    bool shadow_mapping_enabled = render_settings_->lighting()->isShadowMappingEnabled();
+    bool shadow_mapping_enabled = current_scene_->lighting()->isShadowMappingEnabled();
     ImGui::Checkbox("Enabled", &shadow_mapping_enabled);
-    render_settings_->lighting()->enableShadowMapping(shadow_mapping_enabled);
+    current_scene_->lighting()->enableShadowMapping(shadow_mapping_enabled);
 
-    float shadow_distance = render_settings_->lighting()->getShadowDistance();
+    float shadow_distance = current_scene_->lighting()->getShadowDistance();
     ImGui::SliderFloat("Shadow distance", &shadow_distance, 1.0f, 100.0f);
-    render_settings_->lighting()->setShadowDistance(shadow_distance);
+    current_scene_->lighting()->setShadowDistance(shadow_distance);
 
-    int shadow_pcf_samples = render_settings_->lighting()->getShadowMappingPcfSamplesCount();
+    int shadow_pcf_samples = current_scene_->lighting()->getShadowMappingPcfSamplesCount();
     ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 10);
-    render_settings_->lighting()->setShadowMappingPcfsamplesCount(shadow_pcf_samples);
+    current_scene_->lighting()->setShadowMappingPcfsamplesCount(shadow_pcf_samples);
 
     ImGui::PushFont(font_bold_);
     ImGui::Text("Shadow map");
@@ -622,33 +618,33 @@ void DefaultGuiRenderer::renderFogDialog() {
         return;
     }
 
-    bool enabled = render_settings_->fog()->isEnabled();
+    bool enabled = current_scene_->fog()->isEnabled();
     ImGui::Checkbox("Enabled", &enabled);
-    render_settings_->fog()->enable(enabled);
+    current_scene_->fog()->enable(enabled);
 
-    glm::vec3 fog_color = render_settings_->fog()->getColor();
+    glm::vec3 fog_color = current_scene_->fog()->getColor();
     float color[] = {fog_color.r, fog_color.g, fog_color.b};
     ImGui::ColorEdit3("Color", color);
-    render_settings_->fog()->setColor(glm::vec3(color[0], color[1], color[2]));
+    current_scene_->fog()->setColor(glm::vec3(color[0], color[1], color[2]));
 
-    float density = render_settings_->fog()->getDensity();
+    float density = current_scene_->fog()->getDensity();
     ImGui::SliderFloat("Density", &density, 0.0f, 1.0f);
-    render_settings_->fog()->setDensity(density);
+    current_scene_->fog()->setDensity(density);
 
     ImGui::PushFont(font_bold_);
     ImGui::Text("Skybox fog");
     ImGui::PopFont();
 
-    float sb_density = render_settings_->fog()->getSkyboxFogOverallDensity();
+    float sb_density = current_scene_->fog()->getSkyboxFogOverallDensity();
     ImGui::SliderFloat("Density##SkyboxDensity", &sb_density, 0.0f, 1.0f);
 
-    float transition = render_settings_->fog()->getSkyboxFogTransitionPower();
+    float transition = current_scene_->fog()->getSkyboxFogTransitionPower();
     ImGui::SliderFloat("Transition", &transition, 0.0f, 100.0f);
 
-    float height = render_settings_->fog()->getSkyboxFogHeight();
+    float height = current_scene_->fog()->getSkyboxFogHeight();
     ImGui::SliderFloat("Height", &height, 0.0f, 1.0f);
 
-    render_settings_->fog()->setSkyboxFog(sb_density, transition, height);
+    current_scene_->fog()->setSkyboxFog(sb_density, transition, height);
 
     ImGui::End();
 }
@@ -926,7 +922,7 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
         return;
     }
 
-    static std::string file_name = "new_scene";
+    /*static std::string file_name = "new_scene";
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);
@@ -940,7 +936,7 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
     if (ImGui::Button("Save scene")) {
         scene_loader_->saveScene(file_name, current_scene_, save_camera ? camera_ : nullptr,
             save_render_settings ? render_settings_ : nullptr);
-    }
+    }*/
 
     ImGui::End();
 }
@@ -959,14 +955,14 @@ void DefaultGuiRenderer::renderLoadSceneDialog() {
         return;
     }
 
-    static std::string file_name = "new_scene";
+    /*static std::string file_name = "new_scene";
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
     if (ImGui::Button("Load scene")) {
         scene_loader_->loadScene(file_name, current_scene_, camera_, render_settings_);
-    }
+    }*/
 
     ImGui::End();
 }

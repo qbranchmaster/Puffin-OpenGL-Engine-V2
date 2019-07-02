@@ -8,15 +8,9 @@
 
 using namespace puffin;
 
-DefaultShadowMapRenderer::DefaultShadowMapRenderer(
-    RenderSettingsPtr render_settings, CameraPtr camera) {
-    if (!render_settings || !camera) {
-        throw Exception(
-            "DefaultShadowMapRenderer::DefaultShadowMapRenderer()", PUFFIN_MSG_NULL_OBJECT);
-    }
+DefaultShadowMapRenderer::DefaultShadowMapRenderer() {
 
-    render_settings_ = render_settings;
-    camera_ = camera;
+
 
     camera_frustum_.reset(new CameraFrustum());
 
@@ -30,7 +24,7 @@ void DefaultShadowMapRenderer::loadShaders() {
 }
 
 void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
-    auto size = render_settings_->lighting()->getDirectionalLightShadowMapSize();
+    auto size = InitConfig::instance().getDirectionalLightShadowMapSize();
     directional_light_shadow_map_frame_bufer_.reset(new FrameBuffer(size, size));
     directional_light_shadow_map_frame_bufer_->addDepthTextureBuffer(false, true);
     directional_light_shadow_map_frame_bufer_->disableDrawBuffer();
@@ -40,17 +34,17 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
         directional_light_shadow_map_frame_bufer_->getDepthTextureBuffer();
 }
 
-glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix() {
-    camera_frustum_->setCameraParameters(camera_->getNearPlane(),
-        render_settings_->lighting()->getShadowDistance(), camera_->getAspect(), camera_->getFov());
-    camera_frustum_->setCameraVectors(camera_->getDirectionVector(), camera_->getRightVector(),
-        camera_->getUpVector(), camera_->getPosition());
+glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix(LightingPtr lighting, CameraPtr camera) {
+    camera_frustum_->setCameraParameters(camera->getNearPlane(),
+        lighting->getShadowDistance(), camera->getAspect(), camera->getFov());
+    camera_frustum_->setCameraVectors(camera->getDirectionVector(), camera->getRightVector(),
+        camera->getUpVector(), camera->getPosition());
     camera_frustum_->calculateFrustumPoints();
     camera_frustum_->calculateBoundingBoxSize();
 
     glm::vec3 dir_light_pos = camera_frustum_->getCenter();
     glm::mat4 dir_light_view_matrix = glm::lookAt(dir_light_pos,
-        dir_light_pos + render_settings_->lighting()->directionalLight()->getDirection(),
+        dir_light_pos + lighting->directionalLight()->getDirection(),
         glm::vec3(0.0f, 1.0f, 0.0f));
     camera_frustum_->recalculateToFrame(dir_light_view_matrix);
     camera_frustum_->calculateBoundingBoxSize();
@@ -92,12 +86,12 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(ScenePtr scene) {
     FrameBuffer::setViewportSize(directional_light_shadow_map_frame_bufer_);
     FrameBuffer::clear(FrameBufferClearType::OnlyDepth);
 
-    if (!render_settings_->lighting()->isShadowMappingEnabled() ||
-        !render_settings_->lighting()->directionalLight()->isEnabled()) {
+    if (!scene->lighting()->isShadowMappingEnabled() ||
+        !scene->lighting()->directionalLight()->isEnabled()) {
         return;
     }
 
-    output_data_.dir_light_space_matrix = calculateDirectionalLightSpaceMatrix();
+    output_data_.dir_light_space_matrix = calculateDirectionalLightSpaceMatrix(scene->lighting(), scene->camera());
 
     directional_light_shader_program_->activate();
     directional_light_shader_program_->setUniform(

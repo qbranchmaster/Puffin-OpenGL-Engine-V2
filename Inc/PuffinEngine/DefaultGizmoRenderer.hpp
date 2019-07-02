@@ -18,15 +18,14 @@
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/GizmoRenderer.hpp"
 #include "PuffinEngine/Mesh.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 
 namespace puffin {
     class DefaultGizmoRenderer : public GizmoRenderer {
     public:
-        DefaultGizmoRenderer(RenderSettingsPtr render_settings, CameraPtr camera);
+        DefaultGizmoRenderer();
 
-        void render(FrameBufferPtr frame_buffer);
+        void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
     private:
         void loadShaders();
@@ -35,9 +34,7 @@ namespace puffin {
 
         TexturePtr point_light_texture_{nullptr};
 
-        CameraPtr camera_{nullptr};
         MeshPtr gizmo_mesh_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
     };
 
