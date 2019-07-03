@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -8,14 +8,13 @@
 
 using namespace puffin;
 
-DefaultWaterRenderer::DefaultWaterRenderer(DefaultMeshRendererPtr mesh_renderer,
-    DefaultSkyboxRendererPtr skybox_renderer, PostprocessPtr postprocess) {
-    if (!mesh_renderer || !skybox_renderer) {
+DefaultWaterRenderer::DefaultWaterRenderer(PostprocessPtr postprocess,
+    DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer) {
+    if (!postprocess || !mesh_renderer || !skybox_renderer) {
         throw Exception("DefaultWaterRenderer::DefaultWaterRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
-	postprocess_ = postprocess;
-
+    postprocess_ = postprocess;
     mesh_renderer_ = mesh_renderer;
     skybox_renderer_ = skybox_renderer;
 
@@ -131,7 +130,7 @@ void DefaultWaterRenderer::renderToRefractionFrameBuffer(WaterTilePtr water_tile
     mesh_renderer_->render(refraction_frame_buffer_, scene);
     mesh_renderer_->enableClippingPlane(false);
 
-	postprocess_->wireframe()->setMode(wireframe_mode);
+    postprocess_->wireframe()->setMode(wireframe_mode);
 }
 
 void DefaultWaterRenderer::loadShaders() {
@@ -143,7 +142,8 @@ void DefaultWaterRenderer::loadShaders() {
         "Data/Shaders/Wireframe.vert", "Data/Shaders/Wireframe.frag");
 }
 
-void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile, LightingPtr lighting, FogPtr fog, CameraPtr camera) {
+void DefaultWaterRenderer::setDefaultShaderUniforms(
+    WaterTilePtr water_tile, CameraPtr camera, LightingPtr lighting, FogPtr fog) {
     default_shader_program_->setUniform("matrices.view_matrix", camera->getViewMatrix());
     default_shader_program_->setUniform(
         "matrices.projection_matrix", camera->getProjectionMatrix());
@@ -177,7 +177,8 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(WaterTilePtr water_tile, Lig
 
     // default_shader_program_->setUniform(
     //    "postprocess.gamma", render_settings_->postprocess()->getGamma());
-    default_shader_program_->setUniform("postprocess.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
+    default_shader_program_->setUniform(
+        "postprocess.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     default_shader_program_->setUniform("camera_position", camera->getPosition());
     default_shader_program_->setUniform("texture_tiling", texture_tiling_);
@@ -218,7 +219,7 @@ void DefaultWaterRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sc
         AlphaBlend::instance().enable(false);
 
         default_shader_program_->activate();
-        setDefaultShaderUniforms(water_tile, scene->lighting(), scene->fog(), scene->camera());
+        setDefaultShaderUniforms(water_tile, scene->camera(), scene->lighting(), scene->fog());
 
         Texture::setTextureSlot(0);
         reflection_frame_buffer_->getTextureBuffer(0)->bind();

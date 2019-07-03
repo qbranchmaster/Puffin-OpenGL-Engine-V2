@@ -40,9 +40,9 @@ void MasterRenderer::createRenderers() {
         std::static_pointer_cast<DefaultShadowMapRenderer>(shadow_map_renderer_), postprocess_));
     font_renderer_.reset(new DefaultFontRenderer("DemoData/Fonts/unispace/unispace.ttf"));
     gui_renderer_.reset(new DefaultGuiRenderer(target_window_, postprocess_));
-    water_renderer_.reset(
-        new DefaultWaterRenderer(std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
-            std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_), postprocess_));
+    water_renderer_.reset(new DefaultWaterRenderer(
+        postprocess_, std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
+            std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_)));
     gizmo_renderer_.reset(new DefaultGizmoRenderer());
 }
 
