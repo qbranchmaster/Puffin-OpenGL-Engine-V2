@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -8,13 +8,13 @@
 
 using namespace puffin;
 
-MasterRenderer::MasterRenderer(
-    WindowPtr window) {
+MasterRenderer::MasterRenderer(WindowPtr window) {
     if (!window) {
-        throw Exception("MasterRenderer::MasterRenderer()", "Not initialized object.");
+        throw Exception("MasterRenderer::MasterRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     target_window_ = window;
+    postprocess_.reset(new Postprocess());
 
     logInfo("MasterRenderer::MasterRenderer()", "GPU Vendor: " + System::instance().getGpuVendor());
     logInfo("MasterRenderer::MasterRenderer()", "GPU Name: " + System::instance().getGpuName());
@@ -28,7 +28,22 @@ MasterRenderer::MasterRenderer(
                 std::to_string(System::instance().getMonitorSize(i).second));
     }
 
+    createRenderers();
     createDefaultFrameBuffer();
+}
+
+void MasterRenderer::createRenderers() {
+    postprocess_renderer_.reset(new DefaultPostprocessRenderer(postprocess_));
+    shadow_map_renderer_.reset(new DefaultShadowMapRenderer());
+    skybox_renderer_.reset(new DefaultSkyboxRenderer(postprocess_));
+    mesh_renderer_.reset(new DefaultMeshRenderer(
+        std::static_pointer_cast<DefaultShadowMapRenderer>(shadow_map_renderer_), postprocess_));
+    font_renderer_.reset(new DefaultFontRenderer("DemoData/Fonts/unispace/unispace.ttf"));
+    gui_renderer_.reset(new DefaultGuiRenderer(target_window_, postprocess_));
+    water_renderer_.reset(
+        new DefaultWaterRenderer(std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
+            std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_), postprocess_));
+    gizmo_renderer_.reset(new DefaultGizmoRenderer());
 }
 
 void MasterRenderer::createDefaultFrameBuffer() {
@@ -44,11 +59,6 @@ void MasterRenderer::createDefaultFrameBuffer() {
     default_frame_buffer_multisample_->addTextureBuffer(0, true, true);
     default_frame_buffer_multisample_->addTextureBuffer(1, true, true);
     default_frame_buffer_multisample_->addDepthTextureBuffer(true, true);
-
-    if (!default_frame_buffer_->isComplete()) {
-        throw Exception(
-            "MasterRenderer::createDefaultFrameBuffer()", "Error creating default frame buffer.");
-    }
 
     default_frame_buffer_multisample_->unbind();
     default_frame_buffer_->unbind();
@@ -76,15 +86,15 @@ void MasterRenderer::start() {
             postprocess_renderer_->render(default_frame_buffer_, rendered_scene);
         }
 
-		if (gizmo_renderer_) {
-            gizmo_renderer_->render(default_frame_buffer_, rendered_scene);
-		}
+        if (gizmo_renderer_) {
+            gizmo_renderer_->render(rendered_scene);
+        }
 
         if (rendered_scene) {
-            /*for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
+            for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
                 auto text = rendered_scene->getText(i);
                 font_renderer_->render(text);
-            }*/
+            }
         }
 
         if (capture_screen_flag_) {
@@ -122,78 +132,6 @@ void MasterRenderer::assignRenderingFunction(std::function<ScenePtr()> function)
     }
 
     rendering_function_ = function;
-}
-
-void MasterRenderer::assignPostprocessRenderer(PostprocessRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignPostprocessRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    postprocess_renderer_ = renderer;
-}
-
-void MasterRenderer::assignSkyboxRenderer(SkyboxRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignSkyboxRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    skybox_renderer_ = renderer;
-}
-
-void MasterRenderer::assignMeshRenderer(MeshRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignMeshRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    mesh_renderer_ = renderer;
-}
-
-void MasterRenderer::assignShadowMapRenderer(ShadowMapRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignShadowMapRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    shadow_map_renderer_ = renderer;
-}
-
-void MasterRenderer::assignFontRenderer(FontRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignFontRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    font_renderer_ = renderer;
-}
-
-void MasterRenderer::assignGuiRenderer(GuiRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignGuiRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    gui_renderer_ = renderer;
-}
-
-void MasterRenderer::assignWaterRenderer(WaterRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignWaterRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    water_renderer_ = renderer;
-}
-
-void MasterRenderer::assignGizmoRenderer(GizmoRendererPtr renderer) {
-    if (!renderer) {
-        logError("MasterRenderer::assignGizmoRenderer()", PUFFIN_MSG_NULL_OBJECT);
-        return;
-    }
-
-    gizmo_renderer_ = renderer;
 }
 
 void MasterRenderer::drawScene(ScenePtr scene) {

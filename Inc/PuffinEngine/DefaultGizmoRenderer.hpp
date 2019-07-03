@@ -19,13 +19,14 @@
 #include "PuffinEngine/GizmoRenderer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/FrameBuffer.hpp"
 
 namespace puffin {
     class DefaultGizmoRenderer : public GizmoRenderer {
     public:
         DefaultGizmoRenderer();
 
-        void render(FrameBufferPtr frame_buffer, ScenePtr scene);
+        void render(ScenePtr scene);
 
     private:
         void loadShaders();

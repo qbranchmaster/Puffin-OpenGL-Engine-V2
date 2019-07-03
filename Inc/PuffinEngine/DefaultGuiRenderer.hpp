@@ -37,7 +37,7 @@ namespace puffin {
     class DefaultGuiRenderer : public GuiRenderer {
     public:
         DefaultGuiRenderer(WindowPtr window,
-            MasterRendererPtr master_renderer, PostprocessPtr postprocess);
+            PostprocessPtr postprocess);
 
         void render(ScenePtr scene);
 
@@ -88,7 +88,6 @@ namespace puffin {
 
         GLboolean enabled_{true};
 
-        MasterRendererPtr master_renderer_{nullptr};
         WindowPtr target_window_{nullptr};
 
         ScenePtr current_scene_{nullptr};

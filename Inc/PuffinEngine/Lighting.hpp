@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -100,19 +100,17 @@ namespace puffin {
             return shadows_pcf_samples_count_;
         }
 
-        void addPointLight(PointLightPtr point_light) {
-            if (!point_light) {
-                logError("Lighting::addPointLight()", PUFFIN_MSG_NULL_OBJECT);
-                return;
+        PointLightPtr addPointLight(std::string name) {
+            for (const auto &pl : point_lights_) {
+                if (name == pl->getName()) {
+                    logError("Lighting::addPointLight()", PUFFIN_MSG_NAME_ALREADY_EXISTS(name));
+                    return nullptr;
+                }
             }
 
-			if (point_lights_.size() >= max_point_lights_count_) {
-                logError("Lighting::addPointLight()",
-                    PUFFIN_MSG_OUT_OF_RANGE(0, max_point_lights_count_));
-                return;
-			}
-
+            PointLightPtr point_light(new PointLight(name));
             point_lights_.push_back(point_light);
+            return point_light;
         }
 
         PointLightPtr getPointLight(GLuint index) {
@@ -129,9 +127,9 @@ namespace puffin {
             return point_lights_.size();
         }
 
-		GLushort getMaxPointLightsCount() const {
+        GLushort getMaxPointLightsCount() const {
             return max_point_lights_count_;
-		}
+        }
 
     private:
         GLboolean enabled_{false};
@@ -147,7 +145,7 @@ namespace puffin {
         DirectionalLightPtr directional_light_{nullptr};
         std::vector<PointLightPtr> point_lights_;
 
-        constexpr static GLushort max_point_lights_count_{4};
+        const static GLushort max_point_lights_count_{4};
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;

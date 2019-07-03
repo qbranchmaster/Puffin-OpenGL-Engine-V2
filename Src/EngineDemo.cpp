@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1 Demo
+ * Puffin OpenGL Engine ver. 2.0.1 Demo
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -12,26 +12,20 @@ EngineDemo::EngineDemo() : Core() {
     Logger::instance().enable(true, "puffin_engine.log");
     Logger::instance().enableTimeStamp(true);
 
-    InitConfig::instance().setFrameResolution(240, 120);
+    InitConfig::instance().setFrameResolution(1280, 720);
     InitConfig::instance().setMsaaSamples(2);
     InitConfig::instance().setOpenGLVersion(4, 0);
     InitConfig::instance().enableFullscreen(false);
     InitConfig::instance().setTargetMonitorIndex(0);
 
     initialize();
-    createDefaultRenderers();
 
     Texture::setDefaultTextureFilter(TextureType::Texture2D, TextureFilter::Trilinear);
 
     window()->setCaption("Puffin Engine Demo");
     window()->setWindowIcon("Data/Icon.ico");
-    window()->setPosition(2150, 600);
 
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
-
-    postprocess()->setEffect(PostprocessEffect::None);
-    postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
-    postprocess()->enableGlowBloom(false);
 
     createScene();
 
@@ -49,35 +43,25 @@ EngineDemo::EngineDemo() : Core() {
 void EngineDemo::createScene() {
     scene_.reset(new Scene());
 
-    skybox_ = scene_->addSkybox("clear_sky");
-    skybox_texture_.reset(new Texture());
+    SkyboxPtr skybox = scene_->addSkybox("clear_sky_skybox");
+    TexturePtr skybox_texture_(new Texture());
     skybox_texture_->loadTextureCube(
         {"Demo/Skybox/right.jpg", "Demo/Skybox/left.jpg", "Demo/Skybox/up.jpg",
             "Demo/Skybox/down.jpg", "Demo/Skybox/back.jpg", "Demo/Skybox/front.jpg"});
+    skybox->setTexture(skybox_texture_);
+    scene_->setActiveSkybox(skybox);
 
-    skybox_->setTexture(skybox_texture_);
-    scene_->setActiveSkybox(skybox_);
+    MeshPtr mesh = scene_->addMesh("car");
+    mesh->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
+    mesh->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
-    test_mesh_ = scene_->addMesh("car_scene");
-    test_mesh_->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
-    test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
+    WaterTilePtr water_tile = scene_->addWaterTile("main_water_tile");
+    water_tile->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
+    water_tile->setScale(glm::vec3(15.0f, 15.0f, 15.0f));
 
-    /*text_demo_.reset(new Text(L"Puffin Engine Demo", glm::uvec2(10, 710), 48));
-    text_demo_->setFontColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    text_demo_->setOutlineColor(glm::vec3(1.0f, 1.0f, 1.0f));
-    text_demo_->setOutlineSize(2);
-    text_demo_->setHorizontalSpacing(2);
-    text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");*/
-    // scene_->addText(text_demo_);
-
-    water_tile_ = scene_->addWaterTile("main_water_tile");
-    water_tile_->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
-    water_tile_->setScale(glm::vec3(15.0f, 15.0f, 15.0f));
-
-    point_light_.reset(new PointLight("test_light"));
-    point_light_->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-    point_light_->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    scene_->lighting()->addPointLight(point_light_);
+    PointLightPtr point_light = scene_->lighting()->addPointLight("point_light");
+    point_light->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+    point_light->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
     scene_->lighting()->enable(true);
     scene_->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));

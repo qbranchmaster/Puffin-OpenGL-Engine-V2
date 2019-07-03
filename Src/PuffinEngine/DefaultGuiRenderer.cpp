@@ -9,13 +9,12 @@
 using namespace puffin;
 
 DefaultGuiRenderer::DefaultGuiRenderer(
-    WindowPtr window, MasterRendererPtr master_renderer, PostprocessPtr postprocess) {
-    if (!window || !master_renderer) {
+    WindowPtr window, PostprocessPtr postprocess) {
+    if (!window) {
         throw Exception("DefaultGuiRenderer::DefaultGuiRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
     target_window_ = window;
-    master_renderer_ = master_renderer;
 
 	postprocess_ = postprocess;
 
@@ -191,7 +190,7 @@ void DefaultGuiRenderer::renderMainMenuBar() {
             ImGui::Separator();
 
             if (ImGui::MenuItem("Quit")) {
-                master_renderer_->stop();
+                //master_renderer_->stop();
             }
 
             ImGui::EndMenu();
@@ -535,13 +534,13 @@ void DefaultGuiRenderer::renderLightingDialog() {
         ImGui::TreePop();
     }
 
-    ImGui::Text("Add new");
+    /*ImGui::Text("Add new");
     static std::string new_pl_name;
     ImGui::InputText("Name", &new_pl_name);
     if (ImGui::Button("Add")) {
         PointLightPtr point_light(new PointLight(new_pl_name));
         current_scene_->lighting()->addPointLight(point_light);
-    }
+    }*/
 
     ImGui::Separator();
 
@@ -595,12 +594,12 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     ImGui::Text("Shadow map");
     ImGui::PopFont();
 
-    DefaultShadowMapRendererPtr sm_renderer =
+    /*DefaultShadowMapRendererPtr sm_renderer =
         std::static_pointer_cast<DefaultShadowMapRenderer>(master_renderer_->shadowMapRenderer());
     DepthTextureBufferPtr shadow_map_texture = sm_renderer->getOutputData().shadow_map_texture;
     ImTextureID texture_handle = (void *)(shadow_map_texture->getHandle());
     ImGui::Image(texture_handle,
-        ImVec2(shadow_map_texture->getWidth() / 4.0f, shadow_map_texture->getHeight() / 4.0f));
+        ImVec2(shadow_map_texture->getWidth() / 4.0f, shadow_map_texture->getHeight() / 4.0f));*/
 
     ImGui::End();
 }
@@ -672,9 +671,9 @@ void DefaultGuiRenderer::renderCaptureDialog() {
     static bool add_timestamp = true;
     ImGui::Checkbox("Add timestamp", &add_timestamp);
 
-    if (ImGui::Button("Save capture")) {
+    /*if (ImGui::Button("Save capture")) {
         master_renderer_->captureScreen(file_name, add_timestamp);
-    }
+    }*/
 
     ImGui::End();
 }
@@ -693,7 +692,7 @@ void DefaultGuiRenderer::renderRenderersDialog() {
         return;
     }
 
-    ImGui::PushFont(font_bold_);
+/*    ImGui::PushFont(font_bold_);
     ImGui::Text("Mesh renderer");
     ImGui::PopFont();
 
@@ -729,6 +728,7 @@ void DefaultGuiRenderer::renderRenderersDialog() {
     int texture_tiling = water_renderer->getTextureTiling();
     ImGui::SliderInt("Texture tiling", &texture_tiling, 1, 10);
     water_renderer->setTextureTiling(texture_tiling);
+    */
 
     ImGui::End();
 }

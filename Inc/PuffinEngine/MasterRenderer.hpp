@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -15,46 +15,32 @@
 #include <functional>
 #include <memory>
 
-#include "PuffinEngine/Camera.hpp"
-#include "PuffinEngine/DepthTest.hpp"
-#include "PuffinEngine/FontRenderer.hpp"
-#include "PuffinEngine/FrameBuffer.hpp"
-#include "PuffinEngine/GizmoRenderer.hpp"
-#include "PuffinEngine/GuiRenderer.hpp"
-#include "PuffinEngine/Mesh.hpp"
-#include "PuffinEngine/MeshRenderer.hpp"
-#include "PuffinEngine/PostprocessRenderer.hpp"
-#include "PuffinEngine/ShadowMapRenderer.hpp"
-#include "PuffinEngine/SkyboxRenderer.hpp"
+#include "PuffinEngine/DefaultFontRenderer.hpp"
+#include "PuffinEngine/DefaultGizmoRenderer.hpp"
+#include "PuffinEngine/DefaultGuiRenderer.hpp"
+#include "PuffinEngine/DefaultMeshRenderer.hpp"
+#include "PuffinEngine/DefaultPostprocessRenderer.hpp"
+#include "PuffinEngine/DefaultShadowMapRenderer.hpp"
+#include "PuffinEngine/DefaultSkyboxRenderer.hpp"
+#include "PuffinEngine/DefaultWaterRenderer.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 #include "PuffinEngine/System.hpp"
 #include "PuffinEngine/Time.hpp"
 #include "PuffinEngine/Timer.hpp"
-#include "PuffinEngine/WaterRenderer.hpp"
 #include "PuffinEngine/Window.hpp"
 
 namespace puffin {
     class MasterRenderer {
     public:
-        MasterRenderer(WindowPtr window);
-
-        void start();
-        void stop();
+        explicit MasterRenderer(WindowPtr window);
 
         void assignRenderingFunction(std::function<ScenePtr()> function);
 
-        void assignPostprocessRenderer(PostprocessRendererPtr renderer);
-        void assignSkyboxRenderer(SkyboxRendererPtr renderer);
-        void assignMeshRenderer(MeshRendererPtr renderer);
-        void assignShadowMapRenderer(ShadowMapRendererPtr renderer);
-        void assignFontRenderer(FontRendererPtr renderer);
-        void assignGuiRenderer(GuiRendererPtr renderer);
-        void assignWaterRenderer(WaterRendererPtr renderer);
-        void assignGizmoRenderer(GizmoRendererPtr renderer);
-
+        void start();
+        void stop();
         void drawScene(ScenePtr scene);
-        void captureScreen(std::string file_name, GLboolean add_timestamp);
 
-        void addTimer(TimerPtr timer);
+        void captureScreen(std::string file_name, GLboolean add_timestamp);
 
         GuiRendererPtr guiRenderer() const {
             return gui_renderer_;
@@ -84,11 +70,18 @@ namespace puffin {
             return water_renderer_;
         }
 
-		GizmoRendererPtr gizmoRenderer() const {
+        GizmoRendererPtr gizmoRenderer() const {
             return gizmo_renderer_;
-		}
+        }
+
+        PostprocessPtr postprocess() const {
+            return postprocess_;
+        }
+
+        void addTimer(TimerPtr timer);
 
     private:
+        void createRenderers();
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
 
@@ -100,11 +93,11 @@ namespace puffin {
 
         FrameBufferPtr default_frame_buffer_{nullptr};
         FrameBufferPtr default_frame_buffer_multisample_{nullptr};
+
         WindowPtr target_window_{nullptr};
+        PostprocessPtr postprocess_{nullptr};
 
-        std::vector<TimerPtr> timers_;
-
-		GLboolean capture_screen_flag_{false};
+        GLboolean capture_screen_flag_{false};
         GLboolean capture_add_timestamp_{false};
         std::string capture_file_name_;
 
@@ -116,6 +109,8 @@ namespace puffin {
         FontRendererPtr font_renderer_{nullptr};
         WaterRendererPtr water_renderer_{nullptr};
         GizmoRendererPtr gizmo_renderer_{nullptr};
+
+        std::vector<TimerPtr> timers_;
     };
 
     using MasterRendererPtr = std::shared_ptr<MasterRenderer>;

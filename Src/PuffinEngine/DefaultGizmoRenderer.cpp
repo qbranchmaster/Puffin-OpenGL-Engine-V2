@@ -14,8 +14,8 @@ puffin::DefaultGizmoRenderer::DefaultGizmoRenderer() {
     createGizmoMesh();
 }
 
-void DefaultGizmoRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
-    if (!frame_buffer || !scene) {
+void DefaultGizmoRenderer::render(ScenePtr scene) {
+    if (!scene) {
         logError("DefaultGizmoRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
         return;
 	}

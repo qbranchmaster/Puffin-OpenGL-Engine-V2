@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1 Demo
+ * Puffin OpenGL Engine ver. 2.0.1 Demo
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -26,13 +26,7 @@ private:
     void updateWindowCaption();
     void rotateSkybox();
 
-    puffin::MeshPtr test_mesh_{nullptr};
     puffin::ScenePtr scene_{nullptr};
-    puffin::SkyboxPtr skybox_{nullptr};
-    puffin::TextPtr text_demo_{nullptr};
-    puffin::TexturePtr skybox_texture_{nullptr};
-    puffin::WaterTilePtr water_tile_{nullptr};
-    puffin::PointLightPtr point_light_{nullptr};
 
     puffin::TimerPtr fps_caption_timer_{nullptr};
     puffin::TimerPtr skybox_rotate_timer_{nullptr};
