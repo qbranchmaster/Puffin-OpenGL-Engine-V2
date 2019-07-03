@@ -13,11 +13,12 @@
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
+#include "Postprocess.hpp"
 
 namespace puffin {
     class DefaultSkyboxRenderer : public SkyboxRenderer {
     public:
-        DefaultSkyboxRenderer();
+        DefaultSkyboxRenderer(PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -27,6 +28,8 @@ namespace puffin {
         void drawSkybox(SkyboxPtr skybox);
 
         ShaderProgramPtr default_shader_program_{nullptr};
+
+		PostprocessPtr postprocess_;
     };
 
     using DefaultSkyboxRendererPtr = std::shared_ptr<DefaultSkyboxRenderer>;

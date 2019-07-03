@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -21,10 +21,10 @@ namespace puffin {
     std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
     std::istream &operator>>(std::istream &is, glm::mat4 &mat);
 
-	std::ostream &operator<<(std::ostream &os, const glm::mat3 &mat);
+    std::ostream &operator<<(std::ostream &os, const glm::mat3 &mat);
     std::istream &operator>>(std::istream &is, glm::mat3 &mat);
 
-	std::ostream &operator<<(std::ostream &os, GLboolean val);
+    std::ostream &operator<<(std::ostream &os, GLboolean val);
     std::istream &operator>>(std::istream &is, GLboolean &val);
 } // namespace puffin
 

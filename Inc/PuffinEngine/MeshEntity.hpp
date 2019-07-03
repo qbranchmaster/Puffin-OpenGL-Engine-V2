@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -24,6 +24,10 @@
 namespace puffin {
     class MeshEntity {
     public:
+        explicit MeshEntity(std::string name = "") {
+            name_ = name;
+        }
+
         void setStartingVertexIndex(GLuint index) {
             starting_index_ = index;
         }
@@ -67,10 +71,6 @@ namespace puffin {
 
         MaterialPtr getMaterial() const {
             return material_;
-        }
-
-        void setName(std::string name) {
-            name_ = name;
         }
 
         std::string getName() const {

@@ -14,13 +14,14 @@
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 
 namespace puffin {
     class DefaultMeshRenderer : public MeshRenderer {
         friend class DefaultWaterRenderer;
 
     public:
-        DefaultMeshRenderer(DefaultShadowMapRendererPtr shadow_map_renderer);
+        DefaultMeshRenderer(DefaultShadowMapRendererPtr shadow_map_renderer, PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -55,6 +56,8 @@ namespace puffin {
         ShaderProgramPtr wireframe_shader_program_{nullptr};
 
         DefaultShadowMapRendererPtr shadow_map_renderer_{nullptr};
+
+		PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultMeshRendererPtr = std::shared_ptr<DefaultMeshRenderer>;

@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -53,9 +53,9 @@ namespace puffin {
         StateMachine(const StateMachine &) = delete;
         void operator=(const StateMachine &) = delete;
 
-        GLuint bound_frame_buffer_ = 0;
-        GLuint bound_frame_buffer_read_ = 0;
-        GLuint bound_frame_buffer_write_ = 0;
+        GLuint bound_frame_buffer_{0};
+        GLuint bound_frame_buffer_read_{0};
+        GLuint bound_frame_buffer_write_{0};
         GLuint bound_mesh_{0};
         GLuint bound_shader_program_{0};
         GLuint bound_texture_{0};

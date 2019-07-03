@@ -9,11 +9,12 @@
 using namespace puffin;
 
 DefaultMeshRenderer::DefaultMeshRenderer(
-    DefaultShadowMapRendererPtr shadow_map_renderer) {
+    DefaultShadowMapRendererPtr shadow_map_renderer, PostprocessPtr postprocess) {
     if (!shadow_map_renderer) {
         throw Exception("DefaultMeshRenderer::DefaultMeshRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
+	postprocess_ = postprocess;
     shadow_map_renderer_ = shadow_map_renderer;
 
     loadShaders();
@@ -51,9 +52,8 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform("lighting.blinn_phong", lighting->isBlinnPhongEnabled());
     default_shader_program_->setUniform("lighting.emission_factor", lighting->getEmissionFactor());
 
-    default_shader_program_->setUniform("other.gamma", render_settings_->postprocess()->getGamma());
-    default_shader_program_->setUniform("other.bloom_threshold_color",
-        render_settings_->postprocess()->getGlowBloomThresholdColor());
+    default_shader_program_->setUniform("other.gamma", postprocess_->getGamma());
+    default_shader_program_->setUniform("other.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     // Shadow mapping
     default_shader_program_->setUniform(
@@ -292,16 +292,15 @@ void DefaultMeshRenderer::renderWireframe(FrameBufferPtr frame_buffer, ScenePtr 
 
             setWireframeShaderMeshUniforms(mesh, entity);
 
-            render_settings_->postprocess()->wireframe()->enable(true);
+            postprocess_->wireframe()->enable(true);
             drawMeshEntity(entity);
-            render_settings_->postprocess()->wireframe()->enable(false);
+            postprocess_->wireframe()->enable(false);
         }
     }
 }
 
 void DefaultMeshRenderer::setWireframeShaderUniforms(CameraPtr camera) {
-    wireframe_shader_program_->setUniform(
-        "wireframe_color", render_settings_->postprocess()->wireframe()->getColor());
+    wireframe_shader_program_->setUniform("wireframe_color", postprocess_->wireframe()->getColor());
     wireframe_shader_program_->setUniform("matrices.view_matrix", camera->getViewMatrix());
     wireframe_shader_program_->setUniform(
         "matrices.projection_matrix", camera->getProjectionMatrix());
@@ -327,7 +326,7 @@ void DefaultMeshRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
         return;
     }
 
-    switch (render_settings_->postprocess()->wireframe()->getMode()) {
+    switch (postprocess_->wireframe()->getMode()) {
     case WireframeMode::None:
         renderNormal(frame_buffer, scene);
         break;

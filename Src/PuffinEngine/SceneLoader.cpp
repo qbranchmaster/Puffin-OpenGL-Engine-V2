@@ -144,7 +144,7 @@ void SceneLoader::loadCameraSettings(CameraPtr camera) {
 }
 
 void SceneLoader::saveSkybox(ScenePtr scene) {
-    auto skybox = scene->getSkybox();
+    auto skybox = scene->getActiveSkybox();
     if (!skybox) {
         saveValue("skybox", "count", 0);
         return;
@@ -178,7 +178,7 @@ void SceneLoader::loadSkybox(ScenePtr scene) {
 
     texture->loadTextureCube(paths);
     skybox->setTexture(texture);
-    scene->setSkybox(skybox);
+    //scene->setSkybox(skybox);
 }
 
 void SceneLoader::saveMeshes(ScenePtr scene) {
@@ -215,7 +215,7 @@ void SceneLoader::loadMeshes(ScenePtr scene) {
         return;
     }
 
-    for (GLuint i = 0; i < count; i++) {
+   /* for (GLuint i = 0; i < count; i++) {
         std::string section = "mesh_" + std::to_string(i);
 
         std::string name, path;
@@ -236,7 +236,7 @@ void SceneLoader::loadMeshes(ScenePtr scene) {
         loadValue(section, "scale", mesh->scale_);
 
         scene->addMesh(mesh);
-    }
+    }*/
 }
 
 void SceneLoader::saveWaterTiles(ScenePtr scene) {
@@ -278,7 +278,7 @@ void SceneLoader::loadWaterTiles(ScenePtr scene) {
         return;
     }
 
-    for (GLuint i = 0; i < count; i++) {
+    /*for (GLuint i = 0; i < count; i++) {
         std::string section = "water_tile_" + std::to_string(i);
 
         std::string name;
@@ -303,7 +303,7 @@ void SceneLoader::loadWaterTiles(ScenePtr scene) {
         loadValue(section, "scale", water_tile->scale_);
 
         scene->addWaterTile(water_tile);
-    }
+    }*/
 }
 /*
     void SceneLoader::saveRenderSettings(RenderSettingsPtr render_settings) {

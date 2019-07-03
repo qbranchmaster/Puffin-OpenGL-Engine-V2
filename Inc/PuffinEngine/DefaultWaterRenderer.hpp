@@ -14,11 +14,12 @@
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/Texture.hpp"
 #include "PuffinEngine/WaterRenderer.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 
 namespace puffin {
     class DefaultWaterRenderer : public WaterRenderer {
     public:
-        DefaultWaterRenderer(DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer);
+        DefaultWaterRenderer(DefaultMeshRendererPtr mesh_renderer, DefaultSkyboxRendererPtr skybox_renderer, PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -43,7 +44,6 @@ namespace puffin {
 
         DefaultMeshRendererPtr mesh_renderer_{nullptr};
         DefaultSkyboxRendererPtr skybox_renderer_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         ShaderProgramPtr default_shader_program_{nullptr};
         ShaderProgramPtr wireframe_shader_program_{nullptr};
 
@@ -55,6 +55,8 @@ namespace puffin {
         std::string normal_map_path_;
         TexturePtr normal_map_{nullptr};
         GLushort texture_tiling_{1};
+
+		PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultWaterRendererPtr = std::shared_ptr<DefaultWaterRenderer>;

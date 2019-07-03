@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -122,8 +122,8 @@ void BaseMesh::setMeshIndices(const std::vector<GLuint> &data) {
         GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(GLuint), data.data(), GL_STATIC_DRAW);
 }
 
-MeshEntityPtr BaseMesh::addEntity() {
-    MeshEntityPtr entity(new MeshEntity());
+MeshEntityPtr BaseMesh::addEntity(std::string name) {
+    MeshEntityPtr entity(new MeshEntity(name));
     entities_.push_back(entity);
     return entity;
 }

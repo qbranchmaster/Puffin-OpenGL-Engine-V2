@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -16,7 +16,7 @@ void InitConfig::setFrameResolution(GLuint width, GLuint height) {
 void InitConfig::setMsaaSamples(GLushort samples) {
     auto supported_msaa = System::instance().getSupportedMsaaSamples();
     if (std::find(supported_msaa.begin(), supported_msaa.end(), samples) == supported_msaa.end()) {
-        logError("Configuration::setMsaaSamples()", "Invalid value.");
+        logError("InitConfig::setMsaaSamples()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 
@@ -34,7 +34,7 @@ void InitConfig::enableFullscreen(GLboolean enabled) {
 
 void InitConfig::setTargetMonitorIndex(GLushort index) {
     if (index >= System::instance().getMonitorsCount()) {
-        logError("Configuration::setTargetMonitorIndex()", "Invalid value.");
+        logError("InitConfig::setTargetMonitorIndex()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }
 

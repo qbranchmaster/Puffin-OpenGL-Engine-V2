@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_BASE_MESH_HPP
 #define PUFFIN_BASE_MESH_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
@@ -35,8 +32,8 @@ namespace puffin {
 
     class BaseMesh {
     public:
-        BaseMesh(std::string name = "");
-        ~BaseMesh();
+        explicit BaseMesh(std::string name);
+        virtual ~BaseMesh();
 
         std::string getName() const {
             return name_;
@@ -61,7 +58,7 @@ namespace puffin {
             GLboolean dynamic_draw = false);
         void setMeshIndices(const std::vector<GLuint> &data);
 
-        MeshEntityPtr addEntity();
+        MeshEntityPtr addEntity(std::string name);
         MeshEntityPtr getEntity(GLuint index) const;
 
         GLuint getEntitiesCount() const {

@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -63,9 +63,7 @@ namespace puffin {
         void endDeltaMeasure() {
             delta_t1_ = std::chrono::system_clock::now();
             delta_ = static_cast<GLdouble>(std::chrono::duration_cast<std::chrono::microseconds>(
-                         delta_t1_ - delta_t0_)
-                                               .count()) /
-                1000000.0;
+                         delta_t1_ - delta_t0_).count()) / 1000000.0;
         }
 
         void update() {

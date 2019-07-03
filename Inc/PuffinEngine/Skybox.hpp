@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -15,7 +15,7 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
-        Skybox(std::string name = "");
+        explicit Skybox(std::string name = "");
 
         void setTexture(TexturePtr texture);
 
@@ -23,7 +23,7 @@ namespace puffin {
             return texture_;
         }
 
-		MeshType getMeshType() const {
+        MeshType getMeshType() const {
             return MeshType::Skybox;
         }
 

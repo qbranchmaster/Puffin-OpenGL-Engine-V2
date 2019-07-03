@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_ALPHA_BLEND_HPP
 #define PUFFIN_ALPHA_BLEND_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 namespace puffin {
@@ -72,9 +69,6 @@ namespace puffin {
         AlphaBlend(const AlphaBlend &) = delete;
         void operator=(const AlphaBlend &) = delete;
 
-        /**
-         * Reads initial state.
-         */
         void fetchState() {
             glGetBooleanv(GL_BLEND, &enabled_);
 

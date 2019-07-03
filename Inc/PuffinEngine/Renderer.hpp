@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_RENDERER_HPP
 #define PUFFIN_RENDERER_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 #include <memory>

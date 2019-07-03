@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -23,13 +23,13 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
-		PointLight(std::string name = "") {
+        explicit PointLight(std::string name = "") {
             name_ = name;
-		}
+        }
 
-		std::string getName() const {
+        std::string getName() const {
             return name_;
-		}
+        }
 
         void enable(GLboolean state) {
             enabled_ = state;

@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_INIT_CONFIG_HPP
 #define PUFFIN_INIT_CONFIG_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 #include <utility>
@@ -81,9 +78,10 @@ namespace puffin {
             return std::make_pair(water_refraction_width_, water_refraction_height_);
         }
 
-		void setDirectionalLightShadowMapSize(GLuint size) {
+        void setDirectionalLightShadowMapSize(GLuint size) {
             if (size == 0) {
-                logError("InitConfig::setDirectionalLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
+                logError(
+                    "InitConfig::setDirectionalLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
@@ -99,20 +97,20 @@ namespace puffin {
         InitConfig(const InitConfig &) = delete;
         void operator=(const InitConfig &) = delete;
 
+        std::pair<GLushort, GLushort> gl_version_{4, 0};
+
         GLuint frame_width_{640};
         GLuint frame_height_{480};
         GLushort msaa_samples_{4};
         GLboolean fullscreen_{false};
         GLushort monitor_index_{0};
 
-		GLuint directional_light_shadow_map_size_{1024};
-
         GLuint water_reflection_width_{640};
         GLuint water_reflection_height_{320};
         GLuint water_refraction_width_{1280};
         GLuint water_refraction_height_{720};
 
-        std::pair<GLushort, GLushort> gl_version_{4, 0};
+        GLuint directional_light_shadow_map_size_{1024};
     };
 } // namespace puffin
 

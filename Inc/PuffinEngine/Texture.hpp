@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -96,9 +96,9 @@ namespace puffin {
             return path_;
         }
 
-		std::array<std::string, 6> getCubemapPath() const {
+        std::array<std::string, 6> getCubemapPath() const {
             return cubemap_path_;
-		}
+        }
 
         std::pair<GLuint, GLuint> getSize() const {
             return std::make_pair(width_, height_);

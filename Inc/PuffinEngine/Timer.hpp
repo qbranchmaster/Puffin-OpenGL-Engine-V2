@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -24,10 +24,9 @@ namespace puffin {
         friend class MasterRenderer;
 
     public:
-        Timer(const TimeoutCallback &timeout_func) {
+        explicit Timer(const TimeoutCallback &timeout_func) {
             if (!timeout_func) {
-                logError("Timer::Timer()", PUFFIN_MSG_NULL_OBJECT);
-                return;
+                throw Exception("Timer::Timer()", PUFFIN_MSG_NULL_OBJECT);
             }
 
             timeout_func_ = timeout_func;

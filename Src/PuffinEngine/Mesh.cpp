@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -33,9 +33,8 @@ void Mesh::processMeshNode(const aiNode *node, NodeData data) {
     for (GLuint i = 0; i < node->mNumMeshes; i++) {
         auto mesh_index = node->mMeshes[i];
 
-        MeshEntityPtr entity(new MeshEntity());
+        MeshEntityPtr entity(new MeshEntity(node->mName.C_Str()));
         entity->setModelMatrix(data.model_matrix);
-        entity->setName(node->mName.C_Str());
         entity->setIndicesCount(entity_data_[mesh_index].indices_count);
         entity->setVerticesCount(entity_data_[mesh_index].vertices_count);
         entity->setStartingVetexNumber(entity_data_[mesh_index].starting_index);

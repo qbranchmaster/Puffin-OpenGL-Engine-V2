@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -192,7 +192,7 @@ namespace puffin {
             return chromatic_aberration_max_offset_;
         }
 
-		WireframePtr wireframe() const {
+        WireframePtr wireframe() const {
             return wireframe_;
         }
 
@@ -218,7 +218,7 @@ namespace puffin {
         TexturePtr chromatic_aberration_texture_{nullptr};
         glm::vec3 chromatic_aberration_max_offset_{0.01f, 0.0f, -0.01f};
 
-		WireframePtr wireframe_{nullptr};
+        WireframePtr wireframe_{nullptr};
     };
 
     using PostprocessPtr = std::shared_ptr<Postprocess>;

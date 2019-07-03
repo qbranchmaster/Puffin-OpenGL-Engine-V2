@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_DEPTH_TEST_HPP
 #define PUFFIN_DEPTH_TEST_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 namespace puffin {
@@ -59,9 +56,6 @@ namespace puffin {
         DepthTest(const DepthTest &) = delete;
         void operator=(const DepthTest &) = delete;
 
-        /**
-         * Reads initial state.
-         */
         void fetchState() {
             glGetBooleanv(GL_DEPTH_TEST, &enabled_);
             glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask_enabled_);

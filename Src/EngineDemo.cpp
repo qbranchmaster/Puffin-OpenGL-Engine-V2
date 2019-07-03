@@ -29,9 +29,9 @@ EngineDemo::EngineDemo() : Core() {
 
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
 
-    renderSettings()->postprocess()->setEffect(PostprocessEffect::None);
-    renderSettings()->postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
-    renderSettings()->postprocess()->enableGlowBloom(false);
+    postprocess()->setEffect(PostprocessEffect::None);
+    postprocess()->setTintColor(glm::vec3(0.6f, 0.2f, 0.2f));
+    postprocess()->enableGlowBloom(false);
 
     createScene();
 
@@ -48,41 +48,38 @@ EngineDemo::EngineDemo() : Core() {
 
 void EngineDemo::createScene() {
     scene_.reset(new Scene());
-    skybox_.reset(new Skybox("clear_sky"));
 
+    skybox_ = scene_->addSkybox("clear_sky");
     skybox_texture_.reset(new Texture());
     skybox_texture_->loadTextureCube(
         {"Demo/Skybox/right.jpg", "Demo/Skybox/left.jpg", "Demo/Skybox/up.jpg",
             "Demo/Skybox/down.jpg", "Demo/Skybox/back.jpg", "Demo/Skybox/front.jpg"});
 
     skybox_->setTexture(skybox_texture_);
+    scene_->setActiveSkybox(skybox_);
 
-    test_mesh_.reset(new Mesh("car_scene"));
+    test_mesh_ = scene_->addMesh("car_scene");
     test_mesh_->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
     test_mesh_->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
-    scene_->setSkybox(skybox_);
-    scene_->addMesh(test_mesh_);
-
-    text_demo_.reset(new Text(L"Puffin Engine Demo", glm::uvec2(10, 710), 48));
+    /*text_demo_.reset(new Text(L"Puffin Engine Demo", glm::uvec2(10, 710), 48));
     text_demo_->setFontColor(glm::vec3(1.0f, 0.0f, 0.0f));
     text_demo_->setOutlineColor(glm::vec3(1.0f, 1.0f, 1.0f));
     text_demo_->setOutlineSize(2);
     text_demo_->setHorizontalSpacing(2);
-    text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");
+    text_demo_->setFont("Data/Fonts/unispace/unispace.ttf");*/
     // scene_->addText(text_demo_);
 
-    water_tile_.reset(new WaterTile("main_water_tile"));
+    water_tile_ = scene_->addWaterTile("main_water_tile");
     water_tile_->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
     water_tile_->setScale(glm::vec3(15.0f, 15.0f, 15.0f));
-    scene_->addWaterTile(water_tile_);
 
     point_light_.reset(new PointLight("test_light"));
     point_light_->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
     point_light_->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
     scene_->lighting()->addPointLight(point_light_);
 
-	scene_->lighting()->enable(true);
+    scene_->lighting()->enable(true);
     scene_->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
     scene_->lighting()->enableShadowMapping(true);
     scene_->lighting()->setShadowDistance(20.0f);
@@ -93,7 +90,7 @@ void EngineDemo::createScene() {
     scene_->lighting()->directionalLight()->setDiffuseColor(glm::vec3(0.8f, 0.8f, 0.8f));
     scene_->lighting()->directionalLight()->setSpecularColor(glm::vec3(5.5f, 5.5f, 5.5f));
 
-	scene_->camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
+    scene_->camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
     scene_->camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);
     scene_->camera()->setFov(0.85f);
 }
@@ -137,7 +134,7 @@ void EngineDemo::updateWindowCaption() {
 }
 
 void EngineDemo::rotateSkybox() {
-    auto skybox = scene_->getSkybox();
+    auto skybox = scene_->getActiveSkybox();
     if (!skybox) {
         return;
     }

@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -25,14 +25,6 @@
 namespace puffin {
     class Text {
     public:
-        Text(std::wstring text, const glm::uvec2 &position, GLuint font_size,
-            std::string font = "") {
-            setText(text);
-            setPosition(position.x, position.y);
-            setFontSize(font_size);
-            setFont(font);
-        }
-
         void setPosition(GLint x, GLint y) {
             position_.x = x;
             position_.y = y;

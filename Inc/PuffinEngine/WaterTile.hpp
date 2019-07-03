@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -15,7 +15,7 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
-        WaterTile(std::string name = "") : BaseMesh(name) {
+        explicit WaterTile(std::string name = "") : BaseMesh(name) {
             // clang-format off
             std::vector<GLfloat> positions = {
                 -1.0f, 0.0f, -1.0f,
@@ -90,33 +90,33 @@ namespace puffin {
             return move_factor_;
         }
 
-        void setAmbientFactor(GLfloat factor) {
+        void setAmbientLightingFactor(GLfloat factor) {
             if (factor < 0.0f) {
-                logError("WaterTile::setAmbientFactor()", PUFFIN_MSG_INVALID_VALUE);
+                logError("WaterTile::setAmbientLightingFactor()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
             ambient_factor_ = factor;
         }
 
-        GLfloat getAmbientFactor() const {
+        GLfloat getAmbientLightingFactor() const {
             return ambient_factor_;
         }
 
-        void setSpecularFactor(GLfloat factor) {
+        void setSpecularLightingFactor(GLfloat factor) {
             if (factor < 0.0f) {
-                logError("WaterTile::setSpecularFactor()", PUFFIN_MSG_INVALID_VALUE);
+                logError("WaterTile::setSpecularLightingFactor()", PUFFIN_MSG_INVALID_VALUE);
                 return;
             }
 
             specular_factor_ = factor;
         }
 
-        GLfloat getSpecularFactor() const {
+        GLfloat getSpecularLightingFactor() const {
             return specular_factor_;
         }
 
-		MeshType getMeshType() const {
+        MeshType getMeshType() const {
             return MeshType::WaterTile;
         }
 

@@ -81,10 +81,10 @@ void MasterRenderer::start() {
 		}
 
         if (rendered_scene) {
-            for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
+            /*for (GLuint i = 0; i < rendered_scene->getTextesCount(); i++) {
                 auto text = rendered_scene->getText(i);
                 font_renderer_->render(text);
-            }
+            }*/
         }
 
         if (capture_screen_flag_) {

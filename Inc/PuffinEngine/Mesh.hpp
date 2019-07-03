@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -18,7 +18,7 @@ namespace puffin {
         friend class SceneLoader;
 
     public:
-        Mesh(std::string name = "") : BaseMesh(name) {}
+        explicit Mesh(std::string name = "") : BaseMesh(name) {}
 
         void loadFromFile(std::string path);
 
@@ -34,7 +34,7 @@ namespace puffin {
             return shadow_cast_enabled_;
         }
 
-		MeshType getMeshType() const {
+        MeshType getMeshType() const {
             return MeshType::Mesh;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,9 +7,6 @@
 #ifndef PUFFIN_FACE_CULL_HPP
 #define PUFFIN_FACE_CULL_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
 #include <GL/glew.h>
 
 namespace puffin {
@@ -76,9 +73,6 @@ namespace puffin {
         FaceCull(const FaceCull &) = delete;
         void operator=(const FaceCull &) = delete;
 
-        /**
-         * Reads initial state.
-         */
         void fetchState() {
             glGetBooleanv(GL_CULL_FACE, &enabled_);
 

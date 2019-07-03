@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -28,7 +28,7 @@
 namespace puffin {
     class ShaderProgram {
     public:
-        ShaderProgram(std::string name);
+        explicit ShaderProgram(std::string name = "");
         ~ShaderProgram();
 
         std::string getName() const {

@@ -142,7 +142,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer, ScenePtr sc
         return;
     }
 
-    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+    if (postprocess_->isGlowBloomEnabled()) {
         renderGlowBloom(frame_buffer);
     }
 
@@ -159,7 +159,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer, ScenePtr sc
     Texture::setTextureSlot(1);
     frame_buffer->getDepthTextureBuffer()->bind();
     Texture::setTextureSlot(2);
-    if (render_settings_->postprocess()->isGlowBloomEnabled()) {
+    if (postprocess_->isGlowBloomEnabled()) {
         bloom_frame_buffer_[0]->getTextureBuffer(0)->bind();
     }
     else {
@@ -167,7 +167,7 @@ void DefaultPostprocessRenderer::render(FrameBufferPtr frame_buffer, ScenePtr sc
     }
 
     Texture::setTextureSlot(3);
-    render_settings_->postprocess()->getChromaticAberrationLensTexture()->bind();
+    postprocess_->getChromaticAberrationLensTexture()->bind();
 
     DepthTest::instance().enable(false);
     DepthTest::instance().enableDepthMask(false);

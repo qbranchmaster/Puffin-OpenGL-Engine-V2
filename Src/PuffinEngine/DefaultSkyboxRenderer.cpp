@@ -8,8 +8,8 @@
 
 using namespace puffin;
 
-DefaultSkyboxRenderer::DefaultSkyboxRenderer() {
-
+DefaultSkyboxRenderer::DefaultSkyboxRenderer(PostprocessPtr postprocess) {
+    postprocess_ = postprocess;
 
     loadShaders();
 }
@@ -49,7 +49,7 @@ void DefaultSkyboxRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) 
     FaceCull::instance().setCulledSide(CulledSide::Back);
 
     // Get skybox from scene and check if it is valid
-    auto skybox = scene->getSkybox();
+    auto skybox = scene->getActiveSkybox();
     if (!skybox) {
         return;
     }
@@ -75,7 +75,7 @@ void DefaultSkyboxRenderer::setDefaultShaderUniforms(ScenePtr scene) {
         return;
     }
 
-	auto skybox = scene->getSkybox();
+	auto skybox = scene->getActiveSkybox();
 
     // Skybox should not be affected by changing near and far plane values
     auto near_plane = scene->camera()->getNearPlane();
@@ -96,9 +96,8 @@ void DefaultSkyboxRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform("color.cube_texture", 0);
     default_shader_program_->setUniform(
         "color.light_color", scene->lighting()->getSkyboxLightColor());
-    default_shader_program_->setUniform("color.gamma", render_settings_->postprocess()->getGamma());
-    default_shader_program_->setUniform("color.bloom_threshold_color",
-        render_settings_->postprocess()->getGlowBloomThresholdColor());
+    default_shader_program_->setUniform("color.gamma", postprocess_->getGamma());
+    default_shader_program_->setUniform("color.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     default_shader_program_->setUniform("fog.enabled", scene->fog()->isEnabled());
     default_shader_program_->setUniform("fog.color", scene->fog()->getColor());

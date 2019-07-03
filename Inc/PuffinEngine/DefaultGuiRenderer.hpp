@@ -29,15 +29,15 @@
 #include "PuffinEngine/DefaultWaterRenderer.hpp"
 #include "PuffinEngine/GuiRenderer.hpp"
 #include "PuffinEngine/MasterRenderer.hpp"
-#include "PuffinEngine/RenderSettings.hpp"
 #include "PuffinEngine/SceneLoader.hpp"
 #include "PuffinEngine/Window.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 
 namespace puffin {
     class DefaultGuiRenderer : public GuiRenderer {
     public:
-        DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window,
-            MasterRendererPtr master_renderer);
+        DefaultGuiRenderer(WindowPtr window,
+            MasterRendererPtr master_renderer, PostprocessPtr postprocess);
 
         void render(ScenePtr scene);
 
@@ -89,11 +89,12 @@ namespace puffin {
         GLboolean enabled_{true};
 
         MasterRendererPtr master_renderer_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
         WindowPtr target_window_{nullptr};
 
         ScenePtr current_scene_{nullptr};
         SceneLoaderPtr scene_loader_{nullptr};
+
+		PostprocessPtr postprocess_;
 
         ImFont *font_normal_{nullptr};
         ImFont *font_bold_{nullptr};

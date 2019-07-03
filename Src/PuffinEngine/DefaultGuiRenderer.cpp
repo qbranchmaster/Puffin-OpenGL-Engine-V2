@@ -8,14 +8,16 @@
 
 using namespace puffin;
 
-DefaultGuiRenderer::DefaultGuiRenderer(RenderSettingsPtr render_settings, WindowPtr window, MasterRendererPtr master_renderer) {
-    if (!window || !render_settings || !master_renderer) {
+DefaultGuiRenderer::DefaultGuiRenderer(
+    WindowPtr window, MasterRendererPtr master_renderer, PostprocessPtr postprocess) {
+    if (!window || !master_renderer) {
         throw Exception("DefaultGuiRenderer::DefaultGuiRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
-    render_settings_ = render_settings;
     target_window_ = window;
     master_renderer_ = master_renderer;
+
+	postprocess_ = postprocess;
 
     scene_loader_.reset(new SceneLoader());
 
@@ -318,7 +320,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         return;
     }
 
-    PostprocessEffect current = render_settings_->postprocess()->getEffect();
+    PostprocessEffect current = postprocess_->getEffect();
     GLuint selected_index = static_cast<GLuint>(current);
     const char *postprocess_types[] = {
         "None", "Negative", "Grayscale", "Sharpen", "Blur", "Edge", "Tint"};
@@ -329,72 +331,72 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
             bool is_selected = current_item == postprocess_types[i];
             if (ImGui::Selectable(postprocess_types[i], is_selected)) {
                 current_item = postprocess_types[i];
-                render_settings_->postprocess()->setEffect(static_cast<PostprocessEffect>(i));
+                postprocess_->setEffect(static_cast<PostprocessEffect>(i));
             }
         }
 
         ImGui::EndCombo();
     }
 
-    if (render_settings_->postprocess()->getEffect() == PostprocessEffect::Tint) {
-        glm::vec3 color = render_settings_->postprocess()->getTintColor();
+    if (postprocess_->getEffect() == PostprocessEffect::Tint) {
+        glm::vec3 color = postprocess_->getTintColor();
         float tint_color[] = {color.r, color.g, color.b, 1.0f};
         ImGui::ColorEdit3("Tint color", tint_color);
-        render_settings_->postprocess()->setTintColor(
+        postprocess_->setTintColor(
             glm::vec3(tint_color[0], tint_color[1], tint_color[2]));
     }
 
-    if (render_settings_->postprocess()->getEffect() == PostprocessEffect::Blur ||
-        render_settings_->postprocess()->getEffect() == PostprocessEffect::Edge ||
-        render_settings_->postprocess()->getEffect() == PostprocessEffect::Sharpen) {
-        float k_size = render_settings_->postprocess()->getKernelSize();
+    if (postprocess_->getEffect() == PostprocessEffect::Blur ||
+        postprocess_->getEffect() == PostprocessEffect::Edge ||
+        postprocess_->getEffect() == PostprocessEffect::Sharpen) {
+        float k_size = postprocess_->getKernelSize();
         ImGui::SliderFloat("Kernel size", &k_size, 1.0f, 500.0f);
-        render_settings_->postprocess()->setKernelSize(k_size);
+        postprocess_->setKernelSize(k_size);
     }
 
-    float gamma = render_settings_->postprocess()->getGamma();
+    float gamma = postprocess_->getGamma();
     ImGui::SliderFloat("Gamma", &gamma, 1.0f, 10.0f);
-    render_settings_->postprocess()->setGamma(gamma);
+    postprocess_->setGamma(gamma);
 
-    float exposure = render_settings_->postprocess()->getExposure();
+    float exposure = postprocess_->getExposure();
     ImGui::SliderFloat("Exposure", &exposure, 1.0f, 10.0f);
-    render_settings_->postprocess()->setExposure(exposure);
+    postprocess_->setExposure(exposure);
 
-    bool enable_bloom = render_settings_->postprocess()->isGlowBloomEnabled();
+    bool enable_bloom = postprocess_->isGlowBloomEnabled();
     ImGui::Checkbox("Glow bloom", &enable_bloom);
-    render_settings_->postprocess()->enableGlowBloom(enable_bloom);
+    postprocess_->enableGlowBloom(enable_bloom);
 
     if (enable_bloom) {
-        glm::vec3 bloom_thresh = render_settings_->postprocess()->getGlowBloomThresholdColor();
+        glm::vec3 bloom_thresh = postprocess_->getGlowBloomThresholdColor();
         float thresh_color[] = {bloom_thresh.r, bloom_thresh.g, bloom_thresh.b};
         ImGui::ColorEdit3("Threshold color", thresh_color);
-        render_settings_->postprocess()->setGlowBloomThresholdColor(
+        postprocess_->setGlowBloomThresholdColor(
             glm::vec3(thresh_color[0], thresh_color[1], thresh_color[2]));
     }
 
-    bool dof_enabled = render_settings_->postprocess()->isDepthOfFieldEnabled();
+    bool dof_enabled = postprocess_-> isDepthOfFieldEnabled();
     ImGui::Checkbox("Depth of Field", &dof_enabled);
-    render_settings_->postprocess()->enableDepthOfField(dof_enabled);
+    postprocess_->enableDepthOfField(dof_enabled);
 
     if (dof_enabled) {
-        float aperture = render_settings_->postprocess()->getAperture();
+        float aperture = postprocess_->getAperture();
         ImGui::SliderFloat("Aperture", &aperture, 0.01f, 0.1f);
-        render_settings_->postprocess()->setAperture(aperture);
-        float focus = render_settings_->postprocess()->getFocusDistance();
+        postprocess_->setAperture(aperture);
+        float focus = postprocess_->getFocusDistance();
         ImGui::SliderFloat("Distance", &focus, 0.0f, 1.0f);
-        render_settings_->postprocess()->setFocusDistance(focus);
-        float max_blur = render_settings_->postprocess()->getDepthOfFieldMaxBlur();
+        postprocess_->setFocusDistance(focus);
+        float max_blur = postprocess_->getDepthOfFieldMaxBlur();
         ImGui::SliderFloat("Max blur", &max_blur, 0.0f, 1.0f);
-        render_settings_->postprocess()->setDepthOfFieldMaxBlur(max_blur);
+        postprocess_->setDepthOfFieldMaxBlur(max_blur);
     }
 
-    bool chromatic_enabled = render_settings_->postprocess()->isChromaticAberrationEnabled();
+    bool chromatic_enabled = postprocess_->isChromaticAberrationEnabled();
     ImGui::Checkbox("Chromatic aberration", &chromatic_enabled);
-    render_settings_->postprocess()->enableChromaticAberration(chromatic_enabled);
+    postprocess_->enableChromaticAberration(chromatic_enabled);
 
     if (chromatic_enabled) {
         ImGui::Text("Lens texture");
-        auto texture = render_settings_->postprocess()->getChromaticAberrationLensTexture();
+        auto texture = postprocess_->getChromaticAberrationLensTexture();
         auto texture_size = texture->getSize();
         ImTextureID texture_handle = (void *)(texture->getHandle());
         ImGui::Image(texture_handle, ImVec2(texture_size.first / 4.0f, texture_size.second / 4.0f));
@@ -404,19 +406,18 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         ImGui::InputText("Texture path", &path, flags);
 
         if (ImGui::Button("Load texture")) {
-            render_settings_->postprocess()->getChromaticAberrationLensTexture()->loadTexture2D(
+            postprocess_->getChromaticAberrationLensTexture()->loadTexture2D(
                 path);
         }
 
-        auto max_offsets =
-            render_settings_->postprocess()->getChromaticAberrationMaxChannelsOffset();
+        auto max_offsets = postprocess_->getChromaticAberrationMaxChannelsOffset();
         float r_offset = max_offsets.r;
         float g_offset = max_offsets.g;
         float b_offset = max_offsets.b;
         ImGui::SliderFloat("R offset", &r_offset, -0.1f, 0.1f);
         ImGui::SliderFloat("G offset", &g_offset, -0.1f, 0.1f);
         ImGui::SliderFloat("B offset", &b_offset, -0.1f, 0.1f);
-        render_settings_->postprocess()->setChromaticAberrationMaxChannelsOffset(
+        postprocess_->setChromaticAberrationMaxChannelsOffset(
             glm::vec3(r_offset, g_offset, b_offset));
     }
 
@@ -425,7 +426,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
     ImGui::PopFont();
 
     {
-        WireframeMode current = render_settings_->postprocess()->wireframe()->getMode();
+        WireframeMode current = postprocess_->wireframe()->getMode();
         GLuint selected_index = static_cast<GLuint>(current);
         const char *modes_str[] = {"None", "Overlay", "Full"};
         static const char *current_item = modes_str[selected_index];
@@ -435,7 +436,7 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
                 bool is_selected = (current_item == modes_str[i]);
                 if (ImGui::Selectable(modes_str[i], is_selected)) {
                     current_item = modes_str[i];
-                    render_settings_->postprocess()->wireframe()->setMode(
+                    postprocess_->wireframe()->setMode(
                         static_cast<WireframeMode>(i));
                 }
             }
@@ -444,14 +445,14 @@ void DefaultGuiRenderer::renderPostprocessDialog() {
         }
 
         if (current != WireframeMode::None) {
-            glm::vec3 wireframe_color = render_settings_->postprocess()->wireframe()->getColor();
+            glm::vec3 wireframe_color = postprocess_->wireframe()->getColor();
             float color[] = {wireframe_color.r, wireframe_color.g, wireframe_color.b};
             ImGui::ColorEdit3("Color", color);
-            render_settings_->postprocess()->wireframe()->setColor(glm::vec3(color[0], color[1], color[2]));
+            postprocess_->wireframe()->setColor(glm::vec3(color[0], color[1], color[2]));
 
-            int width = render_settings_->postprocess()->wireframe()->getLineWidth();
+            int width = postprocess_->wireframe()->getLineWidth();
             ImGui::SliderInt("Line width", &width, 1, 15);
-            render_settings_->postprocess()->wireframe()->setLineWidth(width);
+            postprocess_->wireframe()->setLineWidth(width);
         }
     }
 
@@ -748,162 +749,162 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
 
     static BaseMeshPtr selected_object = nullptr;
 
-    if (ImGui::TreeNode("Scene objects")) {
-        if (ImGui::TreeNode("Skyboxes")) {
-            auto skybox = current_scene_->getSkybox();
-            if (ImGui::Selectable(skybox->getName().c_str(), selected_object == skybox)) {
-                selected_object = skybox;
-            }
+    //if (ImGui::TreeNode("Scene objects")) {
+    //    if (ImGui::TreeNode("Skyboxes")) {
+    //        auto skybox = current_scene_->getSkybox();
+    //        if (ImGui::Selectable(skybox->getName().c_str(), selected_object == skybox)) {
+    //            selected_object = skybox;
+    //        }
 
-            ImGui::TreePop();
-        }
+    //        ImGui::TreePop();
+    //    }
 
-        if (ImGui::TreeNode("Meshes")) {
-            for (GLuint i = 0; i < current_scene_->getMeshesCount(); i++) {
-                auto mesh = current_scene_->getMesh(i);
-                if (ImGui::Selectable(mesh->getName().c_str(), selected_object == mesh)) {
-                    selected_object = mesh;
-                }
-            }
+    //    if (ImGui::TreeNode("Meshes")) {
+    //        for (GLuint i = 0; i < current_scene_->getMeshesCount(); i++) {
+    //            auto mesh = current_scene_->getMesh(i);
+    //            if (ImGui::Selectable(mesh->getName().c_str(), selected_object == mesh)) {
+    //                selected_object = mesh;
+    //            }
+    //        }
 
-            ImGui::TreePop();
-        }
+    //        ImGui::TreePop();
+    //    }
 
-        if (ImGui::TreeNode("Water tiles")) {
-            for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
-                auto water_tile = current_scene_->getWaterTile(i);
-                if (ImGui::Selectable(
-                        water_tile->getName().c_str(), selected_object == water_tile)) {
-                    selected_object = water_tile;
-                }
-            }
+    //    if (ImGui::TreeNode("Water tiles")) {
+    //        for (GLuint i = 0; i < current_scene_->getWaterTilesCount(); i++) {
+    //            auto water_tile = current_scene_->getWaterTile(i);
+    //            if (ImGui::Selectable(
+    //                    water_tile->getName().c_str(), selected_object == water_tile)) {
+    //                selected_object = water_tile;
+    //            }
+    //        }
 
-            ImGui::TreePop();
-        }
+    //        ImGui::TreePop();
+    //    }
 
-        ImGui::TreePop();
-    }
+    //    ImGui::TreePop();
+    //}
 
-    ImGui::Separator();
+    //ImGui::Separator();
 
-    if (!selected_object) {
-        ImGui::Text("[ No object selected ]");
-        ImGui::End();
-        return;
-    }
+    //if (!selected_object) {
+    //    ImGui::Text("[ No object selected ]");
+    //    ImGui::End();
+    //    return;
+    //}
 
-    ImGui::Text("Name: ");
-    ImGui::SameLine();
-    ImGui::Text(selected_object->getName().c_str());
-    ImGui::Text("Type: ");
-    ImGui::SameLine();
+    //ImGui::Text("Name: ");
+    //ImGui::SameLine();
+    //ImGui::Text(selected_object->getName().c_str());
+    //ImGui::Text("Type: ");
+    //ImGui::SameLine();
 
-    switch (selected_object->getMeshType()) {
-    case MeshType::Mesh:
-        ImGui::Text("Mesh");
-        break;
-    case MeshType::Skybox:
-        ImGui::Text("Skybox");
-        break;
-    case MeshType::WaterTile:
-        ImGui::Text("WaterTile");
-        break;
-    default:
-        ImGui::Text("Unknown");
-        break;
-    }
+    //switch (selected_object->getMeshType()) {
+    //case MeshType::Mesh:
+    //    ImGui::Text("Mesh");
+    //    break;
+    //case MeshType::Skybox:
+    //    ImGui::Text("Skybox");
+    //    break;
+    //case MeshType::WaterTile:
+    //    ImGui::Text("WaterTile");
+    //    break;
+    //default:
+    //    ImGui::Text("Unknown");
+    //    break;
+    //}
 
-    if (selected_object->getMeshType() == MeshType::WaterTile ||
-        selected_object->getMeshType() == MeshType::Mesh) {
-        ImGui::PushFont(font_bold_);
-        ImGui::Text("Transform");
-        ImGui::PopFont();
+    //if (selected_object->getMeshType() == MeshType::WaterTile ||
+    //    selected_object->getMeshType() == MeshType::Mesh) {
+    //    ImGui::PushFont(font_bold_);
+    //    ImGui::Text("Transform");
+    //    ImGui::PopFont();
 
-        glm::vec3 position = selected_object->getPosition();
-        float pos[] = {position.x, position.y, position.z};
-        ImGui::DragFloat3("Position", pos, 0.01f);
-        selected_object->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+    //    glm::vec3 position = selected_object->getPosition();
+    //    float pos[] = {position.x, position.y, position.z};
+    //    ImGui::DragFloat3("Position", pos, 0.01f);
+    //    selected_object->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
 
-        static bool lock_scale = false;
-        glm::vec3 scale = selected_object->getScale();
-        static float prev_scale[] = {scale.x, scale.y, scale.z};
-        float current_scale[] = {scale.x, scale.y, scale.z};
-        if (ImGui::DragFloat3("Scale", current_scale, 0.0001f)) {
-            if (lock_scale) {
-                // Detect which value has changed
-                for (GLushort i = 0; i < 3; i++) {
-                    if (current_scale[i] != prev_scale[i]) {
-                        float new_val = current_scale[i];
-                        for (GLushort j = 0; j < 3; j++) {
-                            current_scale[j] = new_val;
-                            prev_scale[j] = new_val;
-                        }
+    //    static bool lock_scale = false;
+    //    glm::vec3 scale = selected_object->getScale();
+    //    static float prev_scale[] = {scale.x, scale.y, scale.z};
+    //    float current_scale[] = {scale.x, scale.y, scale.z};
+    //    if (ImGui::DragFloat3("Scale", current_scale, 0.0001f)) {
+    //        if (lock_scale) {
+    //            // Detect which value has changed
+    //            for (GLushort i = 0; i < 3; i++) {
+    //                if (current_scale[i] != prev_scale[i]) {
+    //                    float new_val = current_scale[i];
+    //                    for (GLushort j = 0; j < 3; j++) {
+    //                        current_scale[j] = new_val;
+    //                        prev_scale[j] = new_val;
+    //                    }
 
-                        break;
-                    }
-                }
-            }
-        }
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //    }
 
-        ImGui::SameLine();
-        if (ImGui::Checkbox("Lock", &lock_scale)) {
-            if (lock_scale) {
-                current_scale[1] = current_scale[0];
-                current_scale[2] = current_scale[0];
-            }
-        }
+    //    ImGui::SameLine();
+    //    if (ImGui::Checkbox("Lock", &lock_scale)) {
+    //        if (lock_scale) {
+    //            current_scale[1] = current_scale[0];
+    //            current_scale[2] = current_scale[0];
+    //        }
+    //    }
 
-        selected_object->setScale(glm::vec3(current_scale[0], current_scale[1], current_scale[2]));
+    //    selected_object->setScale(glm::vec3(current_scale[0], current_scale[1], current_scale[2]));
 
-        glm::vec3 angles = selected_object->getRotationAngles();
-        float rot_an[] = {angles.x, angles.y, angles.z};
-        ImGui::DragFloat3("Rotation", rot_an, 0.001f);
-        selected_object->setRotation(glm::vec3(rot_an[0], rot_an[1], rot_an[2]));
-    }
+    //    glm::vec3 angles = selected_object->getRotationAngles();
+    //    float rot_an[] = {angles.x, angles.y, angles.z};
+    //    ImGui::DragFloat3("Rotation", rot_an, 0.001f);
+    //    selected_object->setRotation(glm::vec3(rot_an[0], rot_an[1], rot_an[2]));
+    //}
 
-    if (selected_object->getMeshType() == MeshType::WaterTile) {
-        ImGui::PushFont(font_bold_);
-        ImGui::Text("Render");
-        ImGui::PopFont();
+    //if (selected_object->getMeshType() == MeshType::WaterTile) {
+    //    ImGui::PushFont(font_bold_);
+    //    ImGui::Text("Render");
+    //    ImGui::PopFont();
 
-        WaterTilePtr water_tile = std::static_pointer_cast<WaterTile>(selected_object);
+    //    WaterTilePtr water_tile = std::static_pointer_cast<WaterTile>(selected_object);
 
-        glm::vec3 water_color = water_tile->getWaterColor();
-        float color[] = {water_color.r, water_color.g, water_color.b};
-        ImGui::ColorEdit3("Color", color);
-        water_tile->setWaterColor(glm::vec3(color[0], color[1], color[2]));
+    //    glm::vec3 water_color = water_tile->getWaterColor();
+    //    float color[] = {water_color.r, water_color.g, water_color.b};
+    //    ImGui::ColorEdit3("Color", color);
+    //    water_tile->setWaterColor(glm::vec3(color[0], color[1], color[2]));
 
-        float wave_strength = water_tile->getWaveStrength();
-        ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
-        water_tile->setWaveStrength(wave_strength);
+    //    float wave_strength = water_tile->getWaveStrength();
+    //    ImGui::SliderFloat("Wave strength", &wave_strength, 0.0f, 10.0f);
+    //    water_tile->setWaveStrength(wave_strength);
 
-        float wave_speed = water_tile->getWaveSpeed();
-        ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
-        water_tile->setWaveSpeed(wave_speed);
+    //    float wave_speed = water_tile->getWaveSpeed();
+    //    ImGui::SliderFloat("Wave speed", &wave_speed, 0.0f, 10.0f);
+    //    water_tile->setWaveSpeed(wave_speed);
 
-        int shininess = water_tile->getShininess();
-        ImGui::SliderInt("Shininess", &shininess, 1, 100);
-        water_tile->setShininess(shininess);
+    //    int shininess = water_tile->getShininess();
+    //    ImGui::SliderInt("Shininess", &shininess, 1, 100);
+    //    water_tile->setShininess(shininess);
 
-        float ambient_factor = water_tile->getAmbientFactor();
-        ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
-        water_tile->setAmbientFactor(ambient_factor);
+    //    float ambient_factor = water_tile->getAmbientFactor();
+    //    ImGui::SliderFloat("Ambient factor", &ambient_factor, 0.0f, 10.0f);
+    //    water_tile->setAmbientFactor(ambient_factor);
 
-        float specular_factor = water_tile->getSpecularFactor();
-        ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
-        water_tile->setSpecularFactor(specular_factor);
-    }
-    else if (selected_object->getMeshType() == MeshType::Mesh) {
-        ImGui::PushFont(font_bold_);
-        ImGui::Text("Render");
-        ImGui::PopFont();
+    //    float specular_factor = water_tile->getSpecularFactor();
+    //    ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
+    //    water_tile->setSpecularFactor(specular_factor);
+    //}
+    //else if (selected_object->getMeshType() == MeshType::Mesh) {
+    //    ImGui::PushFont(font_bold_);
+    //    ImGui::Text("Render");
+    //    ImGui::PopFont();
 
-        MeshPtr mesh = std::static_pointer_cast<Mesh>(selected_object);
+    //    MeshPtr mesh = std::static_pointer_cast<Mesh>(selected_object);
 
-        bool cast_shadow = mesh->isShadowCastingEnabled();
-        ImGui::Checkbox("Cast shadows", &cast_shadow);
-        mesh->enableShadowCasting(cast_shadow);
-    }
+    //    bool cast_shadow = mesh->isShadowCastingEnabled();
+    //    ImGui::Checkbox("Cast shadows", &cast_shadow);
+    //    mesh->enableShadowCasting(cast_shadow);
+    //}
 
     ImGui::End();
 }
@@ -983,7 +984,7 @@ void DefaultGuiRenderer::renderAddSkyboxDialog() {
 
     ImGuiInputTextFlags flags = 0;
 
-    static std::string name = "new_skybox";
+    /*static std::string name = "new_skybox";
     ImGui::InputText("Name", &name, flags);
 
     ImGui::Text("Skybox textures");
@@ -1003,7 +1004,7 @@ void DefaultGuiRenderer::renderAddSkyboxDialog() {
         skybox->setTexture(texture);
 
         current_scene_->setSkybox(skybox);
-    }
+    }*/
 
     ImGui::End();
 }
@@ -1024,7 +1025,7 @@ void DefaultGuiRenderer::renderAddMeshDialog() {
 
     ImGuiInputTextFlags flags = 0;
 
-    static std::string name = "new_mesh";
+    /*static std::string name = "new_mesh";
     ImGui::InputText("Name", &name, flags);
 
     static std::string path = "";
@@ -1037,7 +1038,7 @@ void DefaultGuiRenderer::renderAddMeshDialog() {
         if (mesh) {
             current_scene_->addMesh(mesh);
         }
-    }
+    }*/
 
     ImGui::End();
 }

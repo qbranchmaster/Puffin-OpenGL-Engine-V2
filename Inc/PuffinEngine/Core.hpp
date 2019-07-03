@@ -34,10 +34,6 @@ namespace puffin {
             return master_renderer_;
         }
 
-        RenderSettingsPtr renderSettings() const {
-            return render_settings_;
-        }
-
         WindowPtr window() const {
             return window_;
         }
@@ -56,7 +52,6 @@ namespace puffin {
         WindowPtr window_{nullptr};
 
         MasterRendererPtr master_renderer_{nullptr};
-        RenderSettingsPtr render_settings_{nullptr};
 
 		PostprocessPtr postprocess_{nullptr};
 
