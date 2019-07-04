@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -13,15 +13,16 @@
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/MeshRenderer.hpp"
-#include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/Postprocess.hpp"
+#include "PuffinEngine/ShaderProgram.hpp"
 
 namespace puffin {
     class DefaultMeshRenderer : public MeshRenderer {
         friend class DefaultWaterRenderer;
 
     public:
-        DefaultMeshRenderer(DefaultShadowMapRendererPtr shadow_map_renderer, PostprocessPtr postprocess);
+        DefaultMeshRenderer(
+            DefaultShadowMapRendererPtr shadow_map_renderer, PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -56,8 +57,7 @@ namespace puffin {
         ShaderProgramPtr wireframe_shader_program_{nullptr};
 
         DefaultShadowMapRendererPtr shadow_map_renderer_{nullptr};
-
-		PostprocessPtr postprocess_{nullptr};
+        PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultMeshRendererPtr = std::shared_ptr<DefaultMeshRenderer>;

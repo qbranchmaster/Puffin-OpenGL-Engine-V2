@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -9,9 +9,6 @@
 using namespace puffin;
 
 DefaultShadowMapRenderer::DefaultShadowMapRenderer() {
-
-
-
     camera_frustum_.reset(new CameraFrustum());
 
     loadShaders();
@@ -34,9 +31,10 @@ void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
         directional_light_shadow_map_frame_bufer_->getDepthTextureBuffer();
 }
 
-glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix(LightingPtr lighting, CameraPtr camera) {
-    camera_frustum_->setCameraParameters(camera->getNearPlane(),
-        lighting->getShadowDistance(), camera->getAspect(), camera->getFov());
+glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix(
+    LightingPtr lighting, CameraPtr camera) {
+    camera_frustum_->setCameraParameters(camera->getNearPlane(), lighting->getShadowDistance(),
+        camera->getAspect(), camera->getFov());
     camera_frustum_->setCameraVectors(camera->getDirectionVector(), camera->getRightVector(),
         camera->getUpVector(), camera->getPosition());
     camera_frustum_->calculateFrustumPoints();
@@ -44,8 +42,7 @@ glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix(Lightin
 
     glm::vec3 dir_light_pos = camera_frustum_->getCenter();
     glm::mat4 dir_light_view_matrix = glm::lookAt(dir_light_pos,
-        dir_light_pos + lighting->directionalLight()->getDirection(),
-        glm::vec3(0.0f, 1.0f, 0.0f));
+        dir_light_pos + lighting->directionalLight()->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f));
     camera_frustum_->recalculateToFrame(dir_light_view_matrix);
     camera_frustum_->calculateBoundingBoxSize();
 
@@ -91,7 +88,8 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(ScenePtr scene) {
         return;
     }
 
-    output_data_.dir_light_space_matrix = calculateDirectionalLightSpaceMatrix(scene->lighting(), scene->camera());
+    output_data_.dir_light_space_matrix =
+        calculateDirectionalLightSpaceMatrix(scene->lighting(), scene->camera());
 
     directional_light_shader_program_->activate();
     directional_light_shader_program_->setUniform(

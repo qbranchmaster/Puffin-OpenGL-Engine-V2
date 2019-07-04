@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -11,25 +11,26 @@
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
 #include "PuffinEngine/SkyboxRenderer.hpp"
-#include "Postprocess.hpp"
 
 namespace puffin {
     class DefaultSkyboxRenderer : public SkyboxRenderer {
     public:
-        DefaultSkyboxRenderer(PostprocessPtr postprocess);
+        explicit DefaultSkyboxRenderer(PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
     private:
         void loadShaders();
-        void setDefaultShaderUniforms(ScenePtr scene);
+        void setDefaultShaderUniforms(
+            SkyboxPtr skybox, CameraPtr camera, LightingPtr lighting, FogPtr fog);
         void drawSkybox(SkyboxPtr skybox);
 
         ShaderProgramPtr default_shader_program_{nullptr};
 
-		PostprocessPtr postprocess_;
+        PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultSkyboxRendererPtr = std::shared_ptr<DefaultSkyboxRenderer>;

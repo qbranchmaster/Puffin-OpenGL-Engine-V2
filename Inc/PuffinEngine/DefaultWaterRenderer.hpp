@@ -7,9 +7,12 @@
 #ifndef PUFFIN_DEFAULT_WATER_RENDERER_HPP
 #define PUFFIN_DEFAULT_WATER_RENDERER_HPP
 
+#include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
+#include "PuffinEngine/DepthTest.hpp"
+#include "PuffinEngine/FaceCull.hpp"
 #include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Postprocess.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"

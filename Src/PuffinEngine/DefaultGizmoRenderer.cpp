@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -18,9 +18,9 @@ void DefaultGizmoRenderer::render(ScenePtr scene) {
     if (!scene) {
         logError("DefaultGizmoRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
         return;
-	}
+    }
 
-	if (!enabled_) {
+    if (!enabled_) {
         return;
     }
 
@@ -36,40 +36,21 @@ void DefaultGizmoRenderer::render(ScenePtr scene) {
     FaceCull::instance().enable(false);
     FaceCull::instance().setCulledSide(CulledSide::Back);
 
-	default_shader_program_->activate();
+    default_shader_program_->activate();
+    setDefaultShaderProgramUniforms(scene->camera());
 
-	gizmo_mesh_->bind();
+    gizmo_mesh_->bind();
 
-	for (GLuint i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
-        auto point_light = scene->lighting()->getPointLight(i);
+    renderPointLightsGizmos(scene);
+}
 
-        auto view_matrix = scene->camera()->getViewMatrix();
-        default_shader_program_->setUniform("view_matrix", view_matrix);
-        default_shader_program_->setUniform(
-            "projection_matrix", scene->camera()->getProjectionMatrix());
+void DefaultGizmoRenderer::setGizmosScale(GLfloat scale) {
+    if (scale <= 0.0f) {
+        logError("DefaultGizmoRenderer::setGizmosScale()", PUFFIN_MSG_INVALID_VALUE);
+        return;
+    }
 
-		glm::mat4 model_matrix(1.0f);
-        model_matrix = glm::translate(model_matrix, point_light->getPosition());
-
-        model_matrix[0][0] = view_matrix[0][0];
-        model_matrix[1][0] = view_matrix[0][1];
-        model_matrix[2][0] = view_matrix[0][2];
-        model_matrix[0][1] = view_matrix[1][0];
-        model_matrix[1][1] = view_matrix[1][1];
-        model_matrix[2][1] = view_matrix[1][2];
-        model_matrix[0][2] = view_matrix[2][0];
-        model_matrix[1][2] = view_matrix[2][1];
-        model_matrix[2][2] = view_matrix[2][2];
-
-        default_shader_program_->setUniform("model_matrix", model_matrix);
-
-		default_shader_program_->setUniform("gizmo_texture", 0);
-
-		Texture::setTextureSlot(0);
-        point_light_texture_->bind();
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-	}
+    gizmo_scale_ = scale;
 }
 
 void DefaultGizmoRenderer::loadShaders() {
@@ -83,8 +64,8 @@ void DefaultGizmoRenderer::loadTextures() {
 }
 
 void DefaultGizmoRenderer::createGizmoMesh() {
-    gizmo_mesh_.reset(new Mesh("gizmo_mesh"));
-	// clang-format off
+    gizmo_mesh_.reset(new Mesh());
+    // clang-format off
 	std::vector<GLfloat> positions = {
         -0.1f,  0.1f, 0.0f,
         -0.1f, -0.1f, 0.0f,
@@ -102,9 +83,54 @@ void DefaultGizmoRenderer::createGizmoMesh() {
 		0.0f, 0.0f,
 		1.0f, 0.0f,
     };
-	// clang-format on
+    // clang-format on
 
     gizmo_mesh_->bind();
     gizmo_mesh_->setMeshData(positions, 0, 3);
     gizmo_mesh_->setMeshData(texture_coords, 1, 2);
+}
+
+void DefaultGizmoRenderer::renderPointLightsGizmos(ScenePtr scene) {
+    Texture::setTextureSlot(0);
+    point_light_texture_->bind();
+
+    for (GLuint i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
+        auto point_light = scene->lighting()->getPointLight(i);
+        auto model_matrix = prepareGizmoModelMatrix(point_light->getPosition(), scene->camera());
+        default_shader_program_->setUniform("model_matrix", model_matrix);
+
+        drawGizmoMesh();
+    }
+}
+
+void DefaultGizmoRenderer::drawGizmoMesh() {
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void DefaultGizmoRenderer::setDefaultShaderProgramUniforms(CameraPtr camera) {
+    default_shader_program_->setUniform("view_matrix", camera->getViewMatrix());
+    default_shader_program_->setUniform("projection_matrix", camera->getProjectionMatrix());
+
+    default_shader_program_->setUniform("gizmo_texture", 0);
+}
+
+glm::mat4 DefaultGizmoRenderer::prepareGizmoModelMatrix(
+    const glm::vec3 &position, CameraPtr camera) {
+    auto view_matrix = camera->getViewMatrix();
+    glm::mat4 model_matrix(1.0f);
+    model_matrix = glm::translate(model_matrix, position);
+
+    model_matrix[0][0] = view_matrix[0][0];
+    model_matrix[1][0] = view_matrix[0][1];
+    model_matrix[2][0] = view_matrix[0][2];
+    model_matrix[0][1] = view_matrix[1][0];
+    model_matrix[1][1] = view_matrix[1][1];
+    model_matrix[2][1] = view_matrix[1][2];
+    model_matrix[0][2] = view_matrix[2][0];
+    model_matrix[1][2] = view_matrix[2][1];
+    model_matrix[2][2] = view_matrix[2][2];
+
+    model_matrix = glm::scale(model_matrix, glm::vec3(gizmo_scale_, gizmo_scale_, gizmo_scale_));
+
+    return model_matrix;
 }

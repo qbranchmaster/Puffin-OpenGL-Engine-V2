@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -9,6 +9,11 @@
 using namespace puffin;
 
 DefaultPostprocessRenderer::DefaultPostprocessRenderer(PostprocessPtr postprocess) {
+    if (!postprocess) {
+        throw Exception(
+            "DefaultPostprocessRenderer::DefaultPostprocessRenderer()", PUFFIN_MSG_NULL_OBJECT);
+    }
+
     postprocess_ = postprocess;
 
     loadShaders();
@@ -40,7 +45,7 @@ void DefaultPostprocessRenderer::setShadersUniforms(CameraPtr camera) {
     default_shader_program_->setUniform("color.tint_color", postprocess_->getTintColor());
     default_shader_program_->setUniform("color.screen_texture", 0);
     default_shader_program_->setUniform("color.depth_texture", 1);
-    default_shader_program_->setUniform("color.gamma", postprocess_-> getGamma());
+    default_shader_program_->setUniform("color.gamma", postprocess_->getGamma());
     default_shader_program_->setUniform("color.exposure", postprocess_->getExposure());
     default_shader_program_->setUniform(
         "color.glow_bloom_enabled", postprocess_->isGlowBloomEnabled());
@@ -59,7 +64,8 @@ void DefaultPostprocessRenderer::setShadersUniforms(CameraPtr camera) {
         default_shader_program_->setUniform("color.camera_aspect", camera->getAspect());
     }
 
-    default_shader_program_->setUniform("chromatic_aberration.enabled", postprocess_->isChromaticAberrationEnabled());
+    default_shader_program_->setUniform(
+        "chromatic_aberration.enabled", postprocess_->isChromaticAberrationEnabled());
 
     if (postprocess_->isChromaticAberrationEnabled()) {
         default_shader_program_->setUniform("chromatic_aberration.lens_texture", 3);

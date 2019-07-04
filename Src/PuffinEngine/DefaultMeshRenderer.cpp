@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -10,11 +10,11 @@ using namespace puffin;
 
 DefaultMeshRenderer::DefaultMeshRenderer(
     DefaultShadowMapRendererPtr shadow_map_renderer, PostprocessPtr postprocess) {
-    if (!shadow_map_renderer) {
+    if (!shadow_map_renderer || !postprocess) {
         throw Exception("DefaultMeshRenderer::DefaultMeshRenderer()", PUFFIN_MSG_NULL_OBJECT);
     }
 
-	postprocess_ = postprocess;
+    postprocess_ = postprocess;
     shadow_map_renderer_ = shadow_map_renderer;
 
     loadShaders();
@@ -53,7 +53,8 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform("lighting.emission_factor", lighting->getEmissionFactor());
 
     default_shader_program_->setUniform("other.gamma", postprocess_->getGamma());
-    default_shader_program_->setUniform("other.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
+    default_shader_program_->setUniform(
+        "other.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     // Shadow mapping
     default_shader_program_->setUniform(
@@ -66,6 +67,7 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
         static_cast<GLint>(lighting->getShadowMappingPcfSamplesCount()));
 
+    // Fog
     default_shader_program_->setUniform("fog.enabled", scene->fog()->isEnabled());
     default_shader_program_->setUniform("fog.color", scene->fog()->getColor());
     default_shader_program_->setUniform("fog.density", scene->fog()->getDensity());

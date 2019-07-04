@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -18,7 +18,7 @@
 namespace puffin {
     class DefaultPostprocessRenderer : public PostprocessRenderer {
     public:
-        DefaultPostprocessRenderer(PostprocessPtr postprocess);
+        explicit DefaultPostprocessRenderer(PostprocessPtr postprocess);
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
@@ -34,7 +34,7 @@ namespace puffin {
         ShaderProgramPtr default_shader_program_{nullptr};
         ShaderProgramPtr bloom_shader_program_{nullptr};
 
-		PostprocessPtr postprocess_{nullptr};
+        PostprocessPtr postprocess_{nullptr};
     };
 
     using DefaultPostprocessRendererPtr = std::shared_ptr<DefaultPostprocessRenderer>;

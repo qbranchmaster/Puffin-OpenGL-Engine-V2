@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -7,19 +7,14 @@
 #ifndef PUFFIN_DEFAULT_GIZMO_RENDERER_HPP
 #define PUFFIN_DEFAULT_GIZMO_RENDERER_HPP
 
-#ifdef WIN32 // Prevents APIENTRY redefinition
-#include <Windows.h>
-#endif // WIN32
-#include <GL/glew.h>
-
 #include "PuffinEngine/AlphaBlend.hpp"
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DepthTest.hpp"
 #include "PuffinEngine/FaceCull.hpp"
+#include "PuffinEngine/FrameBuffer.hpp"
 #include "PuffinEngine/GizmoRenderer.hpp"
 #include "PuffinEngine/Mesh.hpp"
 #include "PuffinEngine/ShaderProgram.hpp"
-#include "PuffinEngine/FrameBuffer.hpp"
 
 namespace puffin {
     class DefaultGizmoRenderer : public GizmoRenderer {
@@ -28,10 +23,24 @@ namespace puffin {
 
         void render(ScenePtr scene);
 
+        void setGizmosScale(GLfloat scale);
+
+        GLfloat getGizmosScale() const {
+            return gizmo_scale_;
+        }
+
     private:
         void loadShaders();
         void loadTextures();
         void createGizmoMesh();
+        void drawGizmoMesh();
+        void setDefaultShaderProgramUniforms(CameraPtr camera);
+
+        glm::mat4 prepareGizmoModelMatrix(const glm::vec3 &position, CameraPtr camera);
+
+        void renderPointLightsGizmos(ScenePtr scene);
+
+        GLfloat gizmo_scale_{1.0f};
 
         TexturePtr point_light_texture_{nullptr};
 

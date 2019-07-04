@@ -175,8 +175,6 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(
     default_shader_program_->setUniform(
         "directional_light.specular_color", lighting->directionalLight()->getSpecularColor());
 
-    // default_shader_program_->setUniform(
-    //    "postprocess.gamma", render_settings_->postprocess()->getGamma());
     default_shader_program_->setUniform(
         "postprocess.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
