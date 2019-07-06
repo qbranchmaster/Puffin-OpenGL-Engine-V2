@@ -120,6 +120,19 @@ namespace puffin {
             return MeshType::WaterTile;
         }
 
+        void setTextureTiling(GLushort tiling) {
+            if (tiling <= 0) {
+                logError("WaterTile::setTextureTiling()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            texture_tiling_ = tiling;
+        }
+
+        GLushort getTextureTiling() const {
+            return texture_tiling_;
+        }
+
     private:
         glm::vec3 water_color_{0.0f, 0.3f, 0.5f};
         GLuint shininess_{10};
@@ -130,6 +143,8 @@ namespace puffin {
         GLfloat wave_speed_{0.01f};
 
         GLfloat move_factor_{0.0f};
+
+        GLushort texture_tiling_{1};
     };
 
     using WaterTilePtr = std::shared_ptr<WaterTile>;

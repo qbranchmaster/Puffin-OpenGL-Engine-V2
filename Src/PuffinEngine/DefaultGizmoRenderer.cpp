@@ -44,8 +44,8 @@ void DefaultGizmoRenderer::render(ScenePtr scene) {
     renderPointLightsGizmos(scene);
 }
 
-void DefaultGizmoRenderer::setGizmosScale(GLfloat scale) {
-    if (scale <= 0.0f) {
+void DefaultGizmoRenderer::setGizmosScale(GLushort scale) {
+    if (scale < 1) {
         logError("DefaultGizmoRenderer::setGizmosScale()", PUFFIN_MSG_INVALID_VALUE);
         return;
     }

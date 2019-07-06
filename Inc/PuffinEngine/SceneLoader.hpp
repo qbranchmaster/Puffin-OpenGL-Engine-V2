@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -28,8 +28,8 @@ namespace puffin {
     public:
         SceneLoader();
 
-        void saveScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr);
-        void loadScene(std::string file_name, ScenePtr scene, CameraPtr camera = nullptr);
+        void saveScene(std::string file_name, ScenePtr scene);
+        void loadScene(std::string file_name, ScenePtr scene);
 
     private:
         template<typename T>
@@ -46,11 +46,8 @@ namespace puffin {
         void saveMeshes(ScenePtr scene);
         void loadMeshes(ScenePtr scene);
 
-		void saveWaterTiles(ScenePtr scene);
+        void saveWaterTiles(ScenePtr scene);
         void loadWaterTiles(ScenePtr scene);
-
-        //void saveRenderSettings(RenderSettingsPtr render_settings);
-        //void loadRenderSettings(RenderSettingsPtr render_settings);
 
         CSimpleIniA ini_file_;
     };

@@ -39,11 +39,18 @@ void MasterRenderer::createRenderers() {
     mesh_renderer_.reset(new DefaultMeshRenderer(
         std::static_pointer_cast<DefaultShadowMapRenderer>(shadow_map_renderer_), postprocess_));
     font_renderer_.reset(new DefaultFontRenderer("DemoData/Fonts/unispace/unispace.ttf"));
-    gui_renderer_.reset(new DefaultGuiRenderer(target_window_, postprocess_));
-    water_renderer_.reset(new DefaultWaterRenderer(
-        postprocess_, std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
-            std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_)));
+    water_renderer_.reset(new DefaultWaterRenderer(postprocess_,
+        std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
+        std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_)));
     gizmo_renderer_.reset(new DefaultGizmoRenderer());
+
+    gui_renderer_.reset(new DefaultGuiRenderer(target_window_, postprocess_, mesh_renderer_,
+        skybox_renderer_, shadow_map_renderer_, water_renderer_, gizmo_renderer_));
+    std::static_pointer_cast<DefaultGuiRenderer>(gui_renderer_)
+        ->bindQuitFunction(std::bind(&MasterRenderer::stop, this));
+    std::static_pointer_cast<DefaultGuiRenderer>(gui_renderer_)
+        ->bindSaveCapture(std::bind(&MasterRenderer::captureScreen, this, std::placeholders::_1,
+            std::placeholders::_2));
 }
 
 void MasterRenderer::createDefaultFrameBuffer() {
@@ -156,7 +163,7 @@ void MasterRenderer::drawScene(ScenePtr scene) {
     }
 }
 
-void MasterRenderer::captureScreen(std::string file_name, GLboolean add_timestamp) {
+void MasterRenderer::captureScreen(std::string file_name, bool add_timestamp) {
     if (file_name.empty()) {
         logError("MasterRenderer::captureScreen()", PUFFIN_MSG_INVALID_VALUE);
         return;

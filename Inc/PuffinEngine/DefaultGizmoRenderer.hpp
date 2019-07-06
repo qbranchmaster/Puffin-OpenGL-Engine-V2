@@ -23,9 +23,9 @@ namespace puffin {
 
         void render(ScenePtr scene);
 
-        void setGizmosScale(GLfloat scale);
+        void setGizmosScale(GLushort scale);
 
-        GLfloat getGizmosScale() const {
+        GLushort getGizmosScale() const {
             return gizmo_scale_;
         }
 
@@ -40,7 +40,7 @@ namespace puffin {
 
         void renderPointLightsGizmos(ScenePtr scene);
 
-        GLfloat gizmo_scale_{1.0f};
+        GLushort gizmo_scale_{1};
 
         TexturePtr point_light_texture_{nullptr};
 

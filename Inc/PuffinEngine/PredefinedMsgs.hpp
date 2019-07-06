@@ -87,6 +87,11 @@ namespace puffin {
     constexpr auto PUFFIN_MSG_NAME_ALREADY_EXISTS(T name) {
         return "Name [" + name + "] already exists.";
     }
+
+    template<typename T>
+    constexpr auto PUFFIN_MSG_NAME_NOT_EXISTS(T name) {
+        return "Name [" + name + "] does not exists.";
+    }
 } // namespace puffin
 
 #endif // PUFFIN_PREDEFINED_MSGS_HPP

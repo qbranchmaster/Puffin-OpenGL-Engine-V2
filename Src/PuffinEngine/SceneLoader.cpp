@@ -13,7 +13,7 @@ SceneLoader::SceneLoader() {
 }
 
 void SceneLoader::saveScene(
-    std::string file_name, ScenePtr scene, CameraPtr camera) {
+    std::string file_name, ScenePtr scene) {
     if (!scene) {
         logError("SceneLoader::saveScene()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -26,7 +26,7 @@ void SceneLoader::saveScene(
 
     file_name += ".psc";
 
-    saveCameraSettings(camera);
+    //saveCameraSettings(camera);
     //saveRenderSettings(render_settings);
 
     saveSkybox(scene);
@@ -42,7 +42,7 @@ void SceneLoader::saveScene(
 }
 
 void SceneLoader::loadScene(
-    std::string file_name, ScenePtr scene, CameraPtr camera) {
+    std::string file_name, ScenePtr scene) {
     if (!scene) {
         logError("SceneLoader::loadScene()", PUFFIN_MSG_NULL_OBJECT);
         return;
@@ -62,7 +62,7 @@ void SceneLoader::loadScene(
 
     scene->reset();
 
-    loadCameraSettings(camera);
+    //loadCameraSettings(camera);
     //loadRenderSettings(render_settings);
 
     loadSkybox(scene);

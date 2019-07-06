@@ -21,7 +21,9 @@
 namespace puffin {
     class Scene {
     public:
-        Scene() {
+        Scene(std::string name) {
+            name_ = name;
+
             camera_.reset(new Camera());
             fog_.reset(new Fog());
             lighting_.reset(new Lighting());
@@ -61,6 +63,17 @@ namespace puffin {
             return mesh;
         }
 
+        void removeMesh(std::string name) {
+            auto pos = std::find_if(meshes_.begin(), meshes_.end(),
+                [&](const auto &val) { return val->getName() == name; });
+            if (pos != meshes_.end()) {
+                meshes_.erase(pos);
+            }
+            else {
+                logError("Scene::removeMesh()", PUFFIN_MSG_NAME_NOT_EXISTS(name));
+            }
+        }
+
         MeshPtr getMesh(GLuint index) {
             if (index >= meshes_.size()) {
                 logError("Scene::getMesh()", PUFFIN_MSG_OUT_OF_RANGE(0, meshes_.size()));
@@ -83,6 +96,17 @@ namespace puffin {
             SkyboxPtr skybox(new Skybox(name));
             skyboxes_.push_back(skybox);
             return skybox;
+        }
+
+        void removeSkybox(std::string name) {
+            auto pos = std::find_if(skyboxes_.begin(), skyboxes_.end(),
+                [&](const auto &val) { return val->getName() == name; });
+            if (pos != skyboxes_.end()) {
+                skyboxes_.erase(pos);
+            }
+            else {
+                logError("Scene::removeSkybox()", PUFFIN_MSG_NAME_NOT_EXISTS(name));
+            }
         }
 
         SkyboxPtr getSkybox(GLuint index) {
@@ -118,6 +142,17 @@ namespace puffin {
             return water_tile;
         }
 
+        void removeWaterTile(std::string name) {
+            auto pos = std::find_if(water_tiles_.begin(), water_tiles_.end(),
+                [&](const auto &val) { return val->getName() == name; });
+            if (pos != water_tiles_.end()) {
+                water_tiles_.erase(pos);
+            }
+            else {
+                logError("Scene::removeWaterTile()", PUFFIN_MSG_NAME_NOT_EXISTS(name));
+            }
+        }
+
         WaterTilePtr getWaterTile(GLuint index) {
             if (index >= water_tiles_.size()) {
                 logError("Scene::getWaterTile()", PUFFIN_MSG_OUT_OF_RANGE(0, meshes_.size()));
@@ -150,6 +185,10 @@ namespace puffin {
             return textes_.size();
         }
 
+        std::string getName() const {
+            return name_;
+        }
+
     private:
         template<typename T>
         GLboolean isNameExistsAlready(std::string name, const T &obj_cont) {
@@ -172,6 +211,8 @@ namespace puffin {
         CameraPtr camera_{nullptr};
         FogPtr fog_{nullptr};
         LightingPtr lighting_{nullptr};
+
+        std::string name_;
     };
 
     using ScenePtr = std::shared_ptr<Scene>;

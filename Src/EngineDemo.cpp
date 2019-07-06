@@ -41,7 +41,7 @@ EngineDemo::EngineDemo() : Core() {
 }
 
 void EngineDemo::createScene() {
-    scene_.reset(new Scene());
+    scene_.reset(new Scene("car_scene"));
 
     SkyboxPtr skybox = scene_->addSkybox("clear_sky_skybox");
     TexturePtr skybox_texture_(new Texture());

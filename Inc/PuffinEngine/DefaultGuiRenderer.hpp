@@ -1,5 +1,5 @@
 /*
- * Puffin OpenGL Engine ver. 2.1
+ * Puffin OpenGL Engine ver. 2.0.1
  * Coded by: Sebastian 'qbranchmaster' Tabaka
  * Contact: sebastian.tabaka@outlook.com
  */
@@ -13,7 +13,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <memory>
+#include <functional>
 
 // clang-format off
 #include "imgui.h" // Must be before 'examples'
@@ -24,11 +24,11 @@
 
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
+#include "PuffinEngine/DefaultGizmoRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
 #include "PuffinEngine/DefaultWaterRenderer.hpp"
 #include "PuffinEngine/GuiRenderer.hpp"
-#include "PuffinEngine/MasterRenderer.hpp"
 #include "PuffinEngine/SceneLoader.hpp"
 #include "PuffinEngine/Window.hpp"
 #include "PuffinEngine/Postprocess.hpp"
@@ -36,67 +36,74 @@
 namespace puffin {
     class DefaultGuiRenderer : public GuiRenderer {
     public:
-        DefaultGuiRenderer(WindowPtr window,
-            PostprocessPtr postprocess);
+        DefaultGuiRenderer(WindowPtr window, PostprocessPtr postprocess,
+            MeshRendererPtr mesh_renderer, SkyboxRendererPtr skybox_renderer,
+            ShadowMapRendererPtr shadow_map_renderer, WaterRendererPtr water_renderer,
+            GizmoRendererPtr gizmo_renderer);
 
         void render(ScenePtr scene);
 
-        void enable(GLboolean state) {
-            enabled_ = state;
-        }
+        void bindQuitFunction(std::function<void()> function);
+        void bindSaveCapture(std::function<void(std::string, bool)> function);
 
         GLboolean isCapturingMouse() const;
         GLboolean isCapturingKeyboard() const;
 
     private:
         void setupImGui();
-        void setupCustomStyle();
 
         void renderMainMenuBar();
         void renderAboutDialog();
-        void renderCameraDialog();
-        void renderPostprocessDialog();
-        void renderLightingDialog();
-        void renderShadowMappingDialog();
-        void renderFogDialog();
-        void renderCaptureDialog();
-        void renderRenderersDialog();
         void renderObjectInspectorDialog();
-
-        void renderSaveSceneDialog();
-        void renderLoadSceneDialog();
-
+        void renderCameraDialog();
+        void renderObjectInspectorMeshPart(BaseMeshPtr object);
+        void renderObjectInspectorTransformPart(BaseMeshPtr object);
+        void renderObjectInspectorWaterTilePart(BaseMeshPtr object);
         void renderAddSkyboxDialog();
         void renderAddMeshDialog();
         void renderAddWaterTileDialog();
+        void renderFogDialog();
+        void renderPostprocessDialog();
+        void renderCaptureDialog();
+        void renderRenderersDialog();
+        void renderLightingDialog();
+        void renderShadowMappingDialog();
+        void renderSaveSceneDialog();
+        void renderLoadSceneDialog();
+
+        WindowPtr target_window_{nullptr};
+        PostprocessPtr postprocess_{nullptr};
+        MeshRendererPtr mesh_renderer_{nullptr};
+        SkyboxRendererPtr skybox_renderer_{nullptr};
+        ShadowMapRendererPtr shadow_map_renderer_{nullptr};
+        WaterRendererPtr water_renderer_{nullptr};
+        GizmoRendererPtr gizmo_renderer_{nullptr};
+
+        SceneLoaderPtr scene_loader_{nullptr};
+
+        ImFont *font_normal_{nullptr};
+        ImFont *font_bold_{nullptr};
+
+        ScenePtr current_scene_{nullptr};
+
+        std::function<void()> quit_function_{nullptr};
+        std::function<void(std::string, bool)> save_capture_function_{nullptr};
 
         bool render_about_dialog_{false};
+        bool render_object_inspector_dialog_{false};
         bool render_camera_dialog_{false};
+        bool render_fog_dialog_{false};
         bool render_postprocess_dialog_{false};
+        bool render_capture_dialog_{false};
+        bool render_renderers_dialog_{false};
         bool render_lighting_dialog_{false};
         bool render_shadow_map_dialog_{false};
-        bool render_fog_dialog_{false};
-        bool render_capture_dialog_{false};
         bool render_save_scene_dialog_{false};
         bool render_load_scene_dialog_{false};
-        bool render_renderers_dialog_{false};
-        bool render_object_inspector_dialog_{false};
 
         bool render_add_skybox_dialog_{false};
         bool render_add_mesh_dialog_{false};
         bool render_add_water_tile_dialog_{false};
-
-        GLboolean enabled_{true};
-
-        WindowPtr target_window_{nullptr};
-
-        ScenePtr current_scene_{nullptr};
-        SceneLoaderPtr scene_loader_{nullptr};
-
-		PostprocessPtr postprocess_;
-
-        ImFont *font_normal_{nullptr};
-        ImFont *font_bold_{nullptr};
     };
 
     using DefaultGuiRendererPtr = std::shared_ptr<DefaultGuiRenderer>;

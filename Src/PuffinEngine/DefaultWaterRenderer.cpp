@@ -54,15 +54,6 @@ void DefaultWaterRenderer::render(FrameBufferPtr frame_buffer, ScenePtr scene) {
     }
 }
 
-void DefaultWaterRenderer::setTextureTiling(GLushort tiling) {
-    if (tiling <= 0) {
-        logError("DefaultWaterRenderer::setTextureTiling()", PUFFIN_MSG_INVALID_VALUE);
-        return;
-    }
-
-    texture_tiling_ = tiling;
-}
-
 void DefaultWaterRenderer::renderToReflectionFrameBuffer(WaterTilePtr water_tile, ScenePtr scene) {
     if (!water_tile || !scene) {
         return;
@@ -179,7 +170,7 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(
         "postprocess.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     default_shader_program_->setUniform("camera_position", camera->getPosition());
-    default_shader_program_->setUniform("texture_tiling", texture_tiling_);
+    default_shader_program_->setUniform("texture_tiling", water_tile->getTextureTiling());
 
     default_shader_program_->setUniform("fog.enabled", fog->isEnabled());
     default_shader_program_->setUniform("fog.density", fog->getDensity());

@@ -40,7 +40,7 @@ namespace puffin {
         void stop();
         void drawScene(ScenePtr scene);
 
-        void captureScreen(std::string file_name, GLboolean add_timestamp);
+        void captureScreen(std::string file_name, bool add_timestamp);
 
         GuiRendererPtr guiRenderer() const {
             return gui_renderer_;

@@ -27,12 +27,6 @@ namespace puffin {
 
         void render(FrameBufferPtr frame_buffer, ScenePtr scene);
 
-        void setTextureTiling(GLushort tiling);
-
-        GLushort getTextureTiling() const {
-            return texture_tiling_;
-        }
-
     private:
         void loadShaders();
         void setDefaultShaderUniforms(
@@ -61,8 +55,6 @@ namespace puffin {
         TexturePtr dudv_map_{nullptr};
         std::string normal_map_path_;
         TexturePtr normal_map_{nullptr};
-
-        GLushort texture_tiling_{1};
     };
 
     using DefaultWaterRendererPtr = std::shared_ptr<DefaultWaterRenderer>;
