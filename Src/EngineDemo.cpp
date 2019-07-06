@@ -23,7 +23,7 @@ EngineDemo::EngineDemo() : Core() {
     Texture::setDefaultTextureFilter(TextureType::Texture2D, TextureFilter::Trilinear);
 
     window()->setCaption("Puffin Engine Demo");
-    window()->setWindowIcon("Data/Icon.ico");
+    window()->setWindowIcon("Data/Icons/PuffinBird.png");
 
     masterRenderer()->assignRenderingFunction(std::bind(&EngineDemo::render, this));
 
