@@ -37,7 +37,7 @@ namespace puffin {
             skyboxes_.clear();
             textes_.clear();
 
-            // TODO: Reset camera, lighting, fog
+            lighting()->reset();
         }
 
         FogPtr fog() const {
@@ -102,6 +102,10 @@ namespace puffin {
             auto pos = std::find_if(skyboxes_.begin(), skyboxes_.end(),
                 [&](const auto &val) { return val->getName() == name; });
             if (pos != skyboxes_.end()) {
+                if (*pos == active_skybox_) {
+                    active_skybox_ = nullptr;
+                }
+
                 skyboxes_.erase(pos);
             }
             else {

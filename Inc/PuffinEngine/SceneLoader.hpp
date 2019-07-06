@@ -21,6 +21,7 @@
 #include "PuffinEngine/Camera.hpp"
 #include "PuffinEngine/CommonUtils.hpp"
 #include "PuffinEngine/Logger.hpp"
+#include "PuffinEngine/Postprocess.hpp"
 #include "PuffinEngine/Scene.hpp"
 
 namespace puffin {
@@ -28,8 +29,8 @@ namespace puffin {
     public:
         SceneLoader();
 
-        void saveScene(std::string file_name, ScenePtr scene);
-        void loadScene(std::string file_name, ScenePtr scene);
+        void saveScene(std::string file_name, ScenePtr scene, PostprocessPtr postprocess);
+        void loadScene(std::string file_name, ScenePtr scene, PostprocessPtr postprocess);
 
     private:
         template<typename T>
@@ -48,6 +49,15 @@ namespace puffin {
 
         void saveWaterTiles(ScenePtr scene);
         void loadWaterTiles(ScenePtr scene);
+
+        void saveFog(ScenePtr scene);
+        void loadFog(ScenePtr scene);
+
+        void savePostprocess(PostprocessPtr postprocess);
+        void loadPostprocess(PostprocessPtr postprocess);
+
+        void saveLighting(ScenePtr scene);
+        void loadLighting(ScenePtr scene);
 
         CSimpleIniA ini_file_;
     };

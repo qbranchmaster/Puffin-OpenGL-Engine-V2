@@ -131,6 +131,21 @@ namespace puffin {
             return max_point_lights_count_;
         }
 
+        void reset() {
+            enabled_ = false;
+            blinn_phong_enabled_ = false;
+
+            shadow_mapping_enabled_ = true;
+            shadow_distance_ = 10.0f;
+            emission_factor_ = 10.0f;
+            shadows_pcf_samples_count_ = 1;
+
+            skybox_light_color_ = glm::vec3(1.0f, 1.0f, 1.0f);
+
+            directional_light_->reset();
+            point_lights_.clear();
+        }
+
     private:
         GLboolean enabled_{false};
         GLboolean blinn_phong_enabled_{false};

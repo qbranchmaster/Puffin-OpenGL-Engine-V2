@@ -68,6 +68,16 @@ namespace puffin {
             return direction_;
         }
 
+        void reset() {
+            enabled_ = false;
+
+            ambient_color_ = glm::vec3(0.2f, 0.2f, 0.2f);
+            diffuse_color_ = glm::vec3(0.6f, 0.6f, 0.6f);
+            specular_color_ = glm::vec3(1.0f, 1.0f, 1.0f);
+
+            direction_ = glm::vec3(-1.0f, -1.0f, -1.0f);
+        }
+
     private:
         GLboolean enabled_{false};
 

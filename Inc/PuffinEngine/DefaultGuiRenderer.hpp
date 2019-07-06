@@ -59,6 +59,7 @@ namespace puffin {
         void renderObjectInspectorMeshPart(BaseMeshPtr object);
         void renderObjectInspectorTransformPart(BaseMeshPtr object);
         void renderObjectInspectorWaterTilePart(BaseMeshPtr object);
+        void renderObjectInspectorSkyboxPart(BaseMeshPtr object);
         void renderAddSkyboxDialog();
         void renderAddMeshDialog();
         void renderAddWaterTileDialog();

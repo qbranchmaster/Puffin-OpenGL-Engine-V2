@@ -144,6 +144,12 @@ void DefaultGuiRenderer::renderMainMenuBar() {
         if (ImGui::BeginMenu("File")) {
             ImGui::MenuItem("Load scene", NULL, &render_load_scene_dialog_);
             ImGui::MenuItem("Save scene", NULL, &render_save_scene_dialog_);
+            if (ImGui::MenuItem("Reset scene")) {
+                current_scene_->reset();
+            }
+
+            ImGui::Separator();
+
             if (ImGui::MenuItem("Quit")) {
                 if (quit_function_) {
                     quit_function_();
@@ -358,6 +364,14 @@ void DefaultGuiRenderer::renderObjectInspectorWaterTilePart(BaseMeshPtr object) 
     water_tile->setSpecularLightingFactor(specular_factor);
 }
 
+void DefaultGuiRenderer::renderObjectInspectorSkyboxPart(BaseMeshPtr object) {
+    bool is_active = (current_scene_->getActiveSkybox() == object);
+    ImGui::Text("Active: %s", is_active ? "Yes" : "No");
+    if (ImGui::Button("Set active")) {
+        current_scene_->setActiveSkybox(std::static_pointer_cast<Skybox>(object));
+    }
+}
+
 void DefaultGuiRenderer::renderAddSkyboxDialog() {
     if (!render_add_skybox_dialog_) {
         return;
@@ -565,6 +579,9 @@ void DefaultGuiRenderer::renderObjectInspectorDialog() {
     }
     else if (selected_object->getMeshType() == MeshType::WaterTile) {
         renderObjectInspectorWaterTilePart(selected_object);
+    }
+    else if (selected_object->getMeshType() == MeshType::Skybox) {
+        renderObjectInspectorSkyboxPart(selected_object);
     }
 
     ImGui::End();
@@ -1033,16 +1050,9 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
-    static bool save_camera = true;
-    ImGui::Checkbox("Save camera", &save_camera);
-
-    /*static bool save_render_settings = true;
-    ImGui::Checkbox("Save render settings", &save_render_settings);
-
     if (ImGui::Button("Save scene")) {
-        scene_loader_->saveScene(file_name, current_scene_, save_camera ? camera_ : nullptr,
-            save_render_settings ? render_settings_ : nullptr);
-    }*/
+        scene_loader_->saveScene(file_name, current_scene_, postprocess_);
+    }
 
     ImGui::End();
 }
@@ -1066,9 +1076,9 @@ void DefaultGuiRenderer::renderLoadSceneDialog() {
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);
 
-    /*if (ImGui::Button("Load scene")) {
-        scene_loader_->loadScene(file_name, current_scene_, camera_, render_settings_);
-    }*/
+    if (ImGui::Button("Load scene")) {
+        scene_loader_->loadScene(file_name, current_scene_, postprocess_);
+    }
 
     ImGui::End();
 }
