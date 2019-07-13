@@ -42,10 +42,12 @@ namespace puffin {
         void setAttenuation(GLfloat linear, GLfloat quadratic) {
             if (linear <= 0) {
                 logError("PointLight::setAttenuation()", PUFFIN_MSG_INVALID_VALUE);
+                return;
             }
 
             if (quadratic <= 0) {
                 logError("PointLight::setAttenuation()", PUFFIN_MSG_INVALID_VALUE);
+                return;
             }
 
             linear_factor_ = linear;

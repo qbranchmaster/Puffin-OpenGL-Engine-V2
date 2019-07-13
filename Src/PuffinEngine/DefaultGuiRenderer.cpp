@@ -948,6 +948,10 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::Text("Directional light");
     ImGui::PopFont();
 
+    bool dir_light_enabled = current_scene_->lighting()->directionalLight()->isEnabled();
+    ImGui::Checkbox("Enabled##DirectionalLightEnabled", &dir_light_enabled);
+    current_scene_->lighting()->directionalLight()->enable(dir_light_enabled);
+
     glm::vec3 dir_light_direction = current_scene_->lighting()->directionalLight()->getDirection();
     float direction[3] = {dir_light_direction.x, dir_light_direction.y, dir_light_direction.z};
     ImGui::DragFloat3("Direction", direction, 0.1f);
@@ -1003,7 +1007,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
     }
 
     ImGui::Text("Add new");
-    static std::string new_pl_name;
+    static std::string new_pl_name = "new_point_light";
     ImGui::InputText("Name", &new_pl_name);
     if (ImGui::Button("Add")) {
         PointLightPtr point_light = current_scene_->lighting()->addPointLight(new_pl_name);
@@ -1022,10 +1026,26 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::Text(selected_point_light->getName().c_str());
 
     {
+        bool enabled = selected_point_light->isEnabled();
+        ImGui::Checkbox("Enabled##PointLightEnabled", &enabled);
+        selected_point_light->enable(enabled);
+
         auto position = selected_point_light->getPosition();
         float pos[] = {position.x, position.y, position.z};
         ImGui::DragFloat3("Position", pos, 0.01f);
         selected_point_light->setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+
+        glm::vec3 color = selected_point_light->getColor();
+        float light_color[] = {color.r, color.g, color.b};
+        ImGui::ColorEdit3("Color##PointLightColor", light_color);
+        selected_point_light->setColor(glm::vec3(light_color[0], light_color[1], light_color[2]));
+
+        ImGui::Text("Attenuation factors");
+        float lf = selected_point_light->getLinearAttenuationFactor();
+        float qf = selected_point_light->getQuadraticAttenuationFactor();
+        ImGui::DragFloat("Linear", &lf, 0.01f);
+        ImGui::DragFloat("Quadratic", &qf, 0.01f);
+        selected_point_light->setAttenuation(lf, qf);
     }
 
     ImGui::End();

@@ -175,6 +175,23 @@ void DefaultWaterRenderer::setDefaultShaderUniforms(
     default_shader_program_->setUniform("fog.enabled", fog->isEnabled());
     default_shader_program_->setUniform("fog.density", fog->getDensity());
     default_shader_program_->setUniform("fog.color", fog->getColor());
+
+    // Point lights
+    default_shader_program_->setUniform("used_point_lights_count",
+        static_cast<GLint>(lighting->getPointLightsCount()));
+
+    for (GLushort i = 0; i < lighting->getPointLightsCount(); i++) {
+        std::string uname = "point_lights[" + std::to_string(i) + "]";
+        auto p_light = lighting->getPointLight(i);
+
+        default_shader_program_->setUniform(uname + ".enabled", p_light->isEnabled());
+        default_shader_program_->setUniform(uname + ".position", p_light->getPosition());
+        default_shader_program_->setUniform(uname + ".color", p_light->getColor());
+        default_shader_program_->setUniform(
+            uname + ".linear_factor", p_light->getLinearAttenuationFactor());
+        default_shader_program_->setUniform(
+            uname + ".quadratic_factor", p_light->getQuadraticAttenuationFactor());
+    }
 }
 
 void DefaultWaterRenderer::setWireframeShaderUniforms(WaterTilePtr water_tile, CameraPtr camera) {
