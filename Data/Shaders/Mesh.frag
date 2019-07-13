@@ -28,9 +28,6 @@ struct Material {
     int shininess;
 
     vec3 transparency;
-
-
-    float reflectivity;
 };
 
 struct DirectionalLight {
@@ -96,6 +93,8 @@ uniform Lighting lighting;
 uniform Other other;
 uniform ShadowMapping shadow_mapping;
 uniform Fog fog;
+uniform Matrices matrices;
+uniform samplerCube skybox_texture;
 
 vec3 calcFog(vec3 input_color) {
     float distance = length(fs_in.position_VIEW);
@@ -312,6 +311,15 @@ vec3 calculateLighting() {
 void main() {
     vec3 result_color = vec3(0.0f, 0.0f, 0.0f);
     result_color = calculateLighting();
+
+	// Skybox reflection on transparent material
+	if (length(material.transparency) < 0.5f) {
+		vec3 reflected = reflect(fs_in.position_VIEW, fs_in.normal_vector_VIEW);
+		reflected = normalize(vec3(inverse(matrices.view_matrix) * vec4(reflected, 0.0f)));
+		vec4 reflection_color = texture(skybox_texture, reflected);
+
+		result_color = mix(result_color, reflection_color.rgb, 0.15f);
+	}
 
     // Calculate transparency
     float tr_value = length(material.transparency);

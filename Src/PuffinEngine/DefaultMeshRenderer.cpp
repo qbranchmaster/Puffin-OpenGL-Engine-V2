@@ -36,6 +36,8 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform(
         "matrices.projection_matrix", scene->camera()->getProjectionMatrix());
 
+    default_shader_program_->setUniform("skybox_texture", 7);
+
     // Lighting
     auto lighting = scene->lighting();
     default_shader_program_->setUniform("lighting.enabled", lighting->isEnabled());
@@ -223,6 +225,9 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
 
     Texture::setTextureSlot(6);
     shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
+
+    Texture::setTextureSlot(7);
+    scene->getActiveSkybox()->getTexture()->bind();
 
     default_shader_program_->activate();
     setDefaultShaderUniforms(scene);
