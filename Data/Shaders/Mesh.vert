@@ -6,6 +6,8 @@ layout(location = 2) in vec3 normal_vector;
 layout(location = 3) in vec3 tangent;
 layout(location = 4) in vec3 bitangent;
 
+#define MAX_POINT_LIGHTS_COUNT 4
+
 struct Matrices {
     mat4 view_matrix;
     mat4 projection_matrix;
@@ -20,6 +22,14 @@ struct DirectionalLight {
     vec3 ambient_color;
     vec3 diffuse_color;
     vec3 specular_color;
+};
+
+struct PointLight {
+    bool enabled;
+    vec3 position;
+    vec3 color;
+    float linear_factor;
+    float quadratic_factor;
 };
 
 struct Lighting {
@@ -43,11 +53,16 @@ out VS_OUT {
     vec3 directional_light_direction_VIEW;
     vec3 directional_light_direction_TANGENT;
 
+	vec3 point_light_position_VIEW[MAX_POINT_LIGHTS_COUNT];
+    vec3 point_light_position_TANGENT[MAX_POINT_LIGHTS_COUNT];
+
     vec4 frag_pos_DIR_LIGHT;
 } vs_out;
 
 uniform Matrices matrices;
 uniform Lighting lighting;
+uniform PointLight point_lights[MAX_POINT_LIGHTS_COUNT];
+uniform int used_point_lights_count;
 
 uniform vec4 clipping_plane;
 
@@ -84,6 +99,12 @@ void main() {
     vs_out.view_position_TANGENT = tbn_matrix * camera_pos_WORLD;
     vs_out.directional_light_direction_TANGENT = normalize(tbn_matrix *
         lighting.directional_light.direction);
+
+	for (int i = 0; i < used_point_lights_count; i++) {
+        vs_out.point_light_position_TANGENT[i] = tbn_matrix * point_lights[i].position;
+        vs_out.point_light_position_VIEW[i] = vec3(matrices.view_matrix *
+			vec4(point_lights[i].position, 1.0f));
+    }
 
 	// Find vertex distance from the plane
 	gl_ClipDistance[0] = dot(vec4(vs_out.position_WORLD, 1.0f), clipping_plane);
