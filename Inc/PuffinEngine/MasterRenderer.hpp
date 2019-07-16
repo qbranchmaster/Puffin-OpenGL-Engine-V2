@@ -84,6 +84,7 @@ namespace puffin {
         void createRenderers();
         void createDefaultFrameBuffer();
         void clearDefaultFrameBuffer();
+        void printGLParams();
 
         void checkGlErrors();
         void saveFrameToFile();

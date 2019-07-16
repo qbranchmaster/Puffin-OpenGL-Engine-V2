@@ -28,6 +28,8 @@ MasterRenderer::MasterRenderer(WindowPtr window) {
                 std::to_string(System::instance().getMonitorSize(i).second));
     }
 
+    printGLParams();
+
     createRenderers();
     createDefaultFrameBuffer();
 }
@@ -49,8 +51,8 @@ void MasterRenderer::createRenderers() {
     std::static_pointer_cast<DefaultGuiRenderer>(gui_renderer_)
         ->bindQuitFunction(std::bind(&MasterRenderer::stop, this));
     std::static_pointer_cast<DefaultGuiRenderer>(gui_renderer_)
-        ->bindSaveCapture(std::bind(&MasterRenderer::captureScreen, this, std::placeholders::_1,
-            std::placeholders::_2));
+        ->bindSaveCapture(std::bind(
+            &MasterRenderer::captureScreen, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void MasterRenderer::createDefaultFrameBuffer() {
@@ -196,6 +198,28 @@ void MasterRenderer::clearDefaultFrameBuffer() {
     FrameBuffer::setViewportSize(default_frame_buffer_multisample_);
     FrameBuffer::clear(FrameBufferClearType::DepthAndColor);
     default_frame_buffer_multisample_->unbind();
+}
+
+void MasterRenderer::printGLParams() {
+    std::map<GLenum, std::string> params = {
+        {GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS"},
+        {GL_MAX_CUBE_MAP_TEXTURE_SIZE, "GL_MAX_CUBE_MAP_TEXTURE_SIZE"},
+        {GL_MAX_DRAW_BUFFERS, "GL_MAX_DRAW_BUFFERS"},
+        {GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS"},
+        {GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS"},
+        {GL_MAX_TEXTURE_SIZE, "GL_MAX_TEXTURE_SIZE"},
+        {GL_MAX_VARYING_FLOATS, "GL_MAX_VARYING_FLOATS"},
+        {GL_MAX_VERTEX_ATTRIBS, "GL_MAX_VERTEX_ATTRIBS"},
+        {GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS"},
+        {GL_MAX_VERTEX_UNIFORM_COMPONENTS, "GL_MAX_VERTEX_UNIFORM_COMPONENTS"},
+    };
+
+    logInfo("MasterRenderer::printGLParams()", "GL context params:");
+    for (const auto &p : params) {
+        GLint value = 0;
+        glGetIntegerv(p.first, &value);
+        logInfo("MasterRenderer::printGLParams()", p.second + ": " + std::to_string(value));
+    }
 }
 
 void MasterRenderer::checkGlErrors() {
