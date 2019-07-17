@@ -82,8 +82,14 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
         return;
     }
 
+    if (validateProgram()) {
+        logError("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_VALIDATE_ERROR(name_));
+        return;
+    }
+
     fetchUniforms();
     logInfo("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_SUCCESS(name_));
+    logInfo("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_VALIDATE_SUCCESS(name_));
 }
 
 GLint ShaderProgram::loadShaderCode(std::string file_path, std::string &shader_code) {
@@ -176,6 +182,18 @@ std::string ShaderProgram::getProgramLinkMessage() {
     }
 
     return link_msg;
+}
+
+GLint ShaderProgram::validateProgram() {
+    glValidateProgram(handle_);
+    GLint validate_status = -1;
+    glGetProgramiv(handle_, GL_VALIDATE_STATUS, &validate_status);
+
+    if (validate_status != GL_TRUE) {
+        return -1;
+    }
+
+    return 0;
 }
 
 void ShaderProgram::fetchUniforms() {

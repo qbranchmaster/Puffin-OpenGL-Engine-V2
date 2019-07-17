@@ -290,60 +290,56 @@ void calculatePointLight(inout vec3 ambient, inout vec3 diffuse, inout vec3 spec
 	}
 }
 
-vec3 calculateLighting() {
+vec4 calculateLighting() {
     // Get base color
-    vec3 ambient_color = vec3(0.0f, 0.0f, 0.0f);
-    vec3 diffuse_color = vec3(0.0f, 0.0f, 0.0f);
-    vec3 specular_color = vec3(0.0f, 0.0f, 0.0f);
-    vec3 emissive_color = vec3(0.0f, 0.0f, 0.0f);
+    vec4 ambient_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    vec4 diffuse_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    vec4 specular_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    vec4 emissive_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     if (material.has_ambient_texture) {
-        ambient_color = texture(material.ambient_texture,
-            fs_in.texture_coord_MODEL).rgb;
+        ambient_color = texture(material.ambient_texture, fs_in.texture_coord_MODEL);
         ambient_color.rgb = gammaCorrection(ambient_color.rgb);
         // Use opacity texture as 'dirt' texture
         if (material.has_opacity_texture) {
             vec4 dirt_color = texture(material.opacity_texture,
                 fs_in.texture_coord_MODEL);
             dirt_color.rgb = gammaCorrection(dirt_color.rgb);
-            ambient_color = ambient_color * dirt_color.rgb;
+            ambient_color = ambient_color * dirt_color;
         }
     }
     else {
-        ambient_color = material.ka;
+        ambient_color = vec4(material.ka, 1.0f);
     }
 
     if (material.has_diffuse_texture) {
         diffuse_color = texture(material.diffuse_texture,
-            fs_in.texture_coord_MODEL).rgb;
+            fs_in.texture_coord_MODEL);
         diffuse_color.rgb = gammaCorrection(diffuse_color.rgb);
 		// Use opacity texture as 'dirt' texture
         if (material.has_opacity_texture) {
-            vec4 dirt_color = texture(material.opacity_texture,
-                fs_in.texture_coord_MODEL);
+            vec4 dirt_color = texture(material.opacity_texture, fs_in.texture_coord_MODEL);
             dirt_color.rgb = gammaCorrection(dirt_color.rgb);
-            diffuse_color = diffuse_color * dirt_color.rgb;
+            diffuse_color = diffuse_color * dirt_color;
         }
     }
     else {
-        diffuse_color = material.kd;
+        diffuse_color = vec4(material.kd, 1.0f);
     }
 
     if (material.has_specular_texture) {
-        specular_color = texture(material.specular_texture,
-            fs_in.texture_coord_MODEL).rgb;
+        specular_color = texture(material.specular_texture, fs_in.texture_coord_MODEL);
     }
     else {
-        specular_color = material.ks;
+        specular_color = vec4(material.ks, 1.0f);
     }
 
     if (material.has_emissive_texture) {
-        emissive_color = texture(material.emissive_texture,
-            fs_in.texture_coord_MODEL).rgb;
+        emissive_color = texture(material.emissive_texture, fs_in.texture_coord_MODEL);
         emissive_color.rgb = gammaCorrection(emissive_color.rgb);
     }
     else {
-        emissive_color = material.ke;
+        emissive_color = vec4(material.ke, 1.0f);
     }
 
     if (!lighting.enabled) {
@@ -362,16 +358,16 @@ vec3 calculateLighting() {
 	calculatePointLight(ambient_light_factor, diffuse_light_factor, specular_light_factor);
 
     // Light is calculated. Calculate final object color.
-    vec3 final_color = vec3(0.0f, 0.0f, 0.0f);
+    vec4 final_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Ambient
-    vec3 ambient = ambient_light_factor * ambient_color;
+    vec4 ambient = vec4(ambient_light_factor, 1.0f) * ambient_color;
 
     // Diffuse
-    vec3 diffuse = diffuse_light_factor * diffuse_color;
+    vec4 diffuse = vec4(diffuse_light_factor, 1.0f) * diffuse_color;
 
     // Specular
-    vec3 specular = specular_light_factor * specular_color;
+    vec4 specular = vec4(specular_light_factor, 1.0f) * specular_color;
 
     // Sum up all lights
     final_color = ambient + calculateShadow(fs_in.frag_pos_DIR_LIGHT) *
@@ -384,7 +380,7 @@ vec3 calculateLighting() {
 }
 
 void main() {
-    vec3 result_color = vec3(0.0f, 0.0f, 0.0f);
+    vec4 result_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     result_color = calculateLighting();
 
 	// Skybox reflection on transparent material
@@ -393,14 +389,16 @@ void main() {
 		reflected = normalize(vec3(inverse(matrices.view_matrix) * vec4(reflected, 0.0f)));
 		vec4 reflection_color = texture(skybox_texture, reflected);
 
-		result_color = mix(result_color, reflection_color.rgb, 0.15f);
+		result_color = mix(result_color, reflection_color, 0.25f);
+
+        // Calculate transparency
+        float tr_value = length(material.transparency);
+        tr_value = clamp(tr_value, 0.0f, 1.0f);
+
+        result_color = vec4(result_color.rgb, tr_value);
 	}
 
-    // Calculate transparency
-    float tr_value = length(material.transparency);
-    tr_value = clamp(tr_value, 0.0f, 1.0f);
-
-    frag_color = vec4(result_color, tr_value);
+    frag_color = result_color;
 
 	if (fog.enabled) {
         frag_color.rgb = calcFog(frag_color.rgb);

@@ -133,6 +133,8 @@ namespace puffin {
         GLint checkProgramLinkStatus();
         std::string getProgramLinkMessage();
 
+        GLint validateProgram();
+
         void fetchUniforms();
         GLint getUniformLocation(std::string uniform_name);
 

@@ -55,6 +55,16 @@ namespace puffin {
         return "Shader program [" + shader_name + "] link success.";
     }
 
+    template<typename T>
+    constexpr auto PUFFIN_MSG_SHADER_VALIDATE_ERROR(T shader_name) {
+        return "Shader program [" + shader_name + "] validate error.";
+    }
+
+    template<typename T>
+    constexpr auto PUFFIN_MSG_SHADER_VALIDATE_SUCCESS(T shader_name) {
+        return "Shader program [" + shader_name + "] validate success.";
+    }
+
     constexpr auto PUFFIN_MSG_FILE_EMPTY_PATH = "File path is empty.";
 
     template<typename T>
