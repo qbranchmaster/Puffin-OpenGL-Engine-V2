@@ -14,6 +14,7 @@
 #include "PuffinEngine/Fog.hpp"
 #include "PuffinEngine/Lighting.hpp"
 #include "PuffinEngine/Mesh.hpp"
+#include "PuffinEngine/ParticleSystem.hpp"
 #include "PuffinEngine/Skybox.hpp"
 #include "PuffinEngine/Text.hpp"
 #include "PuffinEngine/WaterTile.hpp"
@@ -36,6 +37,8 @@ namespace puffin {
             water_tiles_.clear();
             skyboxes_.clear();
             textes_.clear();
+
+            particle_systems_.clear();
 
             lighting()->reset();
         }
@@ -193,6 +196,42 @@ namespace puffin {
             return name_;
         }
 
+        ParticleSystemPtr addParticleSystem(std::string name) {
+            if (isNameExistsAlready(name, particle_systems_)) {
+                logError("Scene::addParticleSystem()", PUFFIN_MSG_NAME_ALREADY_EXISTS(name));
+                return nullptr;
+            }
+
+            ParticleSystemPtr water_tile(new ParticleSystem(name));
+            particle_systems_.push_back(water_tile);
+            return water_tile;
+        }
+
+        void removeParticleSystem(std::string name) {
+            auto pos = std::find_if(particle_systems_.begin(), particle_systems_.end(),
+                [&](const auto &val) { return val->getName() == name; });
+            if (pos != particle_systems_.end()) {
+                particle_systems_.erase(pos);
+            }
+            else {
+                logError("Scene::removeParticleSystem()", PUFFIN_MSG_NAME_NOT_EXISTS(name));
+            }
+        }
+
+        ParticleSystemPtr getParticleSystem(GLuint index) {
+            if (index >= particle_systems_.size()) {
+                logError("Scene::getParticleSystem()",
+                    PUFFIN_MSG_OUT_OF_RANGE(0, particle_systems_.size()));
+                return nullptr;
+            }
+
+            return particle_systems_[index];
+        }
+
+        GLuint getParticleSystemsCount() const {
+            return particle_systems_.size();
+        }
+
     private:
         template<typename T>
         GLboolean isNameExistsAlready(std::string name, const T &obj_cont) {
@@ -209,6 +248,8 @@ namespace puffin {
         std::vector<WaterTilePtr> water_tiles_;
         std::vector<SkyboxPtr> skyboxes_;
         std::vector<TextPtr> textes_;
+
+        std::vector<ParticleSystemPtr> particle_systems_;
 
         SkyboxPtr active_skybox_{nullptr};
 

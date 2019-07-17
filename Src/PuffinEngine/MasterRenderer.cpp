@@ -45,6 +45,7 @@ void MasterRenderer::createRenderers() {
         std::static_pointer_cast<DefaultMeshRenderer>(mesh_renderer_),
         std::static_pointer_cast<DefaultSkyboxRenderer>(skybox_renderer_)));
     gizmo_renderer_.reset(new DefaultGizmoRenderer());
+    particle_system_renderer_.reset(new DefaultParticleSystemRenderer());
 
     gui_renderer_.reset(new DefaultGuiRenderer(target_window_, postprocess_, mesh_renderer_,
         skybox_renderer_, shadow_map_renderer_, water_renderer_, gizmo_renderer_));
@@ -162,6 +163,10 @@ void MasterRenderer::drawScene(ScenePtr scene) {
 
     if (mesh_renderer_) {
         mesh_renderer_->render(default_frame_buffer_multisample_, scene);
+    }
+
+    if (particle_system_renderer_) {
+        particle_system_renderer_->render(default_frame_buffer_multisample_, scene);
     }
 }
 

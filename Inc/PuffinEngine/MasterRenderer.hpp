@@ -19,6 +19,7 @@
 #include "PuffinEngine/DefaultGizmoRenderer.hpp"
 #include "PuffinEngine/DefaultGuiRenderer.hpp"
 #include "PuffinEngine/DefaultMeshRenderer.hpp"
+#include "PuffinEngine/DefaultParticleSystemRenderer.hpp"
 #include "PuffinEngine/DefaultPostprocessRenderer.hpp"
 #include "PuffinEngine/DefaultShadowMapRenderer.hpp"
 #include "PuffinEngine/DefaultSkyboxRenderer.hpp"
@@ -104,6 +105,7 @@ namespace puffin {
 
         GuiRendererPtr gui_renderer_{nullptr};
         MeshRendererPtr mesh_renderer_{nullptr};
+        ParticleSystemRendererPtr particle_system_renderer_{nullptr};
         PostprocessRendererPtr postprocess_renderer_{nullptr};
         SkyboxRendererPtr skybox_renderer_{nullptr};
         ShadowMapRendererPtr shadow_map_renderer_{nullptr};
