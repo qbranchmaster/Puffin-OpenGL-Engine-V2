@@ -991,7 +991,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::Text("Point lights");
     ImGui::PopFont();
 
-    ImGui::Text("Max count: %d", current_scene_->lighting()->getMaxPointLightsCount());
+    ImGui::Text("Max count: %d", InitConfig::instance().getMaxPointLightsCount());
 
     static PointLightPtr selected_point_light = nullptr;
 

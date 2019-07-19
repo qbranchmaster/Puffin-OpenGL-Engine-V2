@@ -15,7 +15,6 @@
 #include <memory>
 
 #include "PuffinEngine/InitConfig.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class DepthTextureBuffer {
@@ -58,12 +57,7 @@ namespace puffin {
         }
 
         void bind() {
-            if (StateMachine::instance().bound_texture_ == handle_) {
-                return;
-            }
-
             glBindTexture(multisample_ ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, handle_);
-            StateMachine::instance().bound_texture_ = handle_;
         }
 
         GLuint getWidth() const {

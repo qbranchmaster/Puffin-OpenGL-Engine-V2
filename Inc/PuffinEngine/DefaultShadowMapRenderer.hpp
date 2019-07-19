@@ -21,6 +21,8 @@ namespace puffin {
     struct ShadowMapRendererOutputData {
         glm::mat4 dir_light_space_matrix;
         DepthTextureBufferPtr shadow_map_texture;
+        std::array<CubeTextureBufferPtr, InitConfig::getMaxPointLightsCount()>
+            point_light_texture_buffer;
     };
 
     class DefaultShadowMapRenderer : public ShadowMapRenderer {
@@ -39,12 +41,18 @@ namespace puffin {
         void renderDirectionalLightShadowMap(ScenePtr scene);
         glm::mat4 calculateDirectionalLightSpaceMatrix(LightingPtr lighting, CameraPtr camera);
 
+        void createPointLightFrameBuffer(GLushort light_index);
+        void renderPointLightShadowMap(ScenePtr scene);
+
         CameraFrustumPtr camera_frustum_{nullptr};
         ShaderProgramPtr directional_light_shader_program_{nullptr};
+        ShaderProgramPtr point_light_shader_program_{nullptr};
 
         ShadowMapRendererOutputData output_data_{};
 
         FrameBufferPtr directional_light_shadow_map_frame_bufer_{nullptr};
+        std::array<FrameBufferPtr, InitConfig::getMaxPointLightsCount()>
+            point_light_shadow_map_frame_buffer_;
     };
 
     using DefaultShadowMapRendererPtr = std::shared_ptr<DefaultShadowMapRenderer>;

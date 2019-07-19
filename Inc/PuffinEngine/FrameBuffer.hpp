@@ -17,6 +17,7 @@
 #include <memory>
 #include <vector>
 
+#include "PuffinEngine/CubeTextureBuffer.hpp"
 #include "PuffinEngine/DepthTextureBuffer.hpp"
 #include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Logger.hpp"
@@ -43,9 +44,6 @@ namespace puffin {
     public:
         static void unbindAll() {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            StateMachine::instance().bound_frame_buffer_ = 0;
-            StateMachine::instance().bound_frame_buffer_read_ = 0;
-            StateMachine::instance().bound_frame_buffer_write_ = 0;
         }
 
         static void clear(
@@ -69,47 +67,17 @@ namespace puffin {
             GLuint *handle_ptr = nullptr;
             switch (bind_type) {
             case FrameBufferBindType::Normal:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_;
                 target = GL_FRAMEBUFFER;
                 break;
             case FrameBufferBindType::OnlyRead:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_read_;
                 target = GL_READ_FRAMEBUFFER;
                 break;
             case FrameBufferBindType::OnlyWrite:
-                handle_ptr = &StateMachine::instance().bound_frame_buffer_write_;
                 target = GL_DRAW_FRAMEBUFFER;
                 break;
             }
 
-            if (*handle_ptr == handle_) {
-                return;
-            }
-
             glBindFramebuffer(target, handle_);
-            *handle_ptr = handle_;
-
-            if (bind_type == FrameBufferBindType::Normal) {
-                StateMachine::instance().bound_frame_buffer_read_ = handle_;
-                StateMachine::instance().bound_frame_buffer_write_ = handle_;
-            }
-        }
-
-        void unbind() {
-            if (StateMachine::instance().bound_frame_buffer_ == handle_) {
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_ = 0;
-                StateMachine::instance().bound_frame_buffer_read_ = 0;
-                StateMachine::instance().bound_frame_buffer_write_ = 0;
-            }
-            else if (StateMachine::instance().bound_frame_buffer_read_ == handle_) {
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_read_ = 0;
-            }
-            else if (StateMachine::instance().bound_frame_buffer_write_ == handle_) {
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-                StateMachine::instance().bound_frame_buffer_write_ = 0;
-            }
         }
 
         void setClearColor(const glm::vec3 &color);
@@ -125,6 +93,7 @@ namespace puffin {
         void addRenderBuffer(GLboolean multisample);
         void addTextureBuffer(GLushort index, GLboolean multisample, GLboolean float_buffer);
         void addDepthTextureBuffer(GLboolean multisample, GLboolean float_buffer);
+        void addCubeTextureBuffer();
 
         TextureBufferPtr getTextureBuffer(GLushort index) const {
             if (index >= texture_buffers_.size()) {
@@ -137,6 +106,10 @@ namespace puffin {
 
         DepthTextureBufferPtr getDepthTextureBuffer() const {
             return depth_texture_buffer_;
+        }
+
+        CubeTextureBufferPtr getCubeTextureBuffer() const {
+            return cube_texture_buffer_;
         }
 
         void disableDrawBuffer();
@@ -152,6 +125,7 @@ namespace puffin {
 
         RenderBufferPtr render_buffer_{nullptr};
         DepthTextureBufferPtr depth_texture_buffer_{nullptr};
+        CubeTextureBufferPtr cube_texture_buffer_{nullptr};
         std::vector<TextureBufferPtr> texture_buffers_;
     };
 } // namespace puffin

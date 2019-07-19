@@ -48,8 +48,6 @@ void FrameBuffer::copyFrameBuffer(
     }
 
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, copy_bits, GL_NEAREST);
-
-    target->unbind();
 }
 
 void FrameBuffer::addRenderBuffer(GLboolean multisample) {
@@ -106,6 +104,13 @@ void FrameBuffer::addDepthTextureBuffer(GLboolean multisample, GLboolean float_b
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
         multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, depth_texture_buffer_->getHandle(),
         0);
+}
+
+void FrameBuffer::addCubeTextureBuffer() {
+    cube_texture_buffer_.reset(new CubeTextureBuffer(width_, height_));
+
+    bind(FrameBufferBindType::Normal);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cube_texture_buffer_->getHandle(), 0);
 }
 
 void FrameBuffer::disableDrawBuffer() {

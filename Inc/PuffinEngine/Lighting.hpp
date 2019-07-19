@@ -127,10 +127,6 @@ namespace puffin {
             return point_lights_.size();
         }
 
-        GLushort getMaxPointLightsCount() const {
-            return max_point_lights_count_;
-        }
-
         void reset() {
             enabled_ = false;
             blinn_phong_enabled_ = false;
@@ -159,8 +155,6 @@ namespace puffin {
 
         DirectionalLightPtr directional_light_{nullptr};
         std::vector<PointLightPtr> point_lights_;
-
-        const static GLushort max_point_lights_count_{4};
     };
 
     using LightingPtr = std::shared_ptr<Lighting>;

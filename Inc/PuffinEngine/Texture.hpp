@@ -25,7 +25,6 @@
 
 #include "PuffinEngine/InitConfig.hpp"
 #include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     enum class TextureType {
@@ -69,10 +68,6 @@ namespace puffin {
                 return;
             }
 
-            if (StateMachine::instance().bound_texture_ == handle_) {
-                return;
-            }
-
             switch (type_) {
             case TextureType::Texture2D:
                 glBindTexture(GL_TEXTURE_2D, handle_);
@@ -84,8 +79,6 @@ namespace puffin {
                 glBindTexture(GL_TEXTURE_CUBE_MAP, handle_);
                 break;
             }
-
-            StateMachine::instance().bound_texture_ = handle_;
         }
 
         GLushort getChannelsCount() const {

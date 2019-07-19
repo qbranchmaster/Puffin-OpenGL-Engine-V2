@@ -15,7 +15,6 @@
 #include <memory>
 
 #include "PuffinEngine/InitConfig.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class RenderBuffer {
@@ -43,12 +42,7 @@ namespace puffin {
         }
 
         void bind() {
-            if (StateMachine::instance().bound_render_buffer_ == handle_) {
-                return;
-            }
-
             glBindRenderbuffer(GL_RENDERBUFFER, handle_);
-            StateMachine::instance().bound_render_buffer_ = handle_;
         }
 
         GLuint getWidth() const {

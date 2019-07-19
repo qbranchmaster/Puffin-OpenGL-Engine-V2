@@ -24,7 +24,8 @@ endif (MSVC)
 file(GLOB PUFFIN_ENGINE_INC "Inc/PuffinEngine/*.hpp")
 file(GLOB PUFFIN_ENGINE_SRC "Src/PuffinEngine/*.cpp")
 file(GLOB PUFFIN_SHADERS "Data/Shaders/*.vert"
-                         "Data/Shaders/*.frag")
+                         "Data/Shaders/*.frag"
+						 "Data/Shaders/*.geom")
 
 source_group("PuffinEngine\\Inc" FILES ${PUFFIN_ENGINE_INC})
 source_group("PuffinEngine\\Src" FILES ${PUFFIN_ENGINE_SRC})

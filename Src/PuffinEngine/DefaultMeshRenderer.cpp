@@ -85,6 +85,13 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
         static_cast<GLint>(InitConfig::instance().getDirectionalLightShadowMapSize()));
     default_shader_program_->setUniform("shadow_mapping.pcf_filter_count",
         static_cast<GLint>(lighting->getShadowMappingPcfSamplesCount()));
+    default_shader_program_->setUniform(
+        "shadow_mapping.shadow_distance", lighting->getShadowDistance());
+
+    for (GLushort i = 0; i < lighting->getPointLightsCount(); i++) {
+        default_shader_program_->setUniform(
+            "shadow_mapping.point_shadow_map_" + std::to_string(i + 1), 8 + i);
+    }
 
     // Fog
     default_shader_program_->setUniform("fog.enabled", scene->fog()->isEnabled());
@@ -245,6 +252,11 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
 
     Texture::setTextureSlot(7);
     scene->getActiveSkybox()->getTexture()->bind();
+
+    for (GLushort i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
+        Texture::setTextureSlot(8 + i);
+        shadow_map_renderer_->getOutputData().point_light_texture_buffer[i]->bind();
+    }
 
     default_shader_program_->activate();
     setDefaultShaderUniforms(scene);

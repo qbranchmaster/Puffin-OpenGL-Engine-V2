@@ -1,4 +1,5 @@
 #version 330 core
+
 layout(location = 0) out vec4 frag_color;
 layout(location = 1) out vec4 bright_color;
 
@@ -79,6 +80,11 @@ struct ShadowMapping {
     sampler2D shadow_map_texture;
     int shadow_map_size;
     int pcf_filter_count;
+	float shadow_distance;
+	samplerCube point_shadow_map_1;
+	samplerCube point_shadow_map_2;
+	samplerCube point_shadow_map_3;
+	samplerCube point_shadow_map_4;
 };
 
 in VS_OUT {
@@ -118,6 +124,38 @@ vec3 calcFog(vec3 input_color) {
     fog_power = clamp(fog_power, 0.0f, 1.0f);
     vec3 result = mix(input_color, fog.color, fog_power);
     return result;
+}
+
+float calcPointShadow(vec3 frag_pos, int light_index) {
+	if (!point_lights[light_index].enabled) {
+		return 0.0f;
+	}
+
+	vec3 frag_to_light = frag_pos - point_lights[light_index].position;
+
+	float closest_depth = 0.0f;
+    if (light_index == 0) {
+        closest_depth = texture(shadow_mapping.point_shadow_map_1, frag_to_light).r;
+	}
+    else if (light_index == 1) {
+        closest_depth = texture(shadow_mapping.point_shadow_map_2, frag_to_light).r;
+	}
+    else if (light_index == 2) {
+        closest_depth = texture(shadow_mapping.point_shadow_map_3, frag_to_light).r;
+	}
+    else if (light_index == 3) {
+        closest_depth = texture(shadow_mapping.point_shadow_map_4, frag_to_light).r;
+	}
+
+	// Recalculate from [0, 1] range to [0, ShadowDist]
+	closest_depth *= shadow_mapping.shadow_distance;
+
+	float current_depth = length(frag_to_light);
+
+	float bias = 0.05f;
+    float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
+
+	return shadow;
 }
 
 float calculateShadow(vec4 frag_pos) {
@@ -228,66 +266,65 @@ void calculateDirectionalLight(inout vec3 ambient, inout vec3 diffuse,
     }
 }
 
-void calculatePointLight(inout vec3 ambient, inout vec3 diffuse, inout vec3 specular) {
-	for (int i = 0; i < used_point_lights_count; i++) {
-		if (!point_lights[i].enabled) {
-			continue;
-		}
-
-		float vertex_dist = length(fs_in.point_light_position_VIEW[i] - fs_in.position_VIEW);
-	    float attenuation = 1.0f / (1.0f + point_lights[i].linear_factor *
-	        vertex_dist + point_lights[i].quadratic_factor * vertex_dist * vertex_dist);
-
-		// Get light direction
-		vec3 light_direction = vec3(0.0f, 1.0f, 0.0f);
-		if (material.has_normalmap_texture) {
-			vec3 light_direction_TANGENT = normalize(fs_in.point_light_position_TANGENT[i] -
-				fs_in.position_TANGENT);
-			light_direction = light_direction_TANGENT;
-		}
-		else {
-			vec3 light_direction_VIEW = normalize(fs_in.point_light_position_VIEW[i] -
-				fs_in.position_VIEW);
-			light_direction = light_direction_VIEW;
-		}
-
-		// Get normal vector
-		vec3 normal_vector = vec3(0.0f, 1.0f, 0.0f);
-		if (material.has_normalmap_texture) 		{
-			vec3 normal_vector_TANGENT = texture(material.normalmap_texture,
-				fs_in.texture_coord_MODEL).rgb;
-			normal_vector_TANGENT = normalize(normal_vector_TANGENT * 2.0f - 1.0f);
-			normal_vector = normal_vector_TANGENT;
-		}
-		else {
-			normal_vector = fs_in.normal_vector_VIEW;
-		}
-
-		// Get view direction
-		vec3 view_direction = vec3(0.0f, 1.0f, 0.0f);
-		if (material.has_normalmap_texture) {
-			vec3 view_direction_TANGENT = normalize(fs_in.view_position_TANGENT -
-				fs_in.position_TANGENT);
-			view_direction = view_direction_TANGENT;
-		}
-		else {
-			vec3 view_direction_VIEW = normalize(-fs_in.position_VIEW);
-			view_direction = view_direction_VIEW;
-		}
-
-		// Ambient
-		ambient += point_lights[i].color * attenuation * 0.1f;
-
-		// Diffuse
-		float diffuse_power = max(dot(normal_vector, light_direction), 0.0f);
-		diffuse += point_lights[i].color * diffuse_power * attenuation;
-
-		// Specular
-		vec3 reflected_ray = normalize(reflect(-light_direction, normal_vector));
-		float specular_power = pow(max(dot(reflected_ray, view_direction), 0.0f),
-			material.shininess);
-		specular += point_lights[i].color * specular_power * attenuation;
+void calculatePointLight(inout vec3 ambient, inout vec3 diffuse, inout vec3 specular,
+	int light_index) {
+	if (!point_lights[light_index].enabled) {
+		return;
 	}
+
+	float vertex_dist = length(fs_in.point_light_position_VIEW[light_index] - fs_in.position_VIEW);
+	float attenuation = 1.0f / (1.0f + point_lights[light_index].linear_factor *
+	    vertex_dist + point_lights[light_index].quadratic_factor * vertex_dist * vertex_dist);
+
+	// Get light direction
+	vec3 light_direction = vec3(0.0f, 1.0f, 0.0f);
+	if (material.has_normalmap_texture) {
+		vec3 light_direction_TANGENT = normalize(fs_in.point_light_position_TANGENT[light_index] -
+			fs_in.position_TANGENT);
+		light_direction = light_direction_TANGENT;
+	}
+	else {
+		vec3 light_direction_VIEW = normalize(fs_in.point_light_position_VIEW[light_index] -
+			fs_in.position_VIEW);
+		light_direction = light_direction_VIEW;
+	}
+
+	// Get normal vector
+	vec3 normal_vector = vec3(0.0f, 1.0f, 0.0f);
+	if (material.has_normalmap_texture) {
+		vec3 normal_vector_TANGENT = texture(material.normalmap_texture,
+			fs_in.texture_coord_MODEL).rgb;
+		normal_vector_TANGENT = normalize(normal_vector_TANGENT * 2.0f - 1.0f);
+		normal_vector = normal_vector_TANGENT;
+	}
+	else {
+		normal_vector = fs_in.normal_vector_VIEW;
+	}
+
+	// Get view direction
+	vec3 view_direction = vec3(0.0f, 1.0f, 0.0f);
+	if (material.has_normalmap_texture) {
+		vec3 view_direction_TANGENT = normalize(fs_in.view_position_TANGENT -
+			fs_in.position_TANGENT);
+		view_direction = view_direction_TANGENT;
+	}
+	else {
+		vec3 view_direction_VIEW = normalize(-fs_in.position_VIEW);
+		view_direction = view_direction_VIEW;
+	}
+
+	// Ambient
+	ambient += point_lights[light_index].color * attenuation * 0.1f;
+
+	// Diffuse
+	float diffuse_power = max(dot(normal_vector, light_direction), 0.0f);
+	diffuse += point_lights[light_index].color * diffuse_power * attenuation;
+
+	// Specular
+	vec3 reflected_ray = normalize(reflect(-light_direction, normal_vector));
+	float specular_power = pow(max(dot(reflected_ray, view_direction), 0.0f),
+		material.shininess);
+	specular += point_lights[light_index].color * specular_power * attenuation;
 }
 
 vec4 calculateLighting() {
@@ -346,6 +383,8 @@ vec4 calculateLighting() {
         return diffuse_color;
     }
 
+	vec4 final_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
     // Calculate lighting
     vec3 ambient_light_factor = vec3(0.0f, 0.0f, 0.0f);
     vec3 diffuse_light_factor = vec3(0.0f, 0.0f, 0.0f);
@@ -354,24 +393,25 @@ vec4 calculateLighting() {
     // Directional light
     calculateDirectionalLight(ambient_light_factor, diffuse_light_factor,
         specular_light_factor);
+
+	float dir_light_shadow = calculateShadow(fs_in.frag_pos_DIR_LIGHT);
+
+	final_color = vec4(ambient_light_factor, 1.0f) * ambient_color + dir_light_shadow *
+		(vec4(diffuse_light_factor, 1.0f) * diffuse_color + vec4(specular_light_factor, 1.0f) *
+		specular_color);
+
 	// Point lights
-	calculatePointLight(ambient_light_factor, diffuse_light_factor, specular_light_factor);
+	for (int i = 0; i < MAX_POINT_LIGHTS_COUNT; i++) {
+		vec3 ambient_pf = vec3(0.0f);
+		vec3 diffuse_pf = vec3(0.0f);
+		vec3 specular_pf = vec3(0.0f);
 
-    // Light is calculated. Calculate final object color.
-    vec4 final_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		calculatePointLight(ambient_pf, diffuse_pf, specular_pf, i);
+		float point_light_shadow = calcPointShadow(fs_in.position_WORLD, i);
 
-    // Ambient
-    vec4 ambient = vec4(ambient_light_factor, 1.0f) * ambient_color;
-
-    // Diffuse
-    vec4 diffuse = vec4(diffuse_light_factor, 1.0f) * diffuse_color;
-
-    // Specular
-    vec4 specular = vec4(specular_light_factor, 1.0f) * specular_color;
-
-    // Sum up all lights
-    final_color = ambient + calculateShadow(fs_in.frag_pos_DIR_LIGHT) *
-        (diffuse + specular);
+		final_color += (vec4(ambient_pf, 1.0f) * ambient_color + (1.0f - point_light_shadow) *
+			(vec4(diffuse_pf, 1.0f) * diffuse_color + vec4(specular_pf, 1.0f) * specular_color));
+	}
 
     // Add emissive factor
     final_color = final_color + emissive_color * lighting.emission_factor;
@@ -389,7 +429,7 @@ void main() {
 		reflected = normalize(vec3(inverse(matrices.view_matrix) * vec4(reflected, 0.0f)));
 		vec4 reflection_color = texture(skybox_texture, reflected);
 
-		result_color = mix(result_color, reflection_color, 0.25f);
+		result_color = mix(result_color, reflection_color, 0.20f);
 
         // Calculate transparency
         float tr_value = length(material.transparency);

@@ -35,13 +35,18 @@ ShaderProgram::~ShaderProgram() {
     }
 }
 
-void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
+void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path, std::string gs_path) {
     if (vs_path.empty() || fs_path.empty()) {
         logError("ShaderProgram::loadShaders()", PUFFIN_MSG_FILE_EMPTY_PATH);
         return;
     }
 
     std::vector<GLuint> shaders = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    if (!gs_path.empty()) {
+        handle_gs_ = glCreateShader(GL_GEOMETRY_SHADER);
+        shaders.push_back(GL_GEOMETRY_SHADER);
+    }
+
     for (const auto &type : shaders) {
         GLuint *handle_ptr = nullptr;
         std::string *file_ptr = nullptr;
@@ -52,6 +57,10 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
         else if (type == GL_FRAGMENT_SHADER) {
             handle_ptr = &handle_fs_;
             file_ptr = &fs_path;
+        }
+        else if (type == GL_GEOMETRY_SHADER) {
+            handle_ptr = &handle_gs_;
+            file_ptr = &gs_path;
         }
 
         std::string shader_data;
@@ -79,11 +88,6 @@ void ShaderProgram::loadShaders(std::string vs_path, std::string fs_path) {
         logError("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_LINK_ERROR(name_));
         logInfo("ShaderProgram::loadShaders()",
             PUFFIN_MSG_SHADER_LINK_MESSAGE(name_, getProgramLinkMessage()));
-        return;
-    }
-
-    if (validateProgram()) {
-        logError("ShaderProgram::loadShaders()", PUFFIN_MSG_SHADER_VALIDATE_ERROR(name_));
         return;
     }
 
@@ -151,6 +155,10 @@ GLint ShaderProgram::linkProgram() {
     glAttachShader(handle_, handle_vs_);
     glAttachShader(handle_, handle_fs_);
 
+    if (handle_gs_) {
+        glAttachShader(handle_, handle_gs_);
+    }
+
     glLinkProgram(handle_);
     if (checkProgramLinkStatus()) {
         return -1;
@@ -194,6 +202,21 @@ GLint ShaderProgram::validateProgram() {
     }
 
     return 0;
+}
+
+std::string ShaderProgram::getProgramValidationMessage() {
+    GLint log_size = 256;
+    glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &log_size);
+
+    std::string validate_msg;
+    if (log_size > 1) {
+        GLchar *log_text = new GLchar[log_size];
+        glGetProgramInfoLog(handle_, log_size, nullptr, log_text);
+        validate_msg = std::string(log_text);
+        delete[] log_text;
+    }
+
+    return validate_msg;
 }
 
 void ShaderProgram::fetchUniforms() {

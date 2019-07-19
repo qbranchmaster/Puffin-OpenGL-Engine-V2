@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "PuffinEngine/Logger.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     class ShaderProgram {
@@ -40,15 +39,10 @@ namespace puffin {
         }
 
         void activate() {
-            if (StateMachine::instance().bound_shader_program_ == handle_) {
-                return;
-            }
-
             glUseProgram(handle_);
-            StateMachine::instance().bound_shader_program_ = handle_;
         }
 
-        void loadShaders(std::string vs_path, std::string fs_path);
+        void loadShaders(std::string vs_path, std::string fs_path, std::string gs_path = "");
 
         void setUniform(std::string uniform_name, const glm::mat4 &value) {
             activate();
@@ -134,6 +128,7 @@ namespace puffin {
         std::string getProgramLinkMessage();
 
         GLint validateProgram();
+        std::string getProgramValidationMessage();
 
         void fetchUniforms();
         GLint getUniformLocation(std::string uniform_name);
@@ -143,6 +138,7 @@ namespace puffin {
         GLuint handle_{0};
         GLuint handle_vs_{0};
         GLuint handle_fs_{0};
+        GLuint handle_gs_{0};
 
         std::unordered_map<std::string, GLint> uniforms_;
     };

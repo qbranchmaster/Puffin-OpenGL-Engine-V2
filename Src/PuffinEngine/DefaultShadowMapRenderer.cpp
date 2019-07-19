@@ -15,9 +15,14 @@ DefaultShadowMapRenderer::DefaultShadowMapRenderer() {
 }
 
 void DefaultShadowMapRenderer::loadShaders() {
-    directional_light_shader_program_.reset(new ShaderProgram("shadow_map_shader_program"));
+    directional_light_shader_program_.reset(
+        new ShaderProgram("dir_light_shadow_map_shader_program"));
     directional_light_shader_program_->loadShaders(
         "Data/Shaders/DepthMapDirectionalLight.vert", "Data/Shaders/DepthMapDirectionalLight.frag");
+
+    point_light_shader_program_.reset(new ShaderProgram("point_light_shadow_map_shader_program"));
+    point_light_shader_program_->loadShaders("Data/Shaders/DepthMapPointLight.vert",
+        "Data/Shaders/DepthMapPointLight.frag", "Data/Shaders/DepthMapPointLight.geom");
 }
 
 void DefaultShadowMapRenderer::createDirectionalLightFrameBuffer() {
@@ -54,6 +59,114 @@ glm::mat4 DefaultShadowMapRenderer::calculateDirectionalLightSpaceMatrix(
     return (projection_matrix * dir_light_view_matrix);
 }
 
+void DefaultShadowMapRenderer::createPointLightFrameBuffer(GLushort light_index) {
+    if (light_index >= InitConfig::getMaxPointLightsCount()) {
+        logError(
+            "DefaultShadowMapRenderer::createPointLightFrameBuffer()", PUFFIN_MSG_INVALID_VALUE);
+        return;
+    }
+
+    auto size = InitConfig::instance().getPointLightShadowMapSize();
+
+    point_light_shadow_map_frame_buffer_[light_index].reset(new FrameBuffer(size, size));
+    point_light_shadow_map_frame_buffer_[light_index]->addCubeTextureBuffer();
+
+    point_light_shadow_map_frame_buffer_[light_index]->disableDrawBuffer();
+    point_light_shadow_map_frame_buffer_[light_index]->disableReadBuffer();
+
+    output_data_.point_light_texture_buffer[light_index] =
+        point_light_shadow_map_frame_buffer_[light_index]->getCubeTextureBuffer();
+}
+
+void DefaultShadowMapRenderer::renderPointLightShadowMap(ScenePtr scene) {
+    if (!scene) {
+        logError("DefaultShadowMapRenderer::renderPointLightShadowMap()", PUFFIN_MSG_NULL_OBJECT);
+        return;
+    }
+
+    DepthTest::instance().enable(true);
+    DepthTest::instance().enableDepthMask(true);
+    FaceCull::instance().enable(true);
+    AlphaBlend::instance().enable(false);
+
+    glm::mat4 point_light_projection_matrix_ =
+        glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, scene->lighting()->getShadowDistance());
+
+    point_light_shader_program_->activate();
+    point_light_shader_program_->setUniform(
+        "shadow_distance", scene->lighting()->getShadowDistance());
+
+    for (GLushort i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
+        if (!point_light_shadow_map_frame_buffer_[i]) {
+            createPointLightFrameBuffer(i);
+        }
+
+        auto point_light = scene->lighting()->getPointLight(i);
+        if (!point_light->isEnabled()) {
+            continue;
+        }
+
+        point_light_shader_program_->setUniform("light_position", point_light->getPosition());
+
+        std::vector<glm::mat4> shadow_transforms;
+        auto light_pos = point_light->getPosition();
+
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadow_transforms.push_back(point_light_projection_matrix_ *
+            glm::lookAt(
+                light_pos, light_pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+        for (GLushort i = 0; i < 6; i++) {
+            point_light_shader_program_->setUniform(
+                "shadow_matrices[" + std::to_string(i) + "].mat", shadow_transforms[i]);
+        }
+
+        point_light_shadow_map_frame_buffer_[i]->bind(FrameBufferBindType::Normal);
+        FrameBuffer::setViewportSize(point_light_shadow_map_frame_buffer_[i]);
+        FrameBuffer::clear(FrameBufferClearType::OnlyDepth);
+
+        for (GLuint i = 0; i < scene->getMeshesCount(); i++) {
+            MeshPtr mesh = scene->getMesh(i);
+            if (!mesh) {
+                continue;
+            }
+
+            if (!mesh->isShadowCastingEnabled()) {
+                continue;
+            }
+
+            point_light_shader_program_->setUniform(
+                "matrices.model_matrix", mesh->getModelMatrix());
+
+            mesh->bind();
+            for (GLushort i = 0; i < mesh->getEntitiesCount(); i++) {
+                auto entity = mesh->getEntity(i);
+                auto material = entity->getMaterial();
+                if (material && material->hasTransparency()) {
+                    continue;
+                }
+
+                glDrawElements(GL_TRIANGLES, entity->getIndicesCount(), GL_UNSIGNED_INT,
+                    reinterpret_cast<void *>((entity->getStartingVertexIndex() * sizeof(GLuint))));
+            }
+        }
+    }
+}
+
 void DefaultShadowMapRenderer::render(ScenePtr scene) {
     if (!scene) {
         logError("DefaultShadowMapRenderer::render()", PUFFIN_MSG_NULL_OBJECT);
@@ -61,6 +174,7 @@ void DefaultShadowMapRenderer::render(ScenePtr scene) {
     }
 
     renderDirectionalLightShadowMap(scene);
+    renderPointLightShadowMap(scene);
 }
 
 void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(ScenePtr scene) {

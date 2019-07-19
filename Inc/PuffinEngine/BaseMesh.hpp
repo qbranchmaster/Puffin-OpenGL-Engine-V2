@@ -20,7 +20,6 @@
 
 #include "PuffinEngine/Logger.hpp"
 #include "PuffinEngine/MeshEntity.hpp"
-#include "PuffinEngine/StateMachine.hpp"
 
 namespace puffin {
     enum class MeshType {
@@ -40,12 +39,7 @@ namespace puffin {
         }
 
         void bind() const {
-            if (StateMachine::instance().bound_mesh_ == handle_) {
-                return;
-            }
-
             glBindVertexArray(handle_);
-            StateMachine::instance().bound_mesh_ = handle_;
         }
 
         GLuint getHandle() const {

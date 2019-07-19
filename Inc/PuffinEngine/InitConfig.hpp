@@ -92,6 +92,23 @@ namespace puffin {
             return directional_light_shadow_map_size_;
         }
 
+        void setPointLightShadowMapSize(GLuint size) {
+            if (size == 0) {
+                logError("InitConfig::setPointLightShadowMapSize()", PUFFIN_MSG_INVALID_VALUE);
+                return;
+            }
+
+            point_light_shadow_map_size_ = size;
+        }
+
+        GLuint getPointLightShadowMapSize() const {
+            return point_light_shadow_map_size_;
+        }
+
+        static constexpr GLushort getMaxPointLightsCount() {
+            return max_point_lights_count_;
+        }
+
     private:
         InitConfig() {}
         InitConfig(const InitConfig &) = delete;
@@ -111,6 +128,9 @@ namespace puffin {
         GLuint water_refraction_height_{720};
 
         GLuint directional_light_shadow_map_size_{1024};
+        GLuint point_light_shadow_map_size_{1024};
+
+        static constexpr GLushort max_point_lights_count_{4};
     };
 } // namespace puffin
 
