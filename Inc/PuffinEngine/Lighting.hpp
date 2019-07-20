@@ -149,7 +149,7 @@ namespace puffin {
         GLboolean shadow_mapping_enabled_{true};
         GLfloat shadow_distance_{10.0f};
         GLfloat emission_factor_{10.0f};
-        GLuint shadows_pcf_samples_count_{1};
+        GLuint shadows_pcf_samples_count_{2};
 
         glm::vec3 skybox_light_color_{1.0f, 1.0f, 1.0f};
 

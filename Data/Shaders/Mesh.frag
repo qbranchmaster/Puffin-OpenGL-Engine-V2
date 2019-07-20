@@ -132,28 +132,45 @@ float calcPointShadow(vec3 frag_pos, int light_index) {
 	}
 
 	vec3 frag_to_light = frag_pos - point_lights[light_index].position;
-
-	float closest_depth = 0.0f;
-    if (light_index == 0) {
-        closest_depth = texture(shadow_mapping.point_shadow_map_1, frag_to_light).r;
-	}
-    else if (light_index == 1) {
-        closest_depth = texture(shadow_mapping.point_shadow_map_2, frag_to_light).r;
-	}
-    else if (light_index == 2) {
-        closest_depth = texture(shadow_mapping.point_shadow_map_3, frag_to_light).r;
-	}
-    else if (light_index == 3) {
-        closest_depth = texture(shadow_mapping.point_shadow_map_4, frag_to_light).r;
-	}
-
-	// Recalculate from [0, 1] range to [0, ShadowDist]
-	closest_depth *= shadow_mapping.shadow_distance;
-
 	float current_depth = length(frag_to_light);
 
-	float bias = 0.05f;
-    float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
+	float bias = 0.1f;
+	float offset = 0.1;
+	float shadow  = 0.0;
+
+	for (float x = -offset; x < offset; x += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
+		for (float y = -offset; y < offset; y += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
+			for (float z = -offset; z < offset; z += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
+				float closest_depth = 0.0f;
+				if (light_index == 0) {
+					closest_depth = texture(shadow_mapping.point_shadow_map_1, frag_to_light +
+						vec3(x, y, z)).r;
+				}
+				else if (light_index == 1) {
+					closest_depth = texture(shadow_mapping.point_shadow_map_2, frag_to_light +
+						vec3(x, y, z)).r;
+				}
+				else if (light_index == 2) {
+					closest_depth = texture(shadow_mapping.point_shadow_map_3, frag_to_light +
+						vec3(x, y, z)).r;
+				}
+				else if (light_index == 3) {
+					closest_depth = texture(shadow_mapping.point_shadow_map_4, frag_to_light +
+						vec3(x, y, z)).r;
+				}
+
+				// Recalculate from [0, 1] range to [0, ShadowDist]
+				closest_depth *= shadow_mapping.shadow_distance;
+
+				if (current_depth - bias > closest_depth) {
+					shadow += 1.0;
+				}
+			}
+		}
+	}
+
+	shadow /= (shadow_mapping.pcf_filter_count * shadow_mapping.pcf_filter_count *
+		shadow_mapping.pcf_filter_count);
 
 	return shadow;
 }

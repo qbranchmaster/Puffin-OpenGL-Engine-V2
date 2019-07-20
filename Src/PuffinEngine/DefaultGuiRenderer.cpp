@@ -907,7 +907,7 @@ void DefaultGuiRenderer::renderShadowMappingDialog() {
     current_scene_->lighting()->setShadowDistance(shadow_distance);
 
     int shadow_pcf_samples = current_scene_->lighting()->getShadowMappingPcfSamplesCount();
-    ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 1, 10);
+    ImGui::SliderInt("PCF Samples", &shadow_pcf_samples, 2, 10);
     current_scene_->lighting()->setShadowMappingPcfsamplesCount(shadow_pcf_samples);
 
     ImGui::PushFont(font_bold_);
@@ -1011,6 +1011,7 @@ void DefaultGuiRenderer::renderLightingDialog() {
     ImGui::InputText("Name", &new_pl_name);
     if (ImGui::Button("Add")) {
         PointLightPtr point_light = current_scene_->lighting()->addPointLight(new_pl_name);
+        point_light->enable(true);
     }
 
     ImGui::Separator();
