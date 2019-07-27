@@ -62,7 +62,6 @@ out VS_OUT {
 uniform Matrices matrices;
 uniform Lighting lighting;
 uniform PointLight point_lights[MAX_POINT_LIGHTS_COUNT];
-uniform int used_point_lights_count;
 
 uniform vec4 clipping_plane;
 
@@ -100,7 +99,7 @@ void main() {
     vs_out.directional_light_direction_TANGENT = normalize(tbn_matrix *
         lighting.directional_light.direction);
 
-	for (int i = 0; i < used_point_lights_count; i++) {
+	for (int i = 0; i < MAX_POINT_LIGHTS_COUNT; i++) {
         vs_out.point_light_position_TANGENT[i] = tbn_matrix * point_lights[i].position;
         vs_out.point_light_position_VIEW[i] = vec3(matrices.view_matrix *
 			vec4(point_lights[i].position, 1.0f));

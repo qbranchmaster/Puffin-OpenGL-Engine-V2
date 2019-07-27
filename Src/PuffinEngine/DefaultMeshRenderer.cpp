@@ -59,9 +59,6 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
         "other.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
     // Point lights
-    default_shader_program_->setUniform(
-        "used_point_lights_count", static_cast<GLint>(lighting->getPointLightsCount()));
-
     for (GLushort i = 0; i < lighting->getPointLightsCount(); i++) {
         std::string uname = "point_lights[" + std::to_string(i) + "]";
         auto p_light = lighting->getPointLight(i);
@@ -88,7 +85,7 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform(
         "shadow_mapping.shadow_distance", lighting->getShadowDistance());
 
-    for (GLushort i = 0; i < lighting->getPointLightsCount(); i++) {
+    for (GLushort i = 0; i < InitConfig::getMaxPointLightsCount(); i++) {
         default_shader_program_->setUniform(
             "shadow_mapping.point_shadow_map_" + std::to_string(i + 1), 8 + i);
     }
@@ -253,9 +250,14 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
     Texture::setTextureSlot(7);
     scene->getActiveSkybox()->getTexture()->bind();
 
-    for (GLushort i = 0; i < scene->lighting()->getPointLightsCount(); i++) {
+    for (GLushort i = 0; i < InitConfig::getMaxPointLightsCount(); i++) {
         Texture::setTextureSlot(8 + i);
-        shadow_map_renderer_->getOutputData().point_light_texture_buffer[i]->bind();
+        if (shadow_map_renderer_->getOutputData().point_light_texture_buffer[i]) {
+            shadow_map_renderer_->getOutputData().point_light_texture_buffer[i]->bind();
+        }
+        else {
+            Texture::unbindTextureType(TextureType::TextureCube);
+        }
     }
 
     default_shader_program_->activate();

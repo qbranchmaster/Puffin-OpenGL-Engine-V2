@@ -115,7 +115,6 @@ uniform Fog fog;
 uniform Matrices matrices;
 uniform samplerCube skybox_texture;
 uniform PointLight point_lights[MAX_POINT_LIGHTS_COUNT];
-uniform int used_point_lights_count;
 
 vec3 calcFog(vec3 input_color) {
     float distance = length(fs_in.position_VIEW);
@@ -135,12 +134,12 @@ float calcPointShadow(vec3 frag_pos, int light_index) {
 	float current_depth = length(frag_to_light);
 
 	float bias = 0.1f;
-	float offset = 0.1;
-	float shadow  = 0.0;
+	float offset = 0.1f;
+	float shadow  = 0.0f;
 
-	for (float x = -offset; x < offset; x += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
-		for (float y = -offset; y < offset; y += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
-			for (float z = -offset; z < offset; z += offset / (shadow_mapping.pcf_filter_count * 0.5)) {
+	for (float x = -offset; x < offset; x += offset / (shadow_mapping.pcf_filter_count * 0.5f)) {
+		for (float y = -offset; y < offset; y += offset / (shadow_mapping.pcf_filter_count * 0.5f)) {
+			for (float z = -offset; z < offset; z += offset / (shadow_mapping.pcf_filter_count * 0.5f)) {
 				float closest_depth = 0.0f;
 				if (light_index == 0) {
 					closest_depth = texture(shadow_mapping.point_shadow_map_1, frag_to_light +
@@ -163,7 +162,7 @@ float calcPointShadow(vec3 frag_pos, int light_index) {
 				closest_depth *= shadow_mapping.shadow_distance;
 
 				if (current_depth - bias > closest_depth) {
-					shadow += 1.0;
+					shadow += 1.0f;
 				}
 			}
 		}
