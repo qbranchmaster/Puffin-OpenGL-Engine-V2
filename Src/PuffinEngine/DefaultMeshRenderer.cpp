@@ -58,6 +58,9 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform(
         "other.bloom_threshold_color", postprocess_->getGlowBloomThresholdColor());
 
+    default_shader_program_->setUniform(
+        "used_point_lights", static_cast<GLint>(scene->lighting()->getPointLightsCount()));
+
     // Point lights
     for (GLushort i = 0; i < lighting->getPointLightsCount(); i++) {
         std::string uname = "point_lights[" + std::to_string(i) + "]";

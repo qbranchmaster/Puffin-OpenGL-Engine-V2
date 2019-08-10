@@ -1006,12 +1006,25 @@ void DefaultGuiRenderer::renderLightingDialog() {
         ImGui::TreePop();
     }
 
-    ImGui::Text("Add new");
+    // If there is only one reference that means selected object has been deleted already
+    if (selected_point_light.use_count() == 1) {
+        selected_point_light = nullptr;
+    }
+
     static std::string new_pl_name = "new_point_light";
-    ImGui::InputText("Name", &new_pl_name);
+
     if (ImGui::Button("Add")) {
         PointLightPtr point_light = current_scene_->lighting()->addPointLight(new_pl_name);
-        point_light->enable(true);
+        if (point_light) {
+            point_light->enable(true);
+        }
+    }
+
+    ImGui::SameLine();
+    ImGui::InputText("Name", &new_pl_name);
+
+    if (ImGui::Button("Remove")) {
+        current_scene_->lighting()->removePointLight(selected_point_light->getName());
     }
 
     ImGui::Separator();

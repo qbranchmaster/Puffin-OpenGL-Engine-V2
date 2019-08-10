@@ -115,6 +115,7 @@ uniform Fog fog;
 uniform Matrices matrices;
 uniform samplerCube skybox_texture;
 uniform PointLight point_lights[MAX_POINT_LIGHTS_COUNT];
+uniform int used_point_lights;
 
 vec3 calcFog(vec3 input_color) {
     float distance = length(fs_in.position_VIEW);
@@ -192,8 +193,6 @@ float calculateShadow(vec4 frag_pos) {
     float texel_size = 1.0f / shadow_mapping.shadow_map_size;
     float total = 0.0f;
 
-    float bias = 0.005f;
-
     for (int x = -shadow_mapping.pcf_filter_count;
         x <= shadow_mapping.pcf_filter_count; x++)
     {
@@ -203,7 +202,7 @@ float calculateShadow(vec4 frag_pos) {
             float closest_depth = texture(shadow_mapping.shadow_map_texture,
                 proj_coords.xy + vec2(x, y) * texel_size).r;
 
-            if (current_depth > closest_depth + bias) {
+            if (current_depth > closest_depth) {
                 total += 1.0f;
             }
         }
@@ -418,15 +417,17 @@ vec4 calculateLighting() {
 
 	// Point lights
 	for (int i = 0; i < MAX_POINT_LIGHTS_COUNT; i++) {
-		vec3 ambient_pf = vec3(0.0f);
-		vec3 diffuse_pf = vec3(0.0f);
-		vec3 specular_pf = vec3(0.0f);
+		if (i < used_point_lights) {
+			vec3 ambient_pf = vec3(0.0f);
+			vec3 diffuse_pf = vec3(0.0f);
+			vec3 specular_pf = vec3(0.0f);
 
-		calculatePointLight(ambient_pf, diffuse_pf, specular_pf, i);
-		float point_light_shadow = calcPointShadow(fs_in.position_WORLD, i);
+			calculatePointLight(ambient_pf, diffuse_pf, specular_pf, i);
+			float point_light_shadow = calcPointShadow(fs_in.position_WORLD, i);
 
-		final_color += (vec4(ambient_pf, 1.0f) * ambient_color + (1.0f - point_light_shadow) *
-			(vec4(diffuse_pf, 1.0f) * diffuse_color + vec4(specular_pf, 1.0f) * specular_color));
+			final_color += (vec4(ambient_pf, 1.0f) * ambient_color + (1.0f - point_light_shadow) *
+				(vec4(diffuse_pf, 1.0f) * diffuse_color + vec4(specular_pf, 1.0f) * specular_color));
+		}
 	}
 
     // Add emissive factor

@@ -86,7 +86,7 @@ void DefaultShadowMapRenderer::renderPointLightShadowMap(ScenePtr scene) {
 
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);
-    FaceCull::instance().enable(true);
+    FaceCull::instance().enable(false);
     AlphaBlend::instance().enable(false);
 
     glm::mat4 point_light_projection_matrix_ =
@@ -190,7 +190,7 @@ void DefaultShadowMapRenderer::renderDirectionalLightShadowMap(ScenePtr scene) {
 
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);
-    FaceCull::instance().enable(true);
+    FaceCull::instance().enable(false);
     AlphaBlend::instance().enable(false);
 
     directional_light_shadow_map_frame_bufer_->bind(FrameBufferBindType::Normal);

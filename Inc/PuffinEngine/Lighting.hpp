@@ -14,6 +14,7 @@
 
 #include <glm/glm.hpp>
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -121,6 +122,17 @@ namespace puffin {
             }
 
             return point_lights_[index];
+        }
+
+        void removePointLight(std::string name){
+            auto pos = std::find_if(point_lights_.begin(), point_lights_.end(),
+                [&](const auto &val) { return val->getName() == name; });
+            if (pos != point_lights_.end()) {
+                point_lights_.erase(pos);
+            }
+            else {
+                logError("Lighting::removePointLight()", PUFFIN_MSG_NAME_NOT_EXISTS(name));
+            }
         }
 
         GLuint getPointLightsCount() const {

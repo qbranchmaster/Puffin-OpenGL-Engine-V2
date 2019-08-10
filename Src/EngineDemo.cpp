@@ -55,19 +55,10 @@ void EngineDemo::createScene() {
     mesh->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
     mesh->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
-    WaterTilePtr water_tile = scene_->addWaterTile("main_water_tile");
-    water_tile->setPosition(glm::vec3(0.0f, 0.2f, 0.0f));
-    water_tile->setScale(glm::vec3(15.0f, 15.0f, 15.0f));
-
-    PointLightPtr point_light = scene_->lighting()->addPointLight("point_light");
-    point_light->enable(true);
-    point_light->setPosition(glm::vec3(-3.0f, 3.0f, 0.0f));
-    point_light->setColor(glm::vec3(1.0f, 0.0f, 0.0f));
-
     scene_->lighting()->enable(true);
     scene_->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
     scene_->lighting()->enableShadowMapping(true);
-    scene_->lighting()->setShadowDistance(20.0f);
+    scene_->lighting()->setShadowDistance(15.0f);
     scene_->lighting()->directionalLight()->enable(true);
     scene_->lighting()->enableBlinnPhong(true);
     scene_->lighting()->directionalLight()->setDirection(glm::vec3(0.5f, -0.5f, -0.5f));

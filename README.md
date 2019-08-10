@@ -17,10 +17,11 @@ I am working on this project only in my free time after work, so new features an
   - Postprocessing effects,
   - HDR and bloom effect,
   - Integration with IMGUI,
-  - Font rendering using FreeType.
+  - Font rendering using FreeType,
+  - Depth of field.
 
 ## Screenshots
-### Screenshot #1
+### Screenshot #1 [26.04.2019]
 ![Screenshot 26.04.2019](https://raw.githubusercontent.com/qbranchmaster/Puffin-OpenGL-Engine-V2/master/Screenshots/26_04_2019.png)
 
 ## Build instructions
