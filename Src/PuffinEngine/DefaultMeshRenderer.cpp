@@ -251,7 +251,10 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
     shadow_map_renderer_->getOutputData().shadow_map_texture->bind();
 
     Texture::setTextureSlot(7);
-    scene->getActiveSkybox()->getTexture()->bind();
+    auto skybox = scene->getActiveSkybox();
+    if (skybox) {
+        skybox->getTexture()->bind();
+    }
 
     for (GLushort i = 0; i < InitConfig::getMaxPointLightsCount(); i++) {
         Texture::setTextureSlot(8 + i);

@@ -269,8 +269,8 @@ void calculateDirectionalLight(inout vec3 ambient, inout vec3 diffuse,
     // Specular
     if (lighting.blinn_phong) {
         vec3 halfway = normalize(-light_direction + view_direction);
-        float specular_power = pow(max(dot(normal_vector, halfway), 0.0f),
-            material.shininess * 4);
+		float spec_factor = smoothstep(0.1f, 0.9f, dot(normal_vector, halfway));
+        float specular_power = pow(spec_factor, material.shininess * 4);
         specular = lighting.directional_light.specular_color * specular_power;
     }
     else {

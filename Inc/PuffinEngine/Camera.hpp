@@ -58,6 +58,7 @@ namespace puffin {
         }
 
         void move(CameraMoveDirection direction);
+        void move(CameraMoveDirection direction, GLfloat move_speed);
         void setMoveSpeed(GLfloat move_speed);
         void setMoveResistanceFactor(GLfloat resistance_factor);
         void updateSpeed(GLdouble delta_time);

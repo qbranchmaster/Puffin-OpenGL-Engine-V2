@@ -45,21 +45,25 @@ void Camera::translate(const glm::vec3 &translation) {
     calculateViewMatrix();
 }
 
-void Camera::move(CameraMoveDirection direction) {
+void Camera::move(CameraMoveDirection direction, GLfloat move_speed) {
     switch (direction) {
     case CameraMoveDirection::Forward:
-        ahead_speed_ = camera_move_speed_;
+        ahead_speed_ = move_speed;
         break;
     case CameraMoveDirection::Backward:
-        ahead_speed_ = -camera_move_speed_;
+        ahead_speed_ = -move_speed;
         break;
     case CameraMoveDirection::Left:
-        side_speed_ = -camera_move_speed_;
+        side_speed_ = -move_speed;
         break;
     case CameraMoveDirection::Right:
-        side_speed_ = camera_move_speed_;
+        side_speed_ = move_speed;
         break;
     }
+}
+
+void Camera::move(CameraMoveDirection direction) {
+    move(direction, camera_move_speed_);
 }
 
 void Camera::setMoveSpeed(GLfloat move_speed) {

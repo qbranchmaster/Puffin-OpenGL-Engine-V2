@@ -265,6 +265,14 @@ void DefaultGuiRenderer::renderCameraDialog() {
     ImGui::DragFloat("Aspect", &aspect, 0.01f);
     camera->setProjection(fov, aspect, near_plane, far_plane);
 
+    ImGui::Text("Camera move");
+    auto move_speed = camera->getMoveSpeed();
+    auto move_resistance_factor = camera->getMoveResistanceFactor();
+    ImGui::DragFloat("Speed", &move_speed, 0.1f);
+    ImGui::DragFloat("Resistance factor", &move_resistance_factor, 0.1f);
+    camera->setMoveSpeed(move_speed);
+    camera->setMoveResistanceFactor(move_resistance_factor);
+
     ImGui::End();
 }
 
@@ -1079,7 +1087,11 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
         return;
     }
 
-    static std::string file_name = "new_scene";
+    std::string file_name = "new_scene";
+    if (current_scene_) {
+        file_name = current_scene_->getName();
+    }
+
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
     ImGui::InputText("File name (*.psc)", &file_name, flags);

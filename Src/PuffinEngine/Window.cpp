@@ -28,7 +28,7 @@ Window::Window() {
     }
 
     glfwMakeContextCurrent(handle_);
-    glfwSwapInterval(1); // TODO: Check this code
+    //glfwSwapInterval(1); // TODO: Check this code
 }
 
 Window::~Window() {
