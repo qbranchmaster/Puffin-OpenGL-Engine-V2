@@ -352,13 +352,6 @@ vec4 calculateLighting() {
     if (material.has_ambient_texture) {
         ambient_color = texture(material.ambient_texture, fs_in.texture_coord_MODEL);
         ambient_color.rgb = gammaCorrection(ambient_color.rgb);
-        // Use opacity texture as 'dirt' texture
-        if (material.has_opacity_texture) {
-            vec4 dirt_color = texture(material.opacity_texture,
-                fs_in.texture_coord_MODEL);
-            dirt_color.rgb = gammaCorrection(dirt_color.rgb);
-            ambient_color = ambient_color * dirt_color;
-        }
     }
     else {
         ambient_color = vec4(material.ka, 1.0f);
@@ -368,12 +361,6 @@ vec4 calculateLighting() {
         diffuse_color = texture(material.diffuse_texture,
             fs_in.texture_coord_MODEL);
         diffuse_color.rgb = gammaCorrection(diffuse_color.rgb);
-		// Use opacity texture as 'dirt' texture
-        if (material.has_opacity_texture) {
-            vec4 dirt_color = texture(material.opacity_texture, fs_in.texture_coord_MODEL);
-            dirt_color.rgb = gammaCorrection(dirt_color.rgb);
-            diffuse_color = diffuse_color * dirt_color;
-        }
     }
     else {
         diffuse_color = vec4(material.kd, 1.0f);
@@ -433,6 +420,13 @@ vec4 calculateLighting() {
     // Add emissive factor
     final_color = final_color + emissive_color * lighting.emission_factor;
 
+	if (material.has_opacity_texture) {
+		vec4 opacity_val = texture(material.opacity_texture, fs_in.texture_coord_MODEL);
+		if (opacity_val.w < 0.1f) {
+			discard;
+		}
+	}
+
     return final_color;
 }
 
@@ -441,19 +435,19 @@ void main() {
     result_color = calculateLighting();
 
 	// Skybox reflection on transparent material
-	if (length(material.transparency) < 0.5f) {
-		vec3 reflected = reflect(fs_in.position_VIEW, fs_in.normal_vector_VIEW);
-		reflected = normalize(vec3(inverse(matrices.view_matrix) * vec4(reflected, 0.0f)));
-		vec4 reflection_color = texture(skybox_texture, reflected);
-
-		result_color = mix(result_color, reflection_color, 0.20f);
-
-        // Calculate transparency
-        float tr_value = length(material.transparency);
-        tr_value = clamp(tr_value, 0.0f, 1.0f);
-
-        result_color = vec4(result_color.rgb, tr_value);
-	}
+//	if (length(material.transparency) < 0.5f) {
+//		vec3 reflected = reflect(fs_in.position_VIEW, fs_in.normal_vector_VIEW);
+//		reflected = normalize(vec3(inverse(matrices.view_matrix) * vec4(reflected, 0.0f)));
+//		vec4 reflection_color = texture(skybox_texture, reflected);
+//
+//		result_color = mix(result_color, reflection_color, 0.20f);
+//
+//        // Calculate transparency
+//        float tr_value = length(material.transparency);
+//        tr_value = clamp(tr_value, 0.0f, 1.0f);
+//
+//        result_color = vec4(result_color.rgb, tr_value);
+//	}
 
     frag_color = result_color;
 

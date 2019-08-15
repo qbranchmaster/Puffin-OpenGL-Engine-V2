@@ -42,33 +42,6 @@ EngineDemo::EngineDemo() : Core() {
 
 void EngineDemo::createScene() {
     scene_.reset(new Scene("car_scene"));
-
-    SkyboxPtr skybox = scene_->addSkybox("clear_sky_skybox");
-    TexturePtr skybox_texture_(new Texture());
-    skybox_texture_->loadTextureCube(
-        {"Demo/Skybox/right.jpg", "Demo/Skybox/left.jpg", "Demo/Skybox/up.jpg",
-            "Demo/Skybox/down.jpg", "Demo/Skybox/back.jpg", "Demo/Skybox/front.jpg"});
-    skybox->setTexture(skybox_texture_);
-    scene_->setActiveSkybox(skybox);
-
-    MeshPtr mesh = scene_->addMesh("car");
-    mesh->loadFromFile("Demo/Models/pony-cartoon/Pony_cartoon.obj");
-    mesh->setScale(glm::vec3(0.01f, 0.01f, 0.01f));
-
-    scene_->lighting()->enable(true);
-    scene_->lighting()->setSkyboxLightingColor(glm::vec3(0.9f, 0.9f, 0.9f));
-    scene_->lighting()->enableShadowMapping(true);
-    scene_->lighting()->setShadowDistance(15.0f);
-    scene_->lighting()->directionalLight()->enable(true);
-    scene_->lighting()->enableBlinnPhong(true);
-    scene_->lighting()->directionalLight()->setDirection(glm::vec3(0.5f, -0.5f, -0.5f));
-    scene_->lighting()->directionalLight()->setAmbientColor(glm::vec3(0.1f, 0.1f, 0.1f));
-    scene_->lighting()->directionalLight()->setDiffuseColor(glm::vec3(0.8f, 0.8f, 0.8f));
-    scene_->lighting()->directionalLight()->setSpecularColor(glm::vec3(5.5f, 5.5f, 5.5f));
-
-    scene_->camera()->setPosition(glm::vec3(0.0f, 2.0f, 8.0f));
-    scene_->camera()->setProjection(1.05f, InitConfig::instance().getFrameAspect(), 0.1f, 15.0f);
-    scene_->camera()->setFov(0.85f);
 }
 
 void EngineDemo::pollKeyboard() {
@@ -121,27 +94,25 @@ void EngineDemo::rotateSkybox() {
 }
 
 void EngineDemo::moveCamera() {
+    auto camera_speed = scene_->camera()->getMoveSpeed();
     if (input()->keyPressed(Key::LeftShift, true)) {
-        scene_->camera()->setMoveSpeed(2.0f);
-    }
-    else {
-        scene_->camera()->setMoveSpeed(1.0f);
+        camera_speed *= 2.0f;
     }
 
     if (input()->keyPressed(Key::A, true)) {
-        scene_->camera()->move(CameraMoveDirection::Left);
+        scene_->camera()->move(CameraMoveDirection::Left, camera_speed);
     }
 
     if (input()->keyPressed(Key::D, true)) {
-        scene_->camera()->move(CameraMoveDirection::Right);
+        scene_->camera()->move(CameraMoveDirection::Right, camera_speed);
     }
 
     if (input()->keyPressed(Key::W, true)) {
-        scene_->camera()->move(CameraMoveDirection::Forward);
+        scene_->camera()->move(CameraMoveDirection::Forward, camera_speed);
     }
 
     if (input()->keyPressed(Key::S, true)) {
-        scene_->camera()->move(CameraMoveDirection::Backward);
+        scene_->camera()->move(CameraMoveDirection::Backward, camera_speed);
     }
 }
 

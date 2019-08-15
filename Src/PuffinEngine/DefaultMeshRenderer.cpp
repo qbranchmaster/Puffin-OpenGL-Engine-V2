@@ -36,7 +36,7 @@ void DefaultMeshRenderer::setDefaultShaderUniforms(ScenePtr scene) {
     default_shader_program_->setUniform(
         "matrices.projection_matrix", scene->camera()->getProjectionMatrix());
 
-    default_shader_program_->setUniform("skybox_texture", 7);
+    //default_shader_program_->setUniform("skybox_texture", 7);
 
     // Lighting
     auto lighting = scene->lighting();
@@ -143,7 +143,7 @@ void DefaultMeshRenderer::setDefaultShaderMeshUniforms(MeshPtr mesh, MeshEntityP
     default_shader_program_->setUniform("material.opacity_texture", 5);
 
     default_shader_program_->setUniform("material.shininess", material->getShininess());
-    default_shader_program_->setUniform("material.transparency", material->getTransparency());
+    //default_shader_program_->setUniform("material.transparency", material->getTransparency());
 }
 
 void DefaultMeshRenderer::renderMeshEntity(MeshPtr mesh, GLuint entity_index) {
@@ -240,7 +240,6 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
 
     DepthTest::instance().enable(true);
     DepthTest::instance().enableDepthMask(true);
-    FaceCull::instance().enable(true);
     AlphaBlend::instance().enable(false);
 
     if (clipping_plane_enabled_) {
@@ -281,6 +280,13 @@ void DefaultMeshRenderer::renderNormal(FrameBufferPtr frame_buffer, ScenePtr sce
             if (material && material->hasTransparency()) {
                 skipped_en.push_back(i);
                 continue;
+            }
+
+            if (material && material->getOpacityTexture() != nullptr) {
+                FaceCull::instance().enable(false);
+            }
+            else {
+                FaceCull::instance().enable(true);
             }
 
             renderMeshEntity(mesh, i);

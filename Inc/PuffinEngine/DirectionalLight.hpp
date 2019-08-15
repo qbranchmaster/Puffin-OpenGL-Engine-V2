@@ -61,7 +61,7 @@ namespace puffin {
                 return;
             }
 
-            direction_ = glm::normalize(direction);
+            direction_ = direction;
         }
 
         glm::vec3 getDirection() const {

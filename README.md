@@ -24,6 +24,9 @@ I am working on this project only in my free time after work, so new features an
 ### Screenshot #1 [26.04.2019]
 ![Screenshot 26.04.2019](https://raw.githubusercontent.com/qbranchmaster/Puffin-OpenGL-Engine-V2/master/Screenshots/26_04_2019.png)
 
+### Screenshot #2 [15.08.2019]
+![Screenshot 15.08.2019](https://raw.githubusercontent.com/qbranchmaster/Puffin-OpenGL-Engine-V2/master/Screenshots/15_08_2019.png)
+
 ## Build instructions
 **Required libraries:**
 

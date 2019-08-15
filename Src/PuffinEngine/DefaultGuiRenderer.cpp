@@ -370,6 +370,10 @@ void DefaultGuiRenderer::renderObjectInspectorWaterTilePart(BaseMeshPtr object) 
     auto specular_factor = water_tile->getSpecularLightingFactor();
     ImGui::SliderFloat("Specular factor", &specular_factor, 0.0f, 10.0f);
     water_tile->setSpecularLightingFactor(specular_factor);
+
+    int tex_tiling = water_tile->getTextureTiling();
+    ImGui::SliderInt("Texture tiling", &tex_tiling, 1, 10);
+    water_tile->setTextureTiling(tex_tiling);
 }
 
 void DefaultGuiRenderer::renderObjectInspectorSkyboxPart(BaseMeshPtr object) {
@@ -1087,10 +1091,7 @@ void DefaultGuiRenderer::renderSaveSceneDialog() {
         return;
     }
 
-    std::string file_name = "new_scene";
-    if (current_scene_) {
-        file_name = current_scene_->getName();
-    }
+    static std::string file_name = "new_scene";
 
     ImGuiInputTextFlags flags = 0;
     flags |= ImGuiInputTextFlags_CharsNoBlank;
